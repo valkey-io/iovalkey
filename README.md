@@ -1,22 +1,13 @@
-[![ioredis](https://cdn.jsdelivr.net/gh/redis/ioredis@b5e8c74/logo.svg)](https://github.com/redis/ioredis)
-
-[![Build Status](https://github.com/redis/ioredis/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/redis/ioredis/actions/workflows/release.yml?query=branch%3Amain)
-[![Coverage Status](https://coveralls.io/repos/github/luin/ioredis/badge.svg?branch=main)](https://coveralls.io/github/luin/ioredis?branch=main)
-[![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg)](http://commitizen.github.io/cz-cli/)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
-
-[![Discord](https://img.shields.io/discord/697882427875393627.svg?style=social&logo=discord)](https://discord.gg/redis)
-[![Twitch](https://img.shields.io/twitch/status/redisinc?style=social)](https://www.twitch.tv/redisinc)
-[![YouTube](https://img.shields.io/youtube/channel/views/UCD78lHSwYqMlyetR0_P4Vig?style=social)](https://www.youtube.com/redisinc)
-[![Twitter](https://img.shields.io/twitter/follow/redisinc?style=social)](https://twitter.com/redisinc)
+# iovalkey
 
 A robust, performance-focused and full-featured [Redis](http://redis.io) client for [Node.js](https://nodejs.org).
+This is a friendly fork of  [ioredis](https://github.com/redis/ioredis) after [this commit](https://github.com/redis/ioredis/commit/ec42c82ceab1957db00c5175dfe37348f1856a93).
 
 Supports Redis >= 2.6.12. Completely compatible with Redis 7.x.
 
 # Features
 
-ioredis is a robust, full-featured Redis client that is
+iovalkey is a robust, full-featured Redis client that is
 used in the world's biggest online commerce company [Alibaba](http://www.alibaba.com/) and many other awesome companies.
 
 0. Full-featured. It supports [Cluster](http://redis.io/topics/cluster-tutorial), [Sentinel](https://redis.io/docs/reference/sentinel-clients), [Streams](https://redis.io/topics/streams-intro), [Pipelining](http://redis.io/topics/pipelining), and of course [Lua scripting](http://redis.io/commands/eval), [Redis Functions](https://redis.io/topics/functions-intro), [Pub/Sub](http://redis.io/topics/pubsub) (with the support of binary messages).
@@ -24,9 +15,9 @@ used in the world's biggest online commerce company [Alibaba](http://www.alibaba
 2. Delightful API 😄. It works with Node callbacks and Native promises.
 3. Transformation of command arguments and replies.
 4. Transparent key prefixing.
-5. Abstraction for Lua scripting, allowing you to [define custom commands](https://github.com/redis/ioredis#lua-scripting).
-6. Supports [binary data](https://github.com/redis/ioredis#handle-binary-data).
-7. Supports [TLS](https://github.com/redis/ioredis#tls-options) 🔒.
+5. Abstraction for Lua scripting, allowing you to [define custom commands](https://github.com/mcollina/iovalkey#lua-scripting).
+6. Supports [binary data](https://github.com/mcollina/iovalkey#handle-binary-data).
+7. Supports [TLS](https://github.com/mcollina/iovalkey#tls-options) 🔒.
 8. Supports offline queue and ready checking.
 9. Supports ES6 types, such as `Map` and `Set`.
 10. Supports GEO commands 📍.
@@ -39,22 +30,6 @@ used in the world's biggest online commerce company [Alibaba](http://www.alibaba
 
 <img width="837" src="resources/ts-screenshot.png" alt="TypeScript Screenshot" />
 
-# Versions
-
-| Version        | Branch | Node.js Version | Redis Version   |
-| -------------- | ------ | --------------- | --------------- |
-| 5.x.x (latest) | main   | >= 12           | 2.6.12 ~ latest |
-| 4.x.x          | v4     | >= 6            | 2.6.12 ~ 7      |
-
-Refer to [CHANGELOG.md](CHANGELOG.md) for features and bug fixes introduced in v5.
-
-🚀 [Upgrading from v4 to v5](https://github.com/redis/ioredis/wiki/Upgrading-from-v4-to-v5)
-
-# Links
-
-- [API Documentation](https://redis.github.io/ioredis/) ([Redis](https://redis.github.io/ioredis/classes/Redis.html), [Cluster](https://redis.github.io/ioredis/classes/Cluster.html))
-- [Changelog](CHANGELOG.md)
-
 <hr>
 
 # Quick Start
@@ -62,7 +37,7 @@ Refer to [CHANGELOG.md](CHANGELOG.md) for features and bug fixes introduced in v
 ## Install
 
 ```shell
-npm install ioredis
+npm install iovalkey
 ```
 
 In a TypeScript project, you may want to add TypeScript declarations for Node.js:
@@ -74,12 +49,12 @@ npm install --save-dev @types/node
 ## Basic Usage
 
 ```javascript
-// Import ioredis.
-// You can also use `import { Redis } from "ioredis"`
+// Import iovalkey.
+// You can also use `import { Redis } from "iovalkey"`
 // if your project is a TypeScript project,
-// Note that `import Redis from "ioredis"` is still supported,
+// Note that `import Redis from "iovalkey"` is still supported,
 // but will be deprecated in the next major version.
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 
 // Create a Redis instance.
 // By default, it will connect to localhost:6379.
@@ -88,7 +63,7 @@ const redis = new Redis();
 
 redis.set("mykey", "value"); // Returns a promise which resolves to "OK" when the command succeeds.
 
-// ioredis supports the node.js callback style
+// iovalkey supports the node.js callback style
 redis.get("mykey", (err, result) => {
   if (err) {
     console.error(err);
@@ -97,7 +72,7 @@ redis.get("mykey", (err, result) => {
   }
 });
 
-// Or ioredis returns a promise if the last argument isn't a function
+// Or iovalkey returns a promise if the last argument isn't a function
 redis.get("mykey").then((result) => {
   console.log(result); // Prints "value"
 });
@@ -109,7 +84,7 @@ redis.zrange("sortedSet", 0, 2, "WITHSCORES").then((elements) => {
 });
 
 // All arguments are passed directly to the redis server,
-// so technically ioredis supports all Redis commands.
+// so technically iovalkey supports all Redis commands.
 // The format is: redis[SOME_REDIS_COMMAND_IN_LOWERCASE](ARGUMENTS_ARE_JOINED_INTO_COMMAND_STRING)
 // so the following statement is equivalent to the CLI: `redis> SET mykey hello EX 10`
 redis.set("mykey", "hello", "EX", 10);
@@ -126,7 +101,7 @@ See the `examples/` folder for more examples. For example:
 - [Streams](examples/stream.js)
 - [Redis Modules](examples/module.js) e.g. RedisJSON
 
-All Redis commands are supported. See [the documentation](https://redis.github.io/ioredis/classes/Redis.html) for details.
+All Redis commands are supported. See [the documentation](https://redis.github.io/iovalkey/classes/Redis.html) for details.
 
 ## Connect to Redis
 
@@ -158,18 +133,18 @@ new Redis("redis://:authpassword@127.0.0.1:6380/4");
 new Redis("redis://username:authpassword@127.0.0.1:6380/4");
 ```
 
-See [API Documentation](https://redis.github.io/ioredis/index.html#RedisOptions) for all available options.
+See [API Documentation](https://redis.github.io/iovalkey/index.html#RedisOptions) for all available options.
 
 ## Pub/Sub
 
 Redis provides several commands for developers to implement the [Publish–subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern). There are two roles in this pattern: publisher and subscriber. Publishers are not programmed to send their messages to specific subscribers. Rather, published messages are characterized into channels, without knowledge of what (if any) subscribers there may be.
 
-By leveraging Node.js's built-in events module, ioredis makes pub/sub very straightforward to use. Below is a simple example that consists of two files, one is publisher.js that publishes messages to a channel, the other is subscriber.js that listens for messages on specific channels.
+By leveraging Node.js's built-in events module, iovalkey makes pub/sub very straightforward to use. Below is a simple example that consists of two files, one is publisher.js that publishes messages to a channel, the other is subscriber.js that listens for messages on specific channels.
 
 ```javascript
 // publisher.js
 
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const redis = new Redis();
 
 setInterval(() => {
@@ -186,7 +161,7 @@ setInterval(() => {
 ```javascript
 // subscriber.js
 
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const redis = new Redis();
 
 redis.subscribe("my-channel-1", "my-channel-2", (err, count) => {
@@ -220,7 +195,7 @@ It's worth noticing that a connection (aka a `Redis` instance) can't play both r
 If you want to do pub/sub in the same file/process, you should create a separate connection:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const sub = new Redis();
 const pub = new Redis();
 
@@ -246,10 +221,10 @@ redis.on("pmessageBuffer", (pattern, channel, message) => {});
 
 ## Streams
 
-Redis v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With ioredis, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `redis.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://redis.io/topics/streams-intro) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
+Redis v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `redis.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://redis.io/topics/streams-intro) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const redis = new Redis();
 
 const processMessage = (message) => {
@@ -278,7 +253,7 @@ Redis can set a timeout to expire your key, after the timeout has expired the ke
 
 ```javascript
 redis.set("key", "data", "EX", 60);
-// Equivalent to redis command "SET key data EX 60", because on ioredis set method,
+// Equivalent to redis command "SET key data EX 60", because on iovalkey set method,
 // all arguments are passed directly to the redis server.
 ```
 
@@ -467,10 +442,10 @@ redis
 
 ## Lua Scripting
 
-ioredis supports all of the scripting commands such as `EVAL`, `EVALSHA` and `SCRIPT`.
+iovalkey supports all of the scripting commands such as `EVAL`, `EVALSHA` and `SCRIPT`.
 However, it's tedious to use in real world scenarios since developers have to take
 care of script caching and to detect when to use `EVAL` and when to use `EVALSHA`.
-ioredis exposes a `defineCommand` method to make scripting much easier to use:
+iovalkey exposes a `defineCommand` method to make scripting much easier to use:
 
 ```javascript
 const redis = new Redis();
@@ -482,7 +457,7 @@ redis.defineCommand("myecho", {
 });
 
 // Now `myecho` can be used just like any other ordinary command,
-// and ioredis will try to use `EVALSHA` internally when possible for better performance.
+// and iovalkey will try to use `EVALSHA` internally when possible for better performance.
 redis.myecho("k1", "k2", "a1", "a2", (err, result) => {
   // result === ['k1', 'k2', 'a1', 'a2']
 });
@@ -539,8 +514,8 @@ This feature allows you to specify a string that will automatically be prepended
 to all the keys in a command, which makes it easier to manage your key
 namespaces.
 
-**Warning** This feature won't apply to commands like [KEYS](http://redis.io/commands/KEYS) and [SCAN](http://redis.io/commands/scan) that take patterns rather than actual keys([#239](https://github.com/redis/ioredis/issues/239)),
-and this feature also won't apply to the replies of commands even if they are key names ([#325](https://github.com/redis/ioredis/issues/325)).
+**Warning** This feature won't apply to commands like [KEYS](http://redis.io/commands/KEYS) and [SCAN](http://redis.io/commands/scan) that take patterns rather than actual keys([#239](https://github.com/mcollina/iovalkey/issues/239)),
+and this feature also won't apply to the replies of commands even if they are key names ([#325](https://github.com/mcollina/iovalkey/issues/325)).
 
 ```javascript
 const fooRedis = new Redis({ keyPrefix: "foo:" });
@@ -569,11 +544,11 @@ and replies are sent back as a single String or an Array of Strings. However, so
 you may want something different. For instance, it would be more convenient if the `HGETALL`
 command returns a hash (e.g. `{ key: val1, key2: v2 }`) rather than an array of key values (e.g. `[key1, val1, key2, val2]`).
 
-ioredis has a flexible system for transforming arguments and replies. There are two types
+iovalkey has a flexible system for transforming arguments and replies. There are two types
 of transformers, argument transformer and reply transformer:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 
 // Here's the built-in argument transformer converting
 // hmset('key', { k1: 'v1', k2: 'v2' })
@@ -584,7 +559,7 @@ const Redis = require("ioredis");
 Redis.Command.setArgumentTransformer("hmset", (args) => {
   if (args.length === 2) {
     if (args[1] instanceof Map) {
-      // utils is a internal module of ioredis
+      // utils is a internal module of iovalkey
       return [args[0], ...utils.convertMapToArray(args[1])];
     }
     if (typeof args[1] === "object" && args[1] !== null) {
@@ -655,7 +630,7 @@ which lets you see all commands received by the Redis server across all client c
 including from other client libraries and other computers.
 
 The `monitor` method returns a monitor instance.
-After you send the MONITOR command, no other commands are valid on that connection. ioredis will emit a monitor event for every new monitor message that comes across.
+After you send the MONITOR command, no other commands are valid on that connection. iovalkey will emit a monitor event for every new monitor message that comes across.
 The callback for the monitor event takes a timestamp from the Redis server and an array of command arguments.
 
 Here is a simple example:
@@ -682,7 +657,7 @@ async () => {
 Redis 2.8 added the `SCAN` command to incrementally iterate through the keys in the database. It's different from `KEYS` in that
 `SCAN` only returns a small number of elements each call, so it can be used in production without the downside
 of blocking the server for a long time. However, it requires recording the cursor on the client side each time
-the `SCAN` command is called in order to iterate through all the keys correctly. Since it's a relatively common use case, ioredis
+the `SCAN` command is called in order to iterate through all the keys correctly. Since it's a relatively common use case, iovalkey
 provides a streaming interface for the `SCAN` command to make things much easier. A readable stream can be created by calling `scanStream`:
 
 ```javascript
@@ -752,7 +727,7 @@ stream.on("end", () => {
 
 ## Auto-reconnect
 
-By default, ioredis will try to reconnect when the connection to Redis is lost
+By default, iovalkey will try to reconnect when the connection to Redis is lost
 except when the connection is closed manually by `redis.disconnect()` or `redis.quit()`.
 
 It's very flexible to control how long to wait to reconnect after disconnection
@@ -771,7 +746,7 @@ const redis = new Redis({
 `retryStrategy` is a function that will be called when the connection is lost.
 The argument `times` means this is the nth reconnection being made and
 the return value represents how long (in ms) to wait to reconnect. When the
-return value isn't a number, ioredis will stop trying to reconnect, and the connection
+return value isn't a number, iovalkey will stop trying to reconnect, and the connection
 will be lost forever if the user doesn't call `redis.connect()` manually.
 
 When reconnected, the client will auto subscribe to channels that the previous connection subscribed to.
@@ -788,11 +763,11 @@ const redis = new Redis({
 });
 ```
 
-Set maxRetriesPerRequest to `null` to disable this behavior, and every command will wait forever until the connection is alive again (which is the default behavior before ioredis v4).
+Set maxRetriesPerRequest to `null` to disable this behavior, and every command will wait forever until the connection is alive again (which is the default behavior before iovalkey v4).
 
 ### Reconnect on Error
 
-Besides auto-reconnect when the connection is closed, ioredis supports reconnecting on certain Redis errors using the `reconnectOnError` option. Here's an example that will reconnect when receiving `READONLY` error:
+Besides auto-reconnect when the connection is closed, iovalkey supports reconnecting on certain Redis errors using the `reconnectOnError` option. Here's an example that will reconnect when receiving `READONLY` error:
 
 ```javascript
 const redis = new Redis({
@@ -806,9 +781,9 @@ const redis = new Redis({
 });
 ```
 
-This feature is useful when using Amazon ElastiCache instances with Auto-failover disabled. On these instances, test your `reconnectOnError` handler by manually promoting the replica node to the primary role using the AWS console. The following writes fail with the error `READONLY`. Using `reconnectOnError`, we can force the connection to reconnect on this error in order to connect to the new master. Furthermore, if the `reconnectOnError` returns `2`, ioredis will resend the failed command after reconnecting.
+This feature is useful when using Amazon ElastiCache instances with Auto-failover disabled. On these instances, test your `reconnectOnError` handler by manually promoting the replica node to the primary role using the AWS console. The following writes fail with the error `READONLY`. Using `reconnectOnError`, we can force the connection to reconnect on this error in order to connect to the new master. Furthermore, if the `reconnectOnError` returns `2`, iovalkey will resend the failed command after reconnecting.
 
-On ElastiCache instances with Auto-failover enabled, `reconnectOnError` does not execute. Instead of returning a Redis error, AWS closes all connections to the master endpoint until the new primary node is ready. ioredis reconnects via `retryStrategy` instead of `reconnectOnError` after about a minute. On ElastiCache instances with Auto-failover enabled, test failover events with the `Failover primary` option in the AWS console.
+On ElastiCache instances with Auto-failover enabled, `reconnectOnError` does not execute. Instead of returning a Redis error, AWS closes all connections to the master endpoint until the new primary node is ready. iovalkey reconnects via `retryStrategy` instead of `reconnectOnError` after about a minute. On ElastiCache instances with Auto-failover enabled, test failover events with the `Failover primary` option in the AWS console.
 
 ## Connection Events
 
@@ -818,7 +793,7 @@ The Redis instance will emit some events about the state of the connection to th
 | :----------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | connect      | emits when a connection is established to the Redis server.                                                                                                                                                                                     |
 | ready        | If `enableReadyCheck` is `true`, client will emit `ready` when the server reports that it is ready to receive commands (e.g. finish loading data from disk).<br>Otherwise, `ready` will be emitted immediately right after the `connect` event. |
-| error        | emits when an error occurs while connecting.<br>However, ioredis emits all `error` events silently (only emits when there's at least one listener) so that your application won't crash if you're not listening to the `error` event.           |
+| error        | emits when an error occurs while connecting.<br>However, iovalkey emits all `error` events silently (only emits when there's at least one listener) so that your application won't crash if you're not listening to the `error` event.           |
 | close        | emits when an established Redis server connection has closed.                                                                                                                                                                                   |
 | reconnecting | emits after `close` when a reconnection will be made. The argument of the event is the time (in ms) before reconnecting.                                                                                                                        |
 | end          | emits after `close` when no more reconnections will be made, or the connection is failed to establish.                                                                                                                                          |
@@ -904,7 +879,7 @@ const redisWithClientCertificate = new Redis({
 
 ## Sentinel
 
-ioredis supports Sentinel out of the box. It works transparently as all features that work when
+iovalkey supports Sentinel out of the box. It works transparently as all features that work when
 you connect to a single node also work when you connect to a sentinel group. Make sure to run Redis >= 2.8.12 if you want to use this feature. Sentinels have a default port of 26379.
 
 To connect using Sentinel, use:
@@ -930,11 +905,11 @@ The arguments passed to the constructor are different from the ones you use to c
 - `preferredSlaves` (optional) can be used to prefer a particular slave or set of slaves based on priority. It accepts a function or array.
 - `enableTLSForSentinelMode` (optional) set to true if connecting to sentinel instances that are encrypted
 
-ioredis **guarantees** that the node you connected to is always a master even after a failover. When a failover happens, instead of trying to reconnect to the failed node (which will be demoted to slave when it's available again), ioredis will ask sentinels for the new master node and connect to it. All commands sent during the failover are queued and will be executed when the new connection is established so that none of the commands will be lost.
+iovalkey **guarantees** that the node you connected to is always a master even after a failover. When a failover happens, instead of trying to reconnect to the failed node (which will be demoted to slave when it's available again), iovalkey will ask sentinels for the new master node and connect to it. All commands sent during the failover are queued and will be executed when the new connection is established so that none of the commands will be lost.
 
-It's possible to connect to a slave instead of a master by specifying the option `role` with the value of `slave` and ioredis will try to connect to a random slave of the specified master, with the guarantee that the connected node is always a slave. If the current node is promoted to master due to a failover, ioredis will disconnect from it and ask the sentinels for another slave node to connect to.
+It's possible to connect to a slave instead of a master by specifying the option `role` with the value of `slave` and iovalkey will try to connect to a random slave of the specified master, with the guarantee that the connected node is always a slave. If the current node is promoted to master due to a failover, iovalkey will disconnect from it and ask the sentinels for another slave node to connect to.
 
-If you specify the option `preferredSlaves` along with `role: 'slave'` ioredis will attempt to use this value when selecting the slave from the pool of available slaves. The value of `preferredSlaves` should either be a function that accepts an array of available slaves and returns a single result, or an array of slave values priorities by the lowest `prio` value first with a default value of `1`.
+If you specify the option `preferredSlaves` along with `role: 'slave'` iovalkey will attempt to use this value when selecting the slave from the pool of available slaves. The value of `preferredSlaves` should either be a function that accepts an array of available slaves and returns a single result, or an array of slave values priorities by the lowest `prio` value first with a default value of `1`.
 
 ```javascript
 // available slaves format
@@ -971,7 +946,7 @@ const redis = new Redis({
 });
 ```
 
-Besides the `retryStrategy` option, there's also a `sentinelRetryStrategy` in Sentinel mode which will be invoked when all the sentinel nodes are unreachable during connecting. If `sentinelRetryStrategy` returns a valid delay time, ioredis will try to reconnect from scratch. The default value of `sentinelRetryStrategy` is:
+Besides the `retryStrategy` option, there's also a `sentinelRetryStrategy` in Sentinel mode which will be invoked when all the sentinel nodes are unreachable during connecting. If `sentinelRetryStrategy` returns a valid delay time, iovalkey will try to reconnect from scratch. The default value of `sentinelRetryStrategy` is:
 
 ```javascript
 function (times) {
@@ -986,7 +961,7 @@ Redis Cluster provides a way to run a Redis installation where data is automatic
 You can connect to a Redis Cluster like this:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 
 const cluster = new Redis.Cluster([
   {
@@ -1013,7 +988,7 @@ cluster.get("foo", (err, res) => {
 1.  The second argument is the options, where:
 
     - `clusterRetryStrategy`: When none of the startup nodes are reachable, `clusterRetryStrategy` will be invoked. When a number is returned,
-      ioredis will try to reconnect to the startup nodes from scratch after the specified delay (in ms). Otherwise, an error of "None of startup nodes is available" will be returned.
+      iovalkey will try to reconnect to the startup nodes from scratch after the specified delay (in ms). Otherwise, an error of "None of startup nodes is available" will be returned.
       The default value of this option is:
 
       ```javascript
@@ -1040,7 +1015,7 @@ cluster.get("foo", (err, res) => {
     - `maxRedirections`: When a cluster related error (e.g. `MOVED`, `ASK` and `CLUSTERDOWN` etc.) is received, the client will redirect the
       command to another node. This option limits the max redirections allowed when sending a command. The default value is `16`.
     - `retryDelayOnFailover`: If the target node is disconnected when sending a command,
-      ioredis will retry after the specified delay. The default value is `100`. You should make sure `retryDelayOnFailover * maxRedirections > cluster-node-timeout`
+      iovalkey will retry after the specified delay. The default value is `100`. You should make sure `retryDelayOnFailover * maxRedirections > cluster-node-timeout`
       to insure that no command will fail during a failover.
     - `retryDelayOnClusterDown`: When a cluster is down, all commands will be rejected with the error of `CLUSTERDOWN`. If this option is a number (by default, it is `100`), the client
       will resend the commands after the specified time (in ms).
@@ -1057,7 +1032,7 @@ cluster.get("foo", (err, res) => {
 
 A typical redis cluster contains three or more masters and several slaves for each master. It's possible to scale out redis cluster by sending read queries to slaves and write queries to masters by setting the `scaleReads` option.
 
-`scaleReads` is "master" by default, which means ioredis will never send any queries to slaves. There are other three available options:
+`scaleReads` is "master" by default, which means iovalkey will never send any queries to slaves. There are other three available options:
 
 1. "all": Send write queries to masters and read queries to masters or slaves randomly.
 2. "slave": Send write queries to masters and read queries to slaves.
@@ -1084,7 +1059,7 @@ cluster.get("foo", (err, res) => {
 
 ### Running Commands to Multiple Nodes
 
-Every command will be sent to exactly one node. For commands containing keys, (e.g. `GET`, `SET` and `HGETALL`), ioredis sends them to the node that serving the keys, and for other commands not containing keys, (e.g. `INFO`, `KEYS` and `FLUSHDB`), ioredis sends them to a random node.
+Every command will be sent to exactly one node. For commands containing keys, (e.g. `GET`, `SET` and `HGETALL`), iovalkey sends them to the node that serving the keys, and for other commands not containing keys, (e.g. `INFO`, `KEYS` and `FLUSHDB`), iovalkey sends them to a random node.
 
 Sometimes you may want to send a command to multiple nodes (masters or slaves) of the cluster, you can get the nodes via `Cluster#nodes()` method.
 
@@ -1137,17 +1112,17 @@ This option is also useful when the cluster is running inside a Docker container
 Almost all features that are supported by `Redis` are also supported by `Redis.Cluster`, e.g. custom commands, transaction and pipeline.
 However there are some differences when using transaction and pipeline in Cluster mode:
 
-0. All keys in a pipeline should belong to slots served by the same node, since ioredis sends all commands in a pipeline to the same node.
-1. You can't use `multi` without pipeline (aka `cluster.multi({ pipeline: false })`). This is because when you call `cluster.multi({ pipeline: false })`, ioredis doesn't know which node the `multi` command should be sent to.
+0. All keys in a pipeline should belong to slots served by the same node, since iovalkey sends all commands in a pipeline to the same node.
+1. You can't use `multi` without pipeline (aka `cluster.multi({ pipeline: false })`). This is because when you call `cluster.multi({ pipeline: false })`, iovalkey doesn't know which node the `multi` command should be sent to.
 
-When any commands in a pipeline receives a `MOVED` or `ASK` error, ioredis will resend the whole pipeline to the specified node automatically if all of the following conditions are satisfied:
+When any commands in a pipeline receives a `MOVED` or `ASK` error, iovalkey will resend the whole pipeline to the specified node automatically if all of the following conditions are satisfied:
 
 0. All errors received in the pipeline are the same. For example, we won't resend the pipeline if we got two `MOVED` errors pointing to different nodes.
 1. All commands executed successfully are readonly commands. This makes sure that resending the pipeline won't have side effects.
 
 ### Pub/Sub
 
-Pub/Sub in cluster mode works exactly as the same as in standalone mode. Internally, when a node of the cluster receives a message, it will broadcast the message to the other nodes. ioredis makes sure that each message will only be received once by strictly subscribing one node at the same time.
+Pub/Sub in cluster mode works exactly as the same as in standalone mode. Internally, when a node of the cluster receives a message, it will broadcast the message to the other nodes. iovalkey makes sure that each message will only be received once by strictly subscribing one node at the same time.
 
 ```javascript
 const nodes = [
@@ -1183,7 +1158,7 @@ sub.subscribe("news", () => {
 Setting the `password` option to access password-protected clusters:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const cluster = new Redis.Cluster(nodes, {
   redisOptions: {
     password: "your-cluster-password",
@@ -1194,7 +1169,7 @@ const cluster = new Redis.Cluster(nodes, {
 If some of nodes in the cluster using a different password, you should specify them in the first parameter:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const cluster = new Redis.Cluster(
   [
     // Use password "password-for-30001" for 30001
@@ -1238,13 +1213,13 @@ const cluster = new Redis.Cluster(
 
 ## Autopipelining
 
-In standard mode, when you issue multiple commands, ioredis sends them to the server one by one. As described in Redis pipeline documentation, this is a suboptimal use of the network link, especially when such link is not very performant.
+In standard mode, when you issue multiple commands, iovalkey sends them to the server one by one. As described in Redis pipeline documentation, this is a suboptimal use of the network link, especially when such link is not very performant.
 
 The TCP and network overhead negatively affects performance. Commands are stuck in the send queue until the previous ones are correctly delivered to the server. This is a problem known as Head-Of-Line blocking (HOL).
 
-ioredis supports a feature called “auto pipelining”. It can be enabled by setting the option `enableAutoPipelining` to `true`. No other code change is necessary.
+iovalkey supports a feature called “auto pipelining”. It can be enabled by setting the option `enableAutoPipelining` to `true`. No other code change is necessary.
 
-In auto pipelining mode, all commands issued during an event loop are enqueued in a pipeline automatically managed by ioredis. At the end of the iteration, the pipeline is executed and thus all commands are sent to the server at the same time.
+In auto pipelining mode, all commands issued during an event loop are enqueued in a pipeline automatically managed by iovalkey. At the end of the iteration, the pipeline is executed and thus all commands are sent to the server at the same time.
 
 This feature can dramatically improve throughput and avoids HOL blocking. In our benchmarks, the improvement was between 35% and 50%.
 
@@ -1258,7 +1233,7 @@ Note that the same slot limitation within a single command still holds, as it is
 
 ### Example of Automatic Pipeline Enqueuing
 
-This sample code uses ioredis with automatic pipeline enabled.
+This sample code uses iovalkey with automatic pipeline enabled.
 
 ```javascript
 const Redis = require("./built");
@@ -1282,7 +1257,7 @@ server.listen(3000);
 
 When Node receives requests, it schedules them to be processed in one or more iterations of the events loop.
 
-All commands issued by requests processing during one iteration of the loop will be wrapped in a pipeline automatically created by ioredis.
+All commands issued by requests processing during one iteration of the loop will be wrapped in a pipeline automatically created by iovalkey.
 
 In the example above, the pipeline will have the following contents:
 
@@ -1325,7 +1300,7 @@ And here's the same test for a cluster of 3 masters and 3 replicas:
 All the errors returned by the Redis server are instances of `ReplyError`, which can be accessed via `Redis`:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const redis = new Redis();
 // This command causes a reply error since the SET command requires two arguments.
 redis.set("foo", (err) => {
@@ -1337,22 +1312,22 @@ This is the error stack of the `ReplyError`:
 
 ```
 ReplyError: ERR wrong number of arguments for 'set' command
-    at ReplyParser._parseResult (/app/node_modules/ioredis/lib/parsers/javascript.js:60:14)
-    at ReplyParser.execute (/app/node_modules/ioredis/lib/parsers/javascript.js:178:20)
-    at Socket.<anonymous> (/app/node_modules/ioredis/lib/redis/event_handler.js:99:22)
+    at ReplyParser._parseResult (/app/node_modules/iovalkey/lib/parsers/javascript.js:60:14)
+    at ReplyParser.execute (/app/node_modules/iovalkey/lib/parsers/javascript.js:178:20)
+    at Socket.<anonymous> (/app/node_modules/iovalkey/lib/redis/event_handler.js:99:22)
     at Socket.emit (events.js:97:17)
     at readableAddChunk (_stream_readable.js:143:16)
     at Socket.Readable.push (_stream_readable.js:106:10)
     at TCP.onread (net.js:509:20)
 ```
 
-By default, the error stack doesn't make any sense because the whole stack happens in the ioredis
+By default, the error stack doesn't make any sense because the whole stack happens in the iovalkey
 module itself, not in your code. So it's not easy to find out where the error happens in your code.
-ioredis provides an option `showFriendlyErrorStack` to solve the problem. When you enable
-`showFriendlyErrorStack`, ioredis will optimize the error stack for you:
+iovalkey provides an option `showFriendlyErrorStack` to solve the problem. When you enable
+`showFriendlyErrorStack`, iovalkey will optimize the error stack for you:
 
 ```javascript
-const Redis = require("ioredis");
+const Redis = require("iovalkey");
 const redis = new Redis({ showFriendlyErrorStack: true });
 redis.set("foo");
 ```
@@ -1385,14 +1360,14 @@ npm test
 
 `FLUSH ALL` will be invoked after each test, so make sure there's no valuable data in it before running tests.
 
-If your testing environment does not let you spin up a Redis server [ioredis-mock](https://github.com/stipsan/ioredis-mock) is a drop-in replacement you can use in your tests. It aims to behave identically to ioredis connected to a Redis server so that your integration tests is easier to write and of better quality.
+If your testing environment does not let you spin up a Redis server [iovalkey-mock](https://github.com/stipsan/iovalkey-mock) is a drop-in replacement you can use in your tests. It aims to behave identically to iovalkey connected to a Redis server so that your integration tests is easier to write and of better quality.
 
 # Debug
 
-You can set the `DEBUG` env to `ioredis:*` to print debug info:
+You can set the `DEBUG` env to `iovalkey:*` to print debug info:
 
 ```shell
-$ DEBUG=ioredis:* node app.js
+$ DEBUG=iovalkey:* node app.js
 ```
 
 # Join in!
@@ -1405,10 +1380,8 @@ And since I'm not a native English speaker, if you find any grammar mistakes in 
 
 This project exists thanks to all the people who contribute:
 
-<a href="https://github.com/redis/ioredis/graphs/contributors"><img src="https://opencollective.com/ioredis/contributors.svg?width=890&showBtn=false" /></a>
+<a href="https://github.com/mcollina/iovalkey/graphs/contributors"><img src="https://opencollective.com/iovalkey/contributors.svg?width=890&showBtn=false" /></a>
 
 # License
 
 MIT
-
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fluin%2Fioredis.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fluin%2Fioredis?ref=badge_large)
