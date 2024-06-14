@@ -83,9 +83,9 @@ redis.zrange("sortedSet", 0, 2, "WITHSCORES").then((elements) => {
   console.log(elements);
 });
 
-// All arguments are passed directly to the redis server,
+// All arguments are passed directly to the valkey/redis server,
 // so technically iovalkey supports all Redis commands.
-// The format is: redis[SOME_REDIS_COMMAND_IN_LOWERCASE](ARGUMENTS_ARE_JOINED_INTO_COMMAND_STRING)
+// The format is: redis[SOME_VALKEY_COMMAND_IN_LOWERCASE](ARGUMENTS_ARE_JOINED_INTO_COMMAND_STRING)
 // so the following statement is equivalent to the CLI: `redis> SET mykey hello EX 10`
 redis.set("mykey", "hello", "EX", 10);
 ```
@@ -101,7 +101,7 @@ See the `examples/` folder for more examples. For example:
 - [Streams](examples/stream.js)
 - [Redis Modules](examples/module.js) e.g. RedisJSON
 
-All Redis commands are supported. See [the documentation](https://redis.github.io/iovalkey/classes/Redis.html) for details.
+All Redis commands are supported. See [the documentation](https://valkey.github.io/iovalkey/classes/Redis.html) for details.
 
 ## Connect to Redis
 
@@ -1352,15 +1352,13 @@ default, this option is disabled and can only be used for debugging purposes. Yo
 
 # Running tests
 
-Start a Redis server on 127.0.0.1:6379, and then:
+Start a Valkey/Redis server on 127.0.0.1:6379, and then:
 
 ```shell
 npm test
 ```
 
 `FLUSH ALL` will be invoked after each test, so make sure there's no valuable data in it before running tests.
-
-If your testing environment does not let you spin up a Redis server [iovalkey-mock](https://github.com/stipsan/iovalkey-mock) is a drop-in replacement you can use in your tests. It aims to behave identically to iovalkey connected to a Redis server so that your integration tests is easier to write and of better quality.
 
 # Debug
 
@@ -1375,12 +1373,6 @@ $ DEBUG=iovalkey:* node app.js
 I'm happy to receive bug reports, fixes, documentation enhancements, and any other improvements.
 
 And since I'm not a native English speaker, if you find any grammar mistakes in the documentation, please also let me know. :)
-
-# Contributors
-
-This project exists thanks to all the people who contribute:
-
-<a href="https://github.com/mcollina/iovalkey/graphs/contributors"><img src="https://opencollective.com/iovalkey/contributors.svg?width=890&showBtn=false" /></a>
 
 # License
 
