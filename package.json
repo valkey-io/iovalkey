@@ -18,11 +18,12 @@
     "format": "prettier --write \"{,!(node_modules)/**/}*.{js,ts}\"",
     "format-check": "prettier --check \"{,!(node_modules)/**/}*.{js,ts}\"",
     "build": "rm -rf built && tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "start-valkey": "docker run -p 6379:6379 valkey/valkey"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/mcollina/iovalkey.git"
+    "url": "git://github.com/valkey/iovalkey.git"
   },
   "keywords": [
     "redis",
