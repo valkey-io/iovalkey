@@ -13801,6 +13801,18 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zscan(
     key: RedisKey,
     cursor: number | string,
+    noscoresToken: "noscores",
+    callback?: Callback<[cursor: string, elements: string[]]>
+  ): Result<[cursor: string, elements: string[]], Context>;
+  zscanBuffer(
+    key: RedisKey,
+    cursor: number | string,
+    noscoresToken: "noscores",
+    callback?: Callback<[cursor: Buffer, elements: Buffer[]]>
+  ): Result<[cursor: Buffer, elements: Buffer[]], Context>;
+  zscan(
+    key: RedisKey,
+    cursor: number | string,
     countToken: "COUNT",
     count: number | string,
     callback?: Callback<[cursor: string, elements: string[]]>
@@ -13810,6 +13822,22 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
     cursor: number | string,
     countToken: "COUNT",
     count: number | string,
+    callback?: Callback<[cursor: Buffer, elements: Buffer[]]>
+  ): Result<[cursor: Buffer, elements: Buffer[]], Context>;
+  zscan(
+    key: RedisKey,
+    cursor: number | string,
+    countToken: "COUNT",
+    count: number | string,
+    noscoresToken: "noscores",
+    callback?: Callback<[cursor: string, elements: string[]]>
+  ): Result<[cursor: string, elements: string[]], Context>;
+  zscanBuffer(
+    key: RedisKey,
+    cursor: number | string,
+    countToken: "COUNT",
+    count: number | string,
+    noscoresToken: "noscores",
     callback?: Callback<[cursor: Buffer, elements: Buffer[]]>
   ): Result<[cursor: Buffer, elements: Buffer[]], Context>;
   zscan(
@@ -13831,6 +13859,22 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
     cursor: number | string,
     patternToken: "MATCH",
     pattern: string,
+    noscoresToken: "noscores",
+    callback?: Callback<[cursor: string, elements: string[]]>
+  ): Result<[cursor: string, elements: string[]], Context>;
+  zscanBuffer(
+    key: RedisKey,
+    cursor: number | string,
+    patternToken: "MATCH",
+    pattern: string,
+    noscoresToken: "noscores",
+    callback?: Callback<[cursor: Buffer, elements: Buffer[]]>
+  ): Result<[cursor: Buffer, elements: Buffer[]], Context>;
+  zscan(
+    key: RedisKey,
+    cursor: number | string,
+    patternToken: "MATCH",
+    pattern: string,
     countToken: "COUNT",
     count: number | string,
     callback?: Callback<[cursor: string, elements: string[]]>
@@ -13842,6 +13886,26 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
     pattern: string,
     countToken: "COUNT",
     count: number | string,
+    callback?: Callback<[cursor: Buffer, elements: Buffer[]]>
+  ): Result<[cursor: Buffer, elements: Buffer[]], Context>;
+  zscan(
+    key: RedisKey,
+    cursor: number | string,
+    patternToken: "MATCH",
+    pattern: string,
+    countToken: "COUNT",
+    count: number | string,
+    noscoresToken: "noscores",
+    callback?: Callback<[cursor: string, elements: string[]]>
+  ): Result<[cursor: string, elements: string[]], Context>;
+  zscanBuffer(
+    key: RedisKey,
+    cursor: number | string,
+    patternToken: "MATCH",
+    pattern: string,
+    countToken: "COUNT",
+    count: number | string,
+    noscoresToken: "noscores",
     callback?: Callback<[cursor: Buffer, elements: Buffer[]]>
   ): Result<[cursor: Buffer, elements: Buffer[]], Context>;
 
