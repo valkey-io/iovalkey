@@ -251,10 +251,10 @@ describe("scripting", () => {
       const [a, b] = await redis.multi().test("foo").test("bar").exec();
 
       expect(a[0].message).to.equal(
-        "NOSCRIPT No matching script. Please use EVAL."
+        "NOSCRIPT No matching script."
       );
       expect(b[0].message).to.equal(
-        "NOSCRIPT No matching script. Please use EVAL."
+        "NOSCRIPT No matching script."
       );
     });
     spy.restore();
