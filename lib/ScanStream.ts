@@ -4,6 +4,7 @@ interface Options extends ReadableOptions {
   key?: string;
   match?: string;
   type?: string;
+  noscores?: boolean;
   command: string;
   redis: any;
   count?: string | number;
@@ -38,6 +39,9 @@ export default class ScanStream extends Readable {
     }
     if (this.opt.count) {
       args.push("COUNT", String(this.opt.count));
+    }
+    if (this.opt.noscores) {
+      args.push("noscores");
     }
 
     this.opt.redis[this.opt.command](args, (err, res) => {
