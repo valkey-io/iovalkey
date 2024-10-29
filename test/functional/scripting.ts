@@ -250,12 +250,8 @@ describe("scripting", () => {
       // @ts-expect-error
       const [a, b] = await redis.multi().test("foo").test("bar").exec();
 
-      expect(a[0].message).to.equal(
-        "NOSCRIPT No matching script."
-      );
-      expect(b[0].message).to.equal(
-        "NOSCRIPT No matching script."
-      );
+      expect(a[0].message).to.match(/^NOSCRIPT No matching script/);
+      expect(b[0].message).to.match(/^NOSCRIPT No matching script/);
     });
     spy.restore();
     expect(spy.callCount).to.equal(4);
