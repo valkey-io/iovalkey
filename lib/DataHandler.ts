@@ -56,9 +56,13 @@ export default class DataHandler {
       },
     });
 
-    redis.stream.on("data", (data) => {
+    redis.stream.prependListener("data", (data) => {
       parser.execute(data);
     });
+
+    // `prependListener` not switching a stream to flowing mode as `on` does,
+    // so we need to do it manually in case if our listener is the first one
+    redis.stream.resume();
   }
 
   private returnFatalError(err: Error) {
