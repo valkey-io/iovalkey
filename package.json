@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/valkey/iovalkey.git"
+    "url": "git://github.com/valkey-io/iovalkey.git"
   },
   "keywords": [
     "redis",
