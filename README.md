@@ -1,16 +1,16 @@
 # iovalkey
 
-A robust, performance-focused and full-featured [Redis](http://redis.io) client for [Node.js](https://nodejs.org).
+A robust, performance-focused and full-featured [Valkey](http://redis.io) client for [Node.js](https://nodejs.org).
 This is a friendly fork of  [ioredis](https://github.com/redis/ioredis) after [this commit](https://github.com/redis/ioredis/commit/ec42c82ceab1957db00c5175dfe37348f1856a93).
 
-Supports Redis >= 2.6.12. Completely compatible with Redis 7.x.
+Supports Valkey >= 2.6.12. Completely compatible with Valkey 7.x.
 
 # Features
 
-iovalkey is a robust, full-featured Redis client that is
+iovalkey is a robust, full-featured Valkey client that is
 used in the world's biggest online commerce company [Alibaba](http://www.alibaba.com/) and many other awesome companies.
 
-0. Full-featured. It supports [Cluster](http://redis.io/topics/cluster-tutorial), [Sentinel](https://redis.io/docs/reference/sentinel-clients), [Streams](https://redis.io/topics/streams-intro), [Pipelining](http://redis.io/topics/pipelining), and of course [Lua scripting](http://redis.io/commands/eval), [Redis Functions](https://redis.io/topics/functions-intro), [Pub/Sub](http://redis.io/topics/pubsub) (with the support of binary messages).
+0. Full-featured. It supports [Cluster](http://redis.io/topics/cluster-tutorial), [Sentinel](https://redis.io/docs/reference/sentinel-clients), [Streams](https://redis.io/topics/streams-intro), [Pipelining](http://redis.io/topics/pipelining), and of course [Lua scripting](http://redis.io/commands/eval), [Valkey Functions](https://redis.io/topics/functions-intro), [Pub/Sub](http://redis.io/topics/pubsub) (with the support of binary messages).
 1. High performance 🚀.
 2. Delightful API 😄. It works with Node callbacks and Native promises.
 3. Transformation of command arguments and replies.
@@ -21,7 +21,7 @@ used in the world's biggest online commerce company [Alibaba](http://www.alibaba
 8. Supports offline queue and ready checking.
 9. Supports ES6 types, such as `Map` and `Set`.
 10. Supports GEO commands 📍.
-11. Supports Redis ACL.
+11. Supports Valkey ACL.
 12. Sophisticated error handling strategy.
 13. Supports NAT mapping.
 14. Supports autopipelining.
@@ -50,21 +50,21 @@ npm install --save-dev @types/node
 
 ```javascript
 // Import iovalkey.
-// You can also use `import { Redis } from "iovalkey"`
+// You can also use `import { Valkey } from "iovalkey"`
 // if your project is a TypeScript project,
-// Note that `import Redis from "iovalkey"` is still supported,
+// Note that `import Valkey from "iovalkey"` is still supported,
 // but will be deprecated in the next major version.
-const Redis = require("iovalkey");
+const Valkey = require("iovalkey");
 
-// Create a Redis instance.
+// Create a Valkey instance.
 // By default, it will connect to localhost:6379.
 // We are going to cover how to specify connection options soon.
-const redis = new Redis();
+const valkey = new Valkey();
 
-redis.set("mykey", "value"); // Returns a promise which resolves to "OK" when the command succeeds.
+valkey.set("mykey", "value"); // Returns a promise which resolves to "OK" when the command succeeds.
 
 // iovalkey supports the node.js callback style
-redis.get("mykey", (err, result) => {
+valkey.get("mykey", (err, result) => {
   if (err) {
     console.error(err);
   } else {
@@ -73,21 +73,21 @@ redis.get("mykey", (err, result) => {
 });
 
 // Or iovalkey returns a promise if the last argument isn't a function
-redis.get("mykey").then((result) => {
+valkey.get("mykey").then((result) => {
   console.log(result); // Prints "value"
 });
 
-redis.zadd("sortedSet", 1, "one", 2, "dos", 4, "quatro", 3, "three");
-redis.zrange("sortedSet", 0, 2, "WITHSCORES").then((elements) => {
+valkey.zadd("sortedSet", 1, "one", 2, "dos", 4, "quatro", 3, "three");
+valkey.zrange("sortedSet", 0, 2, "WITHSCORES").then((elements) => {
   // ["one", "1", "dos", "2", "three", "3"] as if the command was `redis> ZRANGE sortedSet 0 2 WITHSCORES`
   console.log(elements);
 });
 
-// All arguments are passed directly to the valkey/redis server,
-// so technically iovalkey supports all Redis commands.
-// The format is: redis[SOME_VALKEY_COMMAND_IN_LOWERCASE](ARGUMENTS_ARE_JOINED_INTO_COMMAND_STRING)
+// All arguments are passed directly to the valkey/valkey server,
+// so technically iovalkey supports all Valkey commands.
+// The format is: valkey[SOME_VALKEY_COMMAND_IN_LOWERCASE](ARGUMENTS_ARE_JOINED_INTO_COMMAND_STRING)
 // so the following statement is equivalent to the CLI: `redis> SET mykey hello EX 10`
-redis.set("mykey", "hello", "EX", 10);
+valkey.set("mykey", "hello", "EX", 10);
 ```
 
 See the `examples/` folder for more examples. For example:
@@ -101,23 +101,23 @@ See the `examples/` folder for more examples. For example:
 - [Streams](examples/stream.js)
 - [Redis Modules](examples/module.js) e.g. RedisJSON
 
-All Redis commands are supported. See [the documentation](https://valkey.github.io/iovalkey/classes/Redis.html) for details.
+All Valkey commands are supported. See [the documentation](https://valkey.github.io/iovalkey/classes/Redis.html) for details.
 
-## Connect to Redis
+## Connect to Valkey
 
-When a new `Redis` instance is created,
-a connection to Redis will be created at the same time.
-You can specify which Redis to connect to by:
+When a new `Valkey` instance is created,
+a connection to Valkey will be created at the same time.
+You can specify which Valkey to connect to by:
 
 ```javascript
-new Redis(); // Connect to 127.0.0.1:6379
-new Redis(6380); // 127.0.0.1:6380
-new Redis(6379, "192.168.1.1"); // 192.168.1.1:6379
-new Redis("/tmp/redis.sock");
-new Redis({
-  port: 6379, // Redis port
-  host: "127.0.0.1", // Redis host
-  username: "default", // needs Redis >= 6
+new Valkey(); // Connect to 127.0.0.1:6379
+new Valkey(6380); // 127.0.0.1:6380
+new Valkey(6379, "192.168.1.1"); // 192.168.1.1:6379
+new Valkey("/tmp/valkey.sock");
+new Valkey({
+  port: 6379, // Valkey port
+  host: "127.0.0.1", // Valkey host
+  username: "default", // needs Valkey >= 6
   password: "my-top-secret",
   db: 0, // Defaults to 0
 });
@@ -127,25 +127,25 @@ You can also specify connection options as a [`redis://` URL](http://www.iana.or
 
 ```javascript
 // Connect to 127.0.0.1:6380, db 4, using password "authpassword":
-new Redis("redis://:authpassword@127.0.0.1:6380/4");
+new Valkey("redis://:authpassword@127.0.0.1:6380/4");
 
 // Username can also be passed via URI.
-new Redis("redis://username:authpassword@127.0.0.1:6380/4");
+new Valkey("redis://username:authpassword@127.0.0.1:6380/4");
 ```
 
 See [API Documentation](https://redis.github.io/iovalkey/index.html#RedisOptions) for all available options.
 
 ## Pub/Sub
 
-Redis provides several commands for developers to implement the [Publish–subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern). There are two roles in this pattern: publisher and subscriber. Publishers are not programmed to send their messages to specific subscribers. Rather, published messages are characterized into channels, without knowledge of what (if any) subscribers there may be.
+Valkey provides several commands for developers to implement the [Publish–subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern). There are two roles in this pattern: publisher and subscriber. Publishers are not programmed to send their messages to specific subscribers. Rather, published messages are characterized into channels, without knowledge of what (if any) subscribers there may be.
 
 By leveraging Node.js's built-in events module, iovalkey makes pub/sub very straightforward to use. Below is a simple example that consists of two files, one is publisher.js that publishes messages to a channel, the other is subscriber.js that listens for messages on specific channels.
 
 ```javascript
 // publisher.js
 
-const Redis = require("iovalkey");
-const redis = new Redis();
+const Valkey = require("iovalkey");
+const valkey = new Valkey();
 
 setInterval(() => {
   const message = { foo: Math.random() };
@@ -153,7 +153,7 @@ setInterval(() => {
   const channel = `my-channel-${1 + Math.round(Math.random())}`;
 
   // Message can be either a string or a buffer
-  redis.publish(channel, JSON.stringify(message));
+  valkey.publish(channel, JSON.stringify(message));
   console.log("Published %s to %s", message, channel);
 }, 1000);
 ```
@@ -161,10 +161,10 @@ setInterval(() => {
 ```javascript
 // subscriber.js
 
-const Redis = require("iovalkey");
-const redis = new Redis();
+const Valkey = require("iovalkey");
+const valkey = new Valkey();
 
-redis.subscribe("my-channel-1", "my-channel-2", (err, count) => {
+valkey.subscribe("my-channel-1", "my-channel-2", (err, count) => {
   if (err) {
     // Just like other commands, subscribe() can fail for some reasons,
     // ex network issues.
@@ -177,27 +177,27 @@ redis.subscribe("my-channel-1", "my-channel-2", (err, count) => {
   }
 });
 
-redis.on("message", (channel, message) => {
+valkey.on("message", (channel, message) => {
   console.log(`Received ${message} from ${channel}`);
 });
 
 // There's also an event called 'messageBuffer', which is the same as 'message' except
 // it returns buffers instead of strings.
 // It's useful when the messages are binary data.
-redis.on("messageBuffer", (channel, message) => {
+valkey.on("messageBuffer", (channel, message) => {
   // Both `channel` and `message` are buffers.
   console.log(channel, message);
 });
 ```
 
-It's worth noticing that a connection (aka a `Redis` instance) can't play both roles at the same time. More specifically, when a client issues `subscribe()` or `psubscribe()`, it enters the "subscriber" mode. From that point, only commands that modify the subscription set are valid. Namely, they are: `subscribe`, `psubscribe`, `unsubscribe`, `punsubscribe`, `ping`, and `quit`. When the subscription set is empty (via `unsubscribe`/`punsubscribe`), the connection is put back into the regular mode.
+It's worth noticing that a connection (aka a `Valkey` instance) can't play both roles at the same time. More specifically, when a client issues `subscribe()` or `psubscribe()`, it enters the "subscriber" mode. From that point, only commands that modify the subscription set are valid. Namely, they are: `subscribe`, `psubscribe`, `unsubscribe`, `punsubscribe`, `ping`, and `quit`. When the subscription set is empty (via `unsubscribe`/`punsubscribe`), the connection is put back into the regular mode.
 
 If you want to do pub/sub in the same file/process, you should create a separate connection:
 
 ```javascript
-const Redis = require("iovalkey");
-const sub = new Redis();
-const pub = new Redis();
+const Valkey = require("iovalkey");
+const sub = new Valkey();
+const pub = new Valkey();
 
 sub.subscribe(/* ... */); // From now, `sub` enters the subscriber mode.
 sub.on("message" /* ... */);
@@ -212,20 +212,20 @@ setInterval(() => {
 `PSUBSCRIBE` is also supported in a similar way when you want to subscribe all channels whose name matches a pattern:
 
 ```javascript
-redis.psubscribe("pat?ern", (err, count) => {});
+valkey.psubscribe("pat?ern", (err, count) => {});
 
 // Event names are "pmessage"/"pmessageBuffer" instead of "message/messageBuffer".
-redis.on("pmessage", (pattern, channel, message) => {});
-redis.on("pmessageBuffer", (pattern, channel, message) => {});
+valkey.on("pmessage", (pattern, channel, message) => {});
+valkey.on("pmessageBuffer", (pattern, channel, message) => {});
 ```
 
 ## Streams
 
-Redis v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `redis.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://redis.io/topics/streams-intro) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
+Valkey v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `valkey.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://redis.io/topics/streams-intro) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
 
 ```javascript
-const Redis = require("iovalkey");
-const redis = new Redis();
+const Valkey = require("iovalkey");
+const valkey = new Valkey();
 
 const processMessage = (message) => {
   console.log("Id: %s. Data: %O", message[0], message[1]);
@@ -235,7 +235,7 @@ async function listenForMessage(lastId = "$") {
   // `results` is an array, each element of which corresponds to a key.
   // Because we only listen to one key (mystream) here, `results` only contains
   // a single element. See more: https://redis.io/commands/xread#return-value
-  const results = await redis.xread("block", 0, "STREAMS", "mystream", lastId);
+  const results = await valkey.xread("block", 0, "STREAMS", "mystream", lastId);
   const [key, messages] = results[0]; // `key` equals to "mystream"
 
   messages.forEach(processMessage);
@@ -249,12 +249,12 @@ listenForMessage();
 
 ## Expiration
 
-Redis can set a timeout to expire your key, after the timeout has expired the key will be automatically deleted. (You can find the [official Expire documentation](https://redis.io/commands/expire/) to understand better the different parameters you can use), to set your key to expire in 60 seconds, we will have the following code:
+Valkey can set a timeout to expire your key, after the timeout has expired the key will be automatically deleted. (You can find the [official Expire documentation](https://redis.io/commands/expire/) to understand better the different parameters you can use), to set your key to expire in 60 seconds, we will have the following code:
 
 ```javascript
-redis.set("key", "data", "EX", 60);
-// Equivalent to redis command "SET key data EX 60", because on iovalkey set method,
-// all arguments are passed directly to the redis server.
+valkey.set("key", "data", "EX", 60);
+// Equivalent to valkey command "SET key data EX 60", because on iovalkey set method,
+// all arguments are passed directly to the valkey server.
 ```
 
 ## Handle Binary Data
@@ -262,37 +262,37 @@ redis.set("key", "data", "EX", 60);
 Binary data support is out of the box. Pass buffers to send binary data:
 
 ```javascript
-redis.set("foo", Buffer.from([0x62, 0x75, 0x66]));
+valkey.set("foo", Buffer.from([0x62, 0x75, 0x66]));
 ```
 
 Every command that returns a [bulk string](https://redis.io/docs/reference/protocol-spec/#resp-bulk-strings)
 has a variant command with a `Buffer` suffix. The variant command returns a buffer instead of a UTF-8 string:
 
 ```javascript
-const result = await redis.getBuffer("foo");
+const result = await valkey.getBuffer("foo");
 // result is `<Buffer 62 75 66>`
 ```
 
 It's worth noticing that you don't need the `Buffer` suffix variant in order to **send** binary data. That means
-in most case you should just use `redis.set()` instead of `redis.setBuffer()` unless you want to get the old value
+in most case you should just use `valkey.set()` instead of `valkey.setBuffer()` unless you want to get the old value
 with the `GET` parameter:
 
 ```javascript
-const result = await redis.setBuffer("foo", "new value", "GET");
+const result = await valkey.setBuffer("foo", "new value", "GET");
 // result is `<Buffer 62 75 66>` as `GET` indicates returning the old value.
 ```
 
 ## Pipelining
 
 If you want to send a batch of commands (e.g. > 5), you can use pipelining to queue
-the commands in memory and then send them to Redis all at once. This way the performance improves by 50%~300% (See [benchmark section](#benchmarks)).
+the commands in memory and then send them to Valkey all at once. This way the performance improves by 50%~300% (See [benchmark section](#benchmarks)).
 
-`redis.pipeline()` creates a `Pipeline` instance. You can call any Redis
-commands on it just like the `Redis` instance. The commands are queued in memory
-and flushed to Redis by calling the `exec` method:
+`valkey.pipeline()` creates a `Pipeline` instance. You can call any Valkey
+commands on it just like the `Valkey` instance. The commands are queued in memory
+and flushed to Valkey by calling the `exec` method:
 
 ```javascript
-const pipeline = redis.pipeline();
+const pipeline = valkey.pipeline();
 pipeline.set("foo", "bar");
 pipeline.del("cc");
 pipeline.exec((err, results) => {
@@ -302,14 +302,14 @@ pipeline.exec((err, results) => {
 });
 
 // You can even chain the commands:
-redis
+valkey
   .pipeline()
   .set("foo", "bar")
   .del("cc")
   .exec((err, results) => {});
 
 // `exec` also returns a Promise:
-const promise = redis.pipeline().set("foo", "bar").get("foo").exec();
+const promise = valkey.pipeline().set("foo", "bar").get("foo").exec();
 promise.then((result) => {
   // result === [[null, 'OK'], [null, 'bar']]
 });
@@ -319,7 +319,7 @@ Each chained command can also have a callback, which will be invoked when the co
 gets a reply:
 
 ```javascript
-redis
+valkey
   .pipeline()
   .set("foo", "bar")
   .get("foo", (err, result) => {
@@ -333,7 +333,7 @@ redis
 In addition to adding commands to the `pipeline` queue individually, you can also pass an array of commands and arguments to the constructor:
 
 ```javascript
-redis
+valkey
   .pipeline([
     ["set", "foo", "bar"],
     ["get", "foo"],
@@ -346,7 +346,7 @@ redis
 `#length` property shows how many commands in the pipeline:
 
 ```javascript
-const length = redis.pipeline().set("foo", "bar").get("foo").length;
+const length = valkey.pipeline().set("foo", "bar").get("foo").length;
 // length === 2
 ```
 
@@ -357,7 +357,7 @@ Therefore, when `multi` is called, a `Pipeline` instance is created automaticall
 so you can use `multi` just like `pipeline`:
 
 ```javascript
-redis
+valkey
   .multi()
   .set("foo", "bar")
   .get("foo")
@@ -370,7 +370,7 @@ If there's a syntax error in the transaction's command chain (e.g. wrong number 
 then none of the commands would be executed, and an error is returned:
 
 ```javascript
-redis
+valkey
   .multi()
   .set("foo")
   .set("foo", "new value")
@@ -392,7 +392,7 @@ In terms of the interface, `multi` differs from `pipeline` in that when specifyi
 to each chained command, the queueing state is passed to the callback instead of the result of the command:
 
 ```javascript
-redis
+valkey
   .multi()
   .set("foo", "bar", (err, result) => {
     // result === 'QUEUED'
@@ -401,13 +401,13 @@ redis
 ```
 
 If you want to use transaction without pipeline, pass `{ pipeline: false }` to `multi`,
-and every command will be sent to Redis immediately without waiting for an `exec` invocation:
+and every command will be sent to Valkey immediately without waiting for an `exec` invocation:
 
 ```javascript
-redis.multi({ pipeline: false });
-redis.set("foo", "bar");
-redis.get("foo");
-redis.exec((err, result) => {
+valkey.multi({ pipeline: false });
+valkey.set("foo", "bar");
+valkey.get("foo");
+valkey.exec((err, result) => {
   // result === [[null, 'OK'], [null, 'bar']]
 });
 ```
@@ -415,7 +415,7 @@ redis.exec((err, result) => {
 The constructor of `multi` also accepts a batch of commands:
 
 ```javascript
-redis
+valkey
   .multi([
     ["set", "foo", "bar"],
     ["get", "foo"],
@@ -429,7 +429,7 @@ Inline transactions are supported by pipeline, which means you can group a subse
 in the pipeline into a transaction:
 
 ```javascript
-redis
+valkey
   .pipeline()
   .get("foo")
   .multi()
@@ -448,27 +448,27 @@ care of script caching and to detect when to use `EVAL` and when to use `EVALSHA
 iovalkey exposes a `defineCommand` method to make scripting much easier to use:
 
 ```javascript
-const redis = new Redis();
+const valkey = new Valkey();
 
 // This will define a command myecho:
-redis.defineCommand("myecho", {
+valkey.defineCommand("myecho", {
   numberOfKeys: 2,
   lua: "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}",
 });
 
 // Now `myecho` can be used just like any other ordinary command,
 // and iovalkey will try to use `EVALSHA` internally when possible for better performance.
-redis.myecho("k1", "k2", "a1", "a2", (err, result) => {
+valkey.myecho("k1", "k2", "a1", "a2", (err, result) => {
   // result === ['k1', 'k2', 'a1', 'a2']
 });
 
 // `myechoBuffer` is also defined automatically to return buffers instead of strings:
-redis.myechoBuffer("k1", "k2", "a1", "a2", (err, result) => {
+valkey.myechoBuffer("k1", "k2", "a1", "a2", (err, result) => {
   // result[0] equals to Buffer.from('k1');
 });
 
 // And of course it works with pipeline:
-redis.pipeline().set("foo", "bar").myecho("k1", "k2", "a1", "a2").exec();
+valkey.pipeline().set("foo", "bar").myecho("k1", "k2", "a1", "a2").exec();
 ```
 
 ### Dynamic Keys
@@ -478,13 +478,13 @@ omit the `numberOfKeys` property and pass the number of keys as the first argume
 when you call the command:
 
 ```javascript
-redis.defineCommand("echoDynamicKeyNumber", {
+valkey.defineCommand("echoDynamicKeyNumber", {
   lua: "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}",
 });
 
 // Now you have to pass the number of keys as the first argument every time
 // you invoke the `echoDynamicKeyNumber` command:
-redis.echoDynamicKeyNumber(2, "k1", "k2", "a1", "a2", (err, result) => {
+valkey.echoDynamicKeyNumber(2, "k1", "k2", "a1", "a2", (err, result) => {
   // result === ['k1', 'k2', 'a1', 'a2']
 });
 ```
@@ -494,7 +494,7 @@ redis.echoDynamicKeyNumber(2, "k1", "k2", "a1", "a2", (err, result) => {
 Besides `defineCommand()`, you can also define custom commands with the `scripts` constructor option:
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   scripts: {
     myecho: {
       numberOfKeys: 2,
@@ -518,16 +518,16 @@ namespaces.
 and this feature also won't apply to the replies of commands even if they are key names ([#325](https://github.com/mcollina/iovalkey/issues/325)).
 
 ```javascript
-const fooRedis = new Redis({ keyPrefix: "foo:" });
-fooRedis.set("bar", "baz"); // Actually sends SET foo:bar baz
+const fooValkey = new Valkey({ keyPrefix: "foo:" });
+fooValkey.set("bar", "baz"); // Actually sends SET foo:bar baz
 
-fooRedis.defineCommand("myecho", {
+fooValkey.defineCommand("myecho", {
   numberOfKeys: 2,
   lua: "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}",
 });
 
 // Works well with pipelining/transaction
-fooRedis
+fooValkey
   .pipeline()
   // Sends SORT foo:list BY foo:weight_*->fieldname
   .sort("list", "BY", "weight_*->fieldname")
@@ -539,7 +539,7 @@ fooRedis
 
 ## Transforming Arguments & Replies
 
-Most Redis commands take one or more Strings as arguments,
+Most Valkey commands take one or more Strings as arguments,
 and replies are sent back as a single String or an Array of Strings. However, sometimes
 you may want something different. For instance, it would be more convenient if the `HGETALL`
 command returns a hash (e.g. `{ key: val1, key2: v2 }`) rather than an array of key values (e.g. `[key1, val1, key2, val2]`).
@@ -548,7 +548,7 @@ iovalkey has a flexible system for transforming arguments and replies. There are
 of transformers, argument transformer and reply transformer:
 
 ```javascript
-const Redis = require("iovalkey");
+const Valkey = require("iovalkey");
 
 // Here's the built-in argument transformer converting
 // hmset('key', { k1: 'v1', k2: 'v2' })
@@ -556,7 +556,7 @@ const Redis = require("iovalkey");
 // hmset('key', new Map([['k1', 'v1'], ['k2', 'v2']]))
 // into
 // hmset('key', 'k1', 'v1', 'k2', 'v2')
-Redis.Command.setArgumentTransformer("hmset", (args) => {
+Valkey.Command.setArgumentTransformer("hmset", (args) => {
   if (args.length === 2) {
     if (args[1] instanceof Map) {
       // utils is a internal module of iovalkey
@@ -573,7 +573,7 @@ Redis.Command.setArgumentTransformer("hmset", (args) => {
 // ['k1', 'v1', 'k2', 'v2']
 // into
 // { k1: 'v1', 'k2': 'v2' }
-Redis.Command.setReplyTransformer("hgetall", (result) => {
+Valkey.Command.setReplyTransformer("hgetall", (result) => {
   if (Array.isArray(result)) {
     const obj = {};
     for (let i = 0; i < result.length; i += 2) {
@@ -590,18 +590,18 @@ a reply transformer for `hgetall`. Transformers for `hmset` and `hgetall` were m
 above, and the transformer for `mset` is similar to the one for `hmset`:
 
 ```javascript
-redis.mset({ k1: "v1", k2: "v2" });
-redis.get("k1", (err, result) => {
+valkey.mset({ k1: "v1", k2: "v2" });
+valkey.get("k1", (err, result) => {
   // result === 'v1';
 });
 
-redis.mset(
+valkey.mset(
   new Map([
     ["k3", "v3"],
     ["k4", "v4"],
   ])
 );
-redis.get("k3", (err, result) => {
+valkey.get("k3", (err, result) => {
   // result === 'v3';
 });
 ```
@@ -609,34 +609,34 @@ redis.get("k3", (err, result) => {
 Another useful example of a reply transformer is one that changes `hgetall` to return array of arrays instead of objects which avoids an unwanted conversation of hash keys to strings when dealing with binary hash keys:
 
 ```javascript
-Redis.Command.setReplyTransformer("hgetall", (result) => {
+Valkey.Command.setReplyTransformer("hgetall", (result) => {
   const arr = [];
   for (let i = 0; i < result.length; i += 2) {
     arr.push([result[i], result[i + 1]]);
   }
   return arr;
 });
-redis.hset("h1", Buffer.from([0x01]), Buffer.from([0x02]));
-redis.hset("h1", Buffer.from([0x03]), Buffer.from([0x04]));
-redis.hgetallBuffer("h1", (err, result) => {
+valkey.hset("h1", Buffer.from([0x01]), Buffer.from([0x02]));
+valkey.hset("h1", Buffer.from([0x03]), Buffer.from([0x04]));
+valkey.hgetallBuffer("h1", (err, result) => {
   // result === [ [ <Buffer 01>, <Buffer 02> ], [ <Buffer 03>, <Buffer 04> ] ];
 });
 ```
 
 ## Monitor
 
-Redis supports the MONITOR command,
-which lets you see all commands received by the Redis server across all client connections,
+Valkey supports the MONITOR command,
+which lets you see all commands received by the Valkey server across all client connections,
 including from other client libraries and other computers.
 
 The `monitor` method returns a monitor instance.
 After you send the MONITOR command, no other commands are valid on that connection. iovalkey will emit a monitor event for every new monitor message that comes across.
-The callback for the monitor event takes a timestamp from the Redis server and an array of command arguments.
+The callback for the monitor event takes a timestamp from the Valkey server and an array of command arguments.
 
 Here is a simple example:
 
 ```javascript
-redis.monitor((err, monitor) => {
+valkey.monitor((err, monitor) => {
   monitor.on("monitor", (time, args, source, database) => {});
 });
 ```
@@ -645,7 +645,7 @@ Here is another example illustrating an `async` function and `monitor.disconnect
 
 ```javascript
 async () => {
-  const monitor = await redis.monitor();
+  const monitor = await valkey.monitor();
   monitor.on("monitor", console.log);
   // Any other tasks
   monitor.disconnect();
@@ -654,20 +654,20 @@ async () => {
 
 ## Streamify Scanning
 
-Redis 2.8 added the `SCAN` command to incrementally iterate through the keys in the database. It's different from `KEYS` in that
+Valkey 2.8 added the `SCAN` command to incrementally iterate through the keys in the database. It's different from `KEYS` in that
 `SCAN` only returns a small number of elements each call, so it can be used in production without the downside
 of blocking the server for a long time. However, it requires recording the cursor on the client side each time
 the `SCAN` command is called in order to iterate through all the keys correctly. Since it's a relatively common use case, iovalkey
 provides a streaming interface for the `SCAN` command to make things much easier. A readable stream can be created by calling `scanStream`:
 
 ```javascript
-const redis = new Redis();
+const valkey = new Valkey();
 // Create a readable stream (object mode)
-const stream = redis.scanStream();
+const stream = valkey.scanStream();
 stream.on("data", (resultKeys) => {
   // `resultKeys` is an array of strings representing key names.
   // Note that resultKeys may contain 0 keys, and that it will sometimes
-  // contain duplicates due to SCAN's implementation in Redis.
+  // contain duplicates due to SCAN's implementation in Valkey.
   for (let i = 0; i < resultKeys.length; i++) {
     console.log(resultKeys[i]);
   }
@@ -680,11 +680,11 @@ stream.on("end", () => {
 `scanStream` accepts an option, with which you can specify the `MATCH` pattern, the `TYPE` filter, and the `COUNT` argument:
 
 ```javascript
-const stream = redis.scanStream({
+const stream = valkey.scanStream({
   // only returns keys following the pattern of `user:*`
   match: "user:*",
   // only return objects that match a given type,
-  // (requires Redis >= 6.0)
+  // (requires Valkey >= 6.0)
   type: "zset",
   // returns approximately 100 elements per call
   count: 100,
@@ -698,18 +698,18 @@ There are also `hscanStream`, `zscanStream` and `sscanStream` to iterate through
 similar to `scanStream` except the first argument is the key name:
 
 ```javascript
-const stream = redis.hscanStream("myhash", {
+const stream = valkey.hscanStream("myhash", {
   match: "age:??",
 });
 ```
 
-You can learn more from the [Redis documentation](http://redis.io/commands/scan).
+You can learn more from the [Valkey documentation](http://redis.io/commands/scan).
 
 **Useful Tips**
-It's pretty common that doing an async task in the `data` handler. We'd like the scanning process to be paused until the async task to be finished. `Stream#pause()` and `Stream#resume()` do the trick. For example if we want to migrate data in Redis to MySQL:
+It's pretty common that doing an async task in the `data` handler. We'd like the scanning process to be paused until the async task to be finished. `Stream#pause()` and `Stream#resume()` do the trick. For example if we want to migrate data in Valkey to MySQL:
 
 ```javascript
-const stream = redis.scanStream();
+const stream = valkey.scanStream();
 stream.on("data", (resultKeys) => {
   // Pause the stream from scanning more keys until we've migrated the current keys.
   stream.pause();
@@ -727,14 +727,14 @@ stream.on("end", () => {
 
 ## Auto-reconnect
 
-By default, iovalkey will try to reconnect when the connection to Redis is lost
-except when the connection is closed manually by `redis.disconnect()` or `redis.quit()`.
+By default, iovalkey will try to reconnect when the connection to Valkey is lost
+except when the connection is closed manually by `valkey.disconnect()` or `valkey.quit()`.
 
 It's very flexible to control how long to wait to reconnect after disconnection
 using the `retryStrategy` option:
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   // This is the default value of `retryStrategy`
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
@@ -747,7 +747,7 @@ const redis = new Redis({
 The argument `times` means this is the nth reconnection being made and
 the return value represents how long (in ms) to wait to reconnect. When the
 return value isn't a number, iovalkey will stop trying to reconnect, and the connection
-will be lost forever if the user doesn't call `redis.connect()` manually.
+will be lost forever if the user doesn't call `valkey.connect()` manually.
 
 When reconnected, the client will auto subscribe to channels that the previous connection subscribed to.
 This behavior can be disabled by setting the `autoResubscribe` option to `false`.
@@ -758,7 +758,7 @@ the client will resend them when reconnected. This behavior can be disabled by s
 By default, all pending commands will be flushed with an error every 20 retry attempts. That makes sure commands won't wait forever when the connection is down. You can change this behavior by setting `maxRetriesPerRequest`:
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   maxRetriesPerRequest: 1,
 });
 ```
@@ -767,10 +767,10 @@ Set maxRetriesPerRequest to `null` to disable this behavior, and every command w
 
 ### Reconnect on Error
 
-Besides auto-reconnect when the connection is closed, iovalkey supports reconnecting on certain Redis errors using the `reconnectOnError` option. Here's an example that will reconnect when receiving `READONLY` error:
+Besides auto-reconnect when the connection is closed, iovalkey supports reconnecting on certain Valkey errors using the `reconnectOnError` option. Here's an example that will reconnect when receiving `READONLY` error:
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   reconnectOnError(err) {
     const targetError = "READONLY";
     if (err.message.includes(targetError)) {
@@ -783,23 +783,23 @@ const redis = new Redis({
 
 This feature is useful when using Amazon ElastiCache instances with Auto-failover disabled. On these instances, test your `reconnectOnError` handler by manually promoting the replica node to the primary role using the AWS console. The following writes fail with the error `READONLY`. Using `reconnectOnError`, we can force the connection to reconnect on this error in order to connect to the new master. Furthermore, if the `reconnectOnError` returns `2`, iovalkey will resend the failed command after reconnecting.
 
-On ElastiCache instances with Auto-failover enabled, `reconnectOnError` does not execute. Instead of returning a Redis error, AWS closes all connections to the master endpoint until the new primary node is ready. iovalkey reconnects via `retryStrategy` instead of `reconnectOnError` after about a minute. On ElastiCache instances with Auto-failover enabled, test failover events with the `Failover primary` option in the AWS console.
+On ElastiCache instances with Auto-failover enabled, `reconnectOnError` does not execute. Instead of returning a Valkey error, AWS closes all connections to the master endpoint until the new primary node is ready. iovalkey reconnects via `retryStrategy` instead of `reconnectOnError` after about a minute. On ElastiCache instances with Auto-failover enabled, test failover events with the `Failover primary` option in the AWS console.
 
 ## Connection Events
 
-The Redis instance will emit some events about the state of the connection to the Redis server.
+The Valkey instance will emit some events about the state of the connection to the Valkey server.
 
 | Event        | Description                                                                                                                                                                                                                                     |
 | :----------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| connect      | emits when a connection is established to the Redis server.                                                                                                                                                                                     |
+| connect      | emits when a connection is established to the Valkey server.                                                                                                                                                                                     |
 | ready        | If `enableReadyCheck` is `true`, client will emit `ready` when the server reports that it is ready to receive commands (e.g. finish loading data from disk).<br>Otherwise, `ready` will be emitted immediately right after the `connect` event. |
 | error        | emits when an error occurs while connecting.<br>However, iovalkey emits all `error` events silently (only emits when there's at least one listener) so that your application won't crash if you're not listening to the `error` event.           |
-| close        | emits when an established Redis server connection has closed.                                                                                                                                                                                   |
+| close        | emits when an established Valkey server connection has closed.                                                                                                                                                                                   |
 | reconnecting | emits after `close` when a reconnection will be made. The argument of the event is the time (in ms) before reconnecting.                                                                                                                        |
 | end          | emits after `close` when no more reconnections will be made, or the connection is failed to establish.                                                                                                                                          |
 | wait         | emits when `lazyConnect` is set and will wait for the first command to be called before connecting.                                                                                                                                             |
 
-You can also check out the `Redis#status` property to get the current connection status.
+You can also check out the `Valkey#status` property to get the current connection status.
 
 Besides the above connection events, there are several other custom events:
 
@@ -809,20 +809,20 @@ Besides the above connection events, there are several other custom events:
 
 ## Offline Queue
 
-When a command can't be processed by Redis (being sent before the `ready` event), by default, it's added to the offline queue and will be
+When a command can't be processed by Valkey (being sent before the `ready` event), by default, it's added to the offline queue and will be
 executed when it can be processed. You can disable this feature by setting the `enableOfflineQueue`
 option to `false`:
 
 ```javascript
-const redis = new Redis({ enableOfflineQueue: false });
+const valkey = new Valkey({ enableOfflineQueue: false });
 ```
 
 ## TLS Options
 
-Redis doesn't support TLS natively, however if the redis server you want to connect to is hosted behind a TLS proxy (e.g. [stunnel](https://www.stunnel.org/)) or is offered by a PaaS service that supports TLS connection (e.g. [Redis.com](https://redis.com/)), you can set the `tls` option:
+Valkey doesn't support TLS natively, however if the valkey server you want to connect to is hosted behind a TLS proxy (e.g. [stunnel](https://www.stunnel.org/)) or is offered by a PaaS service that supports TLS connection (e.g. [Redis.com](https://redis.com/)), you can set the `tls` option:
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   host: "localhost",
   tls: {
     // Refer to `tls.connect()` section in
@@ -836,14 +836,14 @@ const redis = new Redis({
 Alternatively, specify the connection through a [`rediss://` URL](https://www.iana.org/assignments/uri-schemes/prov/rediss).
 
 ```javascript
-const redis = new Redis("rediss://redis.my-service.com");
+const valkey = new Valkey("rediss://redis.my-service.com");
 ```
 
 If you do not want to use a connection string, you can also specify an empty `tls: {}` object:
 
 ```javascript
-const redis = new Redis({
-  host: "redis.my-service.com",
+const valkey = new Valkey({
+  host: "valkey.my-service.com",
   tls: {},
 });
 ```
@@ -861,12 +861,12 @@ Profiles:
 - `RedisCloudFlexible`: Contains the CA for [Redis.com](https://redis.com/) Cloud flexible subscriptions
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   host: "localhost",
   tls: "RedisCloudFixed",
 });
 
-const redisWithClientCertificate = new Redis({
+const valkeyWithClientCertificate = new Valkey({
   host: "localhost",
   tls: {
     profile: "RedisCloudFixed",
@@ -880,12 +880,12 @@ const redisWithClientCertificate = new Redis({
 ## Sentinel
 
 iovalkey supports Sentinel out of the box. It works transparently as all features that work when
-you connect to a single node also work when you connect to a sentinel group. Make sure to run Redis >= 2.8.12 if you want to use this feature. Sentinels have a default port of 26379.
+you connect to a single node also work when you connect to a sentinel group. Make sure to run Valkey >= 2.8.12 if you want to use this feature. Sentinels have a default port of 26379.
 
 To connect using Sentinel, use:
 
 ```javascript
-const redis = new Redis({
+const valkey = new Valkey({
   sentinels: [
     { host: "localhost", port: 26379 },
     { host: "localhost", port: 26380 },
@@ -893,12 +893,12 @@ const redis = new Redis({
   name: "mymaster",
 });
 
-redis.set("foo", "bar");
+valkey.set("foo", "bar");
 ```
 
 The arguments passed to the constructor are different from the ones you use to connect to a single node, where:
 
-- `name` identifies a group of Redis instances composed of a master and one or more slaves (`mymaster` in the example);
+- `name` identifies a group of Valkey instances composed of a master and one or more slaves (`mymaster` in the example);
 - `sentinelPassword` (optional) password for Sentinel instances.
 - `sentinels` are a list of sentinels to connect to. The list does not need to enumerate all your sentinel instances, but a few so that if one is down the client will try the next one.
 - `role` (optional) with a value of `slave` will return a random slave from the Sentinel group.
@@ -935,7 +935,7 @@ preferredSlaves = function (availableSlaves) {
   return false;
 };
 
-const redis = new Redis({
+const valkey = new Valkey({
   sentinels: [
     { host: "127.0.0.1", port: 26379 },
     { host: "127.0.0.1", port: 26380 },
@@ -957,13 +957,13 @@ function (times) {
 
 ## Cluster
 
-Redis Cluster provides a way to run a Redis installation where data is automatically sharded across multiple Redis nodes.
-You can connect to a Redis Cluster like this:
+Valkey Cluster provides a way to run a Valkey installation where data is automatically sharded across multiple Valkey nodes.
+You can connect to a Valkey Cluster like this:
 
 ```javascript
-const Redis = require("iovalkey");
+const Valkey = require("iovalkey");
 
-const cluster = new Redis.Cluster([
+const cluster = new Valkey.Cluster([
   {
     port: 6380,
     host: "127.0.0.1",
@@ -1008,7 +1008,7 @@ cluster.get("foo", (err, res) => {
       ```
 
     - `dnsLookup`: Alternative DNS lookup function (`dns.lookup()` is used by default). It may be useful to override this in special cases, such as when AWS ElastiCache used with TLS enabled.
-    - `enableOfflineQueue`: Similar to the `enableOfflineQueue` option of `Redis` class.
+    - `enableOfflineQueue`: Similar to the `enableOfflineQueue` option of `Valkey` class.
     - `enableReadyCheck`: When enabled, "ready" event will only be emitted when `CLUSTER INFO` command
       reporting the cluster is ready for handling commands. Otherwise, it will be emitted immediately after "connect" is emitted.
     - `scaleReads`: Config where to send the read queries. See below for more details.
@@ -1024,13 +1024,13 @@ cluster.get("foo", (err, res) => {
     - `retryDelayOnMoved`: By default, this value is `0` (in ms), which means when a `MOVED` error is received, the client will resend
       the command instantly to the node returned together with the `MOVED` error. However, sometimes it takes time for a cluster to become
       state stabilized after a failover, so adding a delay before resending can prevent a ping pong effect.
-    - `redisOptions`: Default options passed to the constructor of `Redis` when connecting to a node.
+    - `redisOptions`: Default options passed to the constructor of `Valkey` when connecting to a node.
     - `slotsRefreshTimeout`: Milliseconds before a timeout occurs while refreshing slots from the cluster (default `1000`).
     - `slotsRefreshInterval`: Milliseconds between every automatic slots refresh (by default, it is disabled).
 
 ### Read-Write Splitting
 
-A typical redis cluster contains three or more masters and several slaves for each master. It's possible to scale out redis cluster by sending read queries to slaves and write queries to masters by setting the `scaleReads` option.
+A typical valkey cluster contains three or more masters and several slaves for each master. It's possible to scale out valkey cluster by sending read queries to slaves and write queries to masters by setting the `scaleReads` option.
 
 `scaleReads` is "master" by default, which means iovalkey will never send any queries to slaves. There are other three available options:
 
@@ -1041,7 +1041,7 @@ A typical redis cluster contains three or more masters and several slaves for ea
 For example:
 
 ```javascript
-const cluster = new Redis.Cluster(
+const cluster = new Valkey.Cluster(
   [
     /* nodes */
   ],
@@ -1063,7 +1063,7 @@ Every command will be sent to exactly one node. For commands containing keys, (e
 
 Sometimes you may want to send a command to multiple nodes (masters or slaves) of the cluster, you can get the nodes via `Cluster#nodes()` method.
 
-`Cluster#nodes()` accepts a parameter role, which can be "master", "slave" and "all" (default), and returns an array of `Redis` instance. For example:
+`Cluster#nodes()` accepts a parameter role, which can be "master", "slave" and "all" (default), and returns an array of `Valkey` instance. For example:
 
 ```javascript
 // Send `FLUSHDB` command to all slaves:
@@ -1088,7 +1088,7 @@ Sometimes the cluster is hosted within a internal network that can only be acces
 You can specify nat mapping rules via `natMap` option:
 
 ```javascript
-const cluster = new Redis.Cluster(
+const cluster = new Valkey.Cluster(
   [
     {
       host: "203.0.113.73",
@@ -1109,7 +1109,7 @@ This option is also useful when the cluster is running inside a Docker container
 
 ### Transaction and Pipeline in Cluster Mode
 
-Almost all features that are supported by `Redis` are also supported by `Redis.Cluster`, e.g. custom commands, transaction and pipeline.
+Almost all features that are supported by `Valkey` are also supported by `Valkey.Cluster`, e.g. custom commands, transaction and pipeline.
 However there are some differences when using transaction and pipeline in Cluster mode:
 
 0. All keys in a pipeline should belong to slots served by the same node, since iovalkey sends all commands in a pipeline to the same node.
@@ -1128,8 +1128,8 @@ Pub/Sub in cluster mode works exactly as the same as in standalone mode. Interna
 const nodes = [
   /* nodes */
 ];
-const pub = new Redis.Cluster(nodes);
-const sub = new Redis.Cluster(nodes);
+const pub = new Valkey.Cluster(nodes);
+const sub = new Valkey.Cluster(nodes);
 sub.on("message", (channel, message) => {
   console.log(channel, message);
 });
@@ -1143,10 +1143,10 @@ sub.subscribe("news", () => {
 
 | Event        | Description                                                                                                                                                                                                |
 | :----------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| connect      | emits when a connection is established to the Redis server.                                                                                                                                                |
+| connect      | emits when a connection is established to the Valkey server.                                                                                                                                                |
 | ready        | emits when `CLUSTER INFO` reporting the cluster is able to receive commands (if `enableReadyCheck` is `true`) or immediately after `connect` event (if `enableReadyCheck` is false).                       |
 | error        | emits when an error occurs while connecting with a property of `lastNodeError` representing the last node error received. This event is emitted silently (only emitting if there's at least one listener). |
-| close        | emits when an established Redis server connection has closed.                                                                                                                                              |
+| close        | emits when an established Valkey server connection has closed.                                                                                                                                              |
 | reconnecting | emits after `close` when a reconnection will be made. The argument of the event is the time (in ms) before reconnecting.                                                                                   |
 | end          | emits after `close` when no more reconnections will be made.                                                                                                                                               |
 | +node        | emits when a new node is connected.                                                                                                                                                                        |
@@ -1158,8 +1158,8 @@ sub.subscribe("news", () => {
 Setting the `password` option to access password-protected clusters:
 
 ```javascript
-const Redis = require("iovalkey");
-const cluster = new Redis.Cluster(nodes, {
+const Valkey = require("iovalkey");
+const cluster = new Valkey.Cluster(nodes, {
   redisOptions: {
     password: "your-cluster-password",
   },
@@ -1169,8 +1169,8 @@ const cluster = new Redis.Cluster(nodes, {
 If some of nodes in the cluster using a different password, you should specify them in the first parameter:
 
 ```javascript
-const Redis = require("iovalkey");
-const cluster = new Redis.Cluster(
+const Valkey = require("iovalkey");
+const cluster = new Valkey.Cluster(
   [
     // Use password "password-for-30001" for 30001
     { port: 30001, password: "password-for-30001" },
@@ -1188,12 +1188,12 @@ const cluster = new Redis.Cluster(
 
 ### Special Note: Aws Elasticache Clusters with TLS
 
-AWS ElastiCache for Redis (Clustered Mode) supports TLS encryption. If you use
+AWS ElastiCache for Valkey (Clustered Mode) supports TLS encryption. If you use
 this, you may encounter errors with invalid certificates. To resolve this
 issue, construct the `Cluster` with the `dnsLookup` option as follows:
 
 ```javascript
-const cluster = new Redis.Cluster(
+const cluster = new Valkey.Cluster(
   [
     {
       host: "clustercfg.myCluster.abcdefg.xyz.cache.amazonaws.com",
@@ -1213,7 +1213,7 @@ const cluster = new Redis.Cluster(
 
 ## Autopipelining
 
-In standard mode, when you issue multiple commands, iovalkey sends them to the server one by one. As described in Redis pipeline documentation, this is a suboptimal use of the network link, especially when such link is not very performant.
+In standard mode, when you issue multiple commands, iovalkey sends them to the server one by one. As described in Valkey pipeline documentation, this is a suboptimal use of the network link, especially when such link is not very performant.
 
 The TCP and network overhead negatively affects performance. Commands are stuck in the send queue until the previous ones are correctly delivered to the server. This is a problem known as Head-Of-Line blocking (HOL).
 
@@ -1225,21 +1225,21 @@ This feature can dramatically improve throughput and avoids HOL blocking. In our
 
 While an automatic pipeline is executing, all new commands will be enqueued in a new pipeline which will be executed as soon as the previous finishes.
 
-When using Redis Cluster, one pipeline per node is created. Commands are assigned to pipelines according to which node serves the slot.
+When using Valkey Cluster, one pipeline per node is created. Commands are assigned to pipelines according to which node serves the slot.
 
 A pipeline will thus contain commands using different slots but that ultimately are assigned to the same node.
 
-Note that the same slot limitation within a single command still holds, as it is a Redis limitation.
+Note that the same slot limitation within a single command still holds, as it is a Valkey limitation.
 
 ### Example of Automatic Pipeline Enqueuing
 
 This sample code uses iovalkey with automatic pipeline enabled.
 
 ```javascript
-const Redis = require("./built");
+const Valkey = require("./built");
 const http = require("http");
 
-const db = new Redis({ enableAutoPipelining: true });
+const db = new Valkey({ enableAutoPipelining: true });
 
 const server = http.createServer((request, response) => {
   const key = new URL(request.url, "https://localhost:3000/").searchParams.get(
@@ -1271,7 +1271,7 @@ GET keyN
 
 When all events in the current loop have been processed, the pipeline is executed and thus all commands are sent to the server at the same time.
 
-While waiting for pipeline response from Redis, Node will still be able to process requests. All commands issued by request handler will be enqueued in a new automatically created pipeline. This pipeline will not be sent to the server yet.
+While waiting for pipeline response from Valkey, Node will still be able to process requests. All commands issued by request handler will be enqueued in a new automatically created pipeline. This pipeline will not be sent to the server yet.
 
 As soon as a previous automatic pipeline has received all responses from the server, the new pipeline is immediately sent without waiting for the events loop iteration to finish.
 
@@ -1297,14 +1297,14 @@ And here's the same test for a cluster of 3 masters and 3 replicas:
 
 # Error Handling
 
-All the errors returned by the Redis server are instances of `ReplyError`, which can be accessed via `Redis`:
+All the errors returned by the Valkey server are instances of `ReplyError`, which can be accessed via `Valkey`:
 
 ```javascript
-const Redis = require("iovalkey");
-const redis = new Redis();
+const Valkey = require("iovalkey");
+const valkey = new Valkey();
 // This command causes a reply error since the SET command requires two arguments.
-redis.set("foo", (err) => {
-  err instanceof Redis.ReplyError;
+valkey.set("foo", (err) => {
+  err instanceof Valkey.ReplyError;
 });
 ```
 
@@ -1327,9 +1327,9 @@ iovalkey provides an option `showFriendlyErrorStack` to solve the problem. When 
 `showFriendlyErrorStack`, iovalkey will optimize the error stack for you:
 
 ```javascript
-const Redis = require("iovalkey");
-const redis = new Redis({ showFriendlyErrorStack: true });
-redis.set("foo");
+const Valkey = require("iovalkey");
+const valkey = new Valkey({ showFriendlyErrorStack: true });
+valkey.set("foo");
 ```
 
 And the output will be:
@@ -1352,7 +1352,7 @@ default, this option is disabled and can only be used for debugging purposes. Yo
 
 # Running tests
 
-Start a Valkey/Redis server on 127.0.0.1:6379, and then:
+Start a Valkey/Valkey server on 127.0.0.1:6379, and then:
 
 ```shell
 npm test
