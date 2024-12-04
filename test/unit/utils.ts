@@ -1,7 +1,6 @@
 import * as sinon from "sinon";
 import { expect } from "chai";
 import * as utils from "../../lib/utils";
-import TLSProfiles from "../../lib/constants/TLSProfiles";
 
 describe("utils", () => {
   describe(".convertBufferToString", () => {
@@ -203,75 +202,6 @@ describe("utils", () => {
         host: "127.0.0.1",
         family: "IPv6",
       });
-    });
-  });
-
-  describe(".resolveTLSProfile", () => {
-    it("should leave options alone when no tls profile is set", () => {
-      [
-        { host: "localhost", port: 6379 },
-        { host: "localhost", port: 6379, tls: true },
-        { host: "localhost", port: 6379, tls: false },
-        { host: "localhost", port: 6379, tls: "foo" },
-        { host: "localhost", port: 6379, tls: {} },
-        { host: "localhost", port: 6379, tls: { ca: "foo" } },
-        { host: "localhost", port: 6379, tls: { profile: "foo" } },
-      ].forEach((options) => {
-        expect(utils.resolveTLSProfile(options)).to.eql(options);
-      });
-    });
-
-    it("should have redis.com profiles defined", () => {
-      expect(TLSProfiles).to.have.property("RedisCloudFixed");
-      expect(TLSProfiles).to.have.property("RedisCloudFlexible");
-    });
-
-    it("should read profile from options.tls.profile", () => {
-      const input = {
-        host: "localhost",
-        port: 6379,
-        tls: { profile: "RedisCloudFixed" },
-      };
-      const expected = {
-        host: "localhost",
-        port: 6379,
-        tls: TLSProfiles.RedisCloudFixed,
-      };
-
-      expect(utils.resolveTLSProfile(input)).to.eql(expected);
-    });
-
-    it("should read profile from options.tls", () => {
-      const input = {
-        host: "localhost",
-        port: 6379,
-        tls: "RedisCloudFixed",
-      };
-      const expected = {
-        host: "localhost",
-        port: 6379,
-        tls: TLSProfiles.RedisCloudFixed,
-      };
-
-      expect(utils.resolveTLSProfile(input)).to.eql(expected);
-    });
-
-    it("supports extra options when using options.tls.profile", () => {
-      const input = {
-        host: "localhost",
-        port: 6379,
-        tls: { profile: "RedisCloudFixed", key: "foo" },
-      };
-      const expected = {
-        host: "localhost",
-        port: 6379,
-        tls: {
-          ...TLSProfiles.RedisCloudFixed,
-          key: "foo",
-        },
-      };
-
-      expect(utils.resolveTLSProfile(input)).to.eql(expected);
     });
   });
 

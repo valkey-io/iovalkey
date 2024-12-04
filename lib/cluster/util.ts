@@ -1,4 +1,4 @@
-import { parseURL, resolveTLSProfile } from "../utils";
+import { parseURL } from "../utils";
 import { isIP } from "net";
 import { SrvRecord } from "dns";
 
@@ -67,7 +67,7 @@ export function normalizeNodeOptions(
       options.host = "127.0.0.1";
     }
 
-    return resolveTLSProfile(options);
+    return options;
   });
 }
 
