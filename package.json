@@ -1,7 +1,7 @@
 {
   "name": "iovalkey",
   "version": "0.2.1",
-  "description": "A robust, performance-focused and full-featured Redis client for Node.js.",
+  "description": "A robust, performance-focused and full-featured Valkey/Redis client for Node.js.",
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
   "files": [
@@ -26,6 +26,7 @@
     "url": "git://github.com/valkey-io/iovalkey.git"
   },
   "keywords": [
+    "valkey",
     "redis",
     "cluster",
     "sentinel",

@@ -1,7 +1,7 @@
 # iovalkey
 
-A robust, performance-focused and full-featured [Valkey](http://redis.io) client for [Node.js](https://nodejs.org).
-This is a friendly fork of  [ioredis](https://github.com/redis/ioredis) after [this commit](https://github.com/redis/ioredis/commit/ec42c82ceab1957db00c5175dfe37348f1856a93).
+A robust, performance-focused and full-featured [Valkey](https://valkey.io) client for [Node.js](https://nodejs.org).
+This is a friendly fork of [ioredis](https://github.com/redis/ioredis) after [this commit](https://github.com/redis/ioredis/commit/ec42c82ceab1957db00c5175dfe37348f1856a93).
 
 Supports Valkey >= 2.6.12. Completely compatible with Valkey 7.x.
 
@@ -10,7 +10,7 @@ Supports Valkey >= 2.6.12. Completely compatible with Valkey 7.x.
 iovalkey is a robust, full-featured Valkey client that is
 used in the world's biggest online commerce company [Alibaba](http://www.alibaba.com/) and many other awesome companies.
 
-0. Full-featured. It supports [Cluster](http://redis.io/topics/cluster-tutorial), [Sentinel](https://redis.io/docs/reference/sentinel-clients), [Streams](https://redis.io/topics/streams-intro), [Pipelining](http://redis.io/topics/pipelining), and of course [Lua scripting](http://redis.io/commands/eval), [Valkey Functions](https://redis.io/topics/functions-intro), [Pub/Sub](http://redis.io/topics/pubsub) (with the support of binary messages).
+0. Full-featured. It supports [Cluster](http://valkey.io/topics/cluster-tutorial), [Sentinel](https://valkey.io/docs/reference/sentinel-clients), [Streams](https://valkey.io/topics/streams-intro), [Pipelining](http://valkey.io/topics/pipelining), and of course [Lua scripting](http://valkey.io/commands/eval), [Valkey Functions](https://valkey.io/topics/functions-intro), [Pub/Sub](http://valkey.io/topics/pubsub) (with the support of binary messages).
 1. High performance 🚀.
 2. Delightful API 😄. It works with Node callbacks and Native promises.
 3. Transformation of command arguments and replies.
@@ -79,14 +79,14 @@ valkey.get("mykey").then((result) => {
 
 valkey.zadd("sortedSet", 1, "one", 2, "dos", 4, "quatro", 3, "three");
 valkey.zrange("sortedSet", 0, 2, "WITHSCORES").then((elements) => {
-  // ["one", "1", "dos", "2", "three", "3"] as if the command was `redis> ZRANGE sortedSet 0 2 WITHSCORES`
+  // ["one", "1", "dos", "2", "three", "3"] as if the command was `ZRANGE sortedSet 0 2 WITHSCORES`
   console.log(elements);
 });
 
 // All arguments are passed directly to the valkey/valkey server,
 // so technically iovalkey supports all Valkey commands.
 // The format is: valkey[SOME_VALKEY_COMMAND_IN_LOWERCASE](ARGUMENTS_ARE_JOINED_INTO_COMMAND_STRING)
-// so the following statement is equivalent to the CLI: `redis> SET mykey hello EX 10`
+// so the following statement is equivalent to the CLI: `SET mykey hello EX 10`
 valkey.set("mykey", "hello", "EX", 10);
 ```
 
@@ -221,7 +221,7 @@ valkey.on("pmessageBuffer", (pattern, channel, message) => {});
 
 ## Streams
 
-Valkey v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `valkey.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://redis.io/topics/streams-intro) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
+Valkey v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `valkey.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://valkey.io/topics/streams-intro/) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
 
 ```javascript
 const Valkey = require("iovalkey");
@@ -234,7 +234,7 @@ const processMessage = (message) => {
 async function listenForMessage(lastId = "$") {
   // `results` is an array, each element of which corresponds to a key.
   // Because we only listen to one key (mystream) here, `results` only contains
-  // a single element. See more: https://redis.io/commands/xread#return-value
+  // a single element. See more: https://valkey.io/commands/xread/
   const results = await valkey.xread("block", 0, "STREAMS", "mystream", lastId);
   const [key, messages] = results[0]; // `key` equals to "mystream"
 
@@ -249,7 +249,7 @@ listenForMessage();
 
 ## Expiration
 
-Valkey can set a timeout to expire your key, after the timeout has expired the key will be automatically deleted. (You can find the [official Expire documentation](https://redis.io/commands/expire/) to understand better the different parameters you can use), to set your key to expire in 60 seconds, we will have the following code:
+Valkey can set a timeout to expire your key, after the timeout has expired the key will be automatically deleted. (You can find the [official Expire documentation](https://valkey.io/commands/expire/) to understand better the different parameters you can use), to set your key to expire in 60 seconds, we will have the following code:
 
 ```javascript
 valkey.set("key", "data", "EX", 60);
@@ -265,6 +265,7 @@ Binary data support is out of the box. Pass buffers to send binary data:
 valkey.set("foo", Buffer.from([0x62, 0x75, 0x66]));
 ```
 
+<!-- This is the only doc reference I found without a valkey.io equivalent -->
 Every command that returns a [bulk string](https://redis.io/docs/reference/protocol-spec/#resp-bulk-strings)
 has a variant command with a `Buffer` suffix. The variant command returns a buffer instead of a UTF-8 string:
 
@@ -514,7 +515,7 @@ This feature allows you to specify a string that will automatically be prepended
 to all the keys in a command, which makes it easier to manage your key
 namespaces.
 
-**Warning** This feature won't apply to commands like [KEYS](http://redis.io/commands/KEYS) and [SCAN](http://redis.io/commands/scan) that take patterns rather than actual keys([#239](https://github.com/mcollina/iovalkey/issues/239)),
+**Warning** This feature won't apply to commands like [KEYS](https://valkey.io/commands/keys/) and [SCAN](http://valkey.io/commands/scan) that take patterns rather than actual keys([#239](https://github.com/mcollina/iovalkey/issues/239)),
 and this feature also won't apply to the replies of commands even if they are key names ([#325](https://github.com/mcollina/iovalkey/issues/325)).
 
 ```javascript
@@ -703,7 +704,7 @@ const stream = valkey.hscanStream("myhash", {
 });
 ```
 
-You can learn more from the [Valkey documentation](http://redis.io/commands/scan).
+You can learn more from the [Valkey documentation](http://valkey.io/commands/scan).
 
 **Useful Tips**
 It's pretty common that doing an async task in the `data` handler. We'd like the scanning process to be paused until the async task to be finished. `Stream#pause()` and `Stream#resume()` do the trick. For example if we want to migrate data in Valkey to MySQL:
@@ -819,7 +820,7 @@ const valkey = new Valkey({ enableOfflineQueue: false });
 
 ## TLS Options
 
-Valkey doesn't support TLS natively, however if the valkey server you want to connect to is hosted behind a TLS proxy (e.g. [stunnel](https://www.stunnel.org/)) or is offered by a PaaS service that supports TLS connection (e.g. [Redis.com](https://redis.com/)), you can set the `tls` option:
+Valkey doesn't support TLS natively, however if the valkey server you want to connect to is hosted behind a TLS proxy (e.g. [stunnel](https://www.stunnel.org/)) or is offered by a PaaS service that supports TLS connection, you can set the `tls` option:
 
 ```javascript
 const valkey = new Valkey({
@@ -836,7 +837,7 @@ const valkey = new Valkey({
 Alternatively, specify the connection through a [`rediss://` URL](https://www.iana.org/assignments/uri-schemes/prov/rediss).
 
 ```javascript
-const valkey = new Valkey("rediss://redis.my-service.com");
+const valkey = new Valkey("rediss://valkey.my-service.com");
 ```
 
 If you do not want to use a connection string, you can also specify an empty `tls: {}` object:
@@ -847,7 +848,6 @@ const valkey = new Valkey({
   tls: {},
 });
 ```
-
 
 <hr>
 
