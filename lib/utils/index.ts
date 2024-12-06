@@ -3,8 +3,6 @@ import { defaults, noop } from "./lodash";
 import { Callback } from "../types";
 import Debug from "./debug";
 
-import TLSProfiles from "../constants/TLSProfiles";
-
 /**
  * Convert a buffer to string, supports buffer array
  *
@@ -253,25 +251,6 @@ interface TLSOptions {
   port: number;
   host: string;
   [key: string]: any;
-}
-
-/**
- * Resolve TLS profile shortcut in connection options
- */
-export function resolveTLSProfile(options: TLSOptions): TLSOptions {
-  let tls = options?.tls;
-
-  if (typeof tls === "string") tls = { profile: tls };
-
-  const profile = TLSProfiles[tls?.profile];
-
-  if (profile) {
-    tls = Object.assign({}, profile, tls);
-    delete tls.profile;
-    options = Object.assign({}, options, { tls });
-  }
-
-  return options;
 }
 
 /**

@@ -27,7 +27,6 @@ import {
   Debug,
   isInt,
   parseURL,
-  resolveTLSProfile,
 } from "./utils";
 import applyMixin from "./utils/applyMixin";
 import Commander from "./utils/Commander";
@@ -742,8 +741,7 @@ class Redis extends Commander implements DataHandledable {
       options.db = parseInt(options.db, 10);
     }
 
-    // @ts-expect-error
-    this.options = resolveTLSProfile(options);
+    this.options = options;
   }
 
   /**
