@@ -67,16 +67,32 @@ describe("Commander", () => {
 
   describe("#zscan", () => {
     it("should pass noscores option", async (done) => {
-      const args: any[] = ["key", "0", "MATCH", "pattern", "COUNT", "10", "noscores"];
+      const args: any[] = [
+        "key",
+        "0",
+        "MATCH",
+        "pattern",
+        "COUNT",
+        "10",
+        "noscores",
+      ];
       sinon.stub(Commander.prototype, "sendCommand").callsFake((command) => {
-        if(command.args.every((arg, index) => arg === args[index])) {
+        if (command.args.every((arg, index) => arg === args[index])) {
           return done();
         }
         return done(new Error(`args should be ${args.join(", ")}`));
       });
       const c = new Commander();
 
-      await c.zscan(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+      await c.zscan(
+        args[0],
+        args[1],
+        args[2],
+        args[3],
+        args[4],
+        args[5],
+        args[6]
+      );
       (Commander.prototype.sendCommand as any).restore();
     });
   });

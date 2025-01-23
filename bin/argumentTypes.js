@@ -1,3 +1,5 @@
+"use strict";
+
 const typeMaps = require("./typeMaps");
 
 module.exports = {

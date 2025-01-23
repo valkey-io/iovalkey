@@ -1,3 +1,5 @@
+"use strict";
+
 const hasToken = (types, token) => {
   if (Array.isArray(token)) return token.some((t) => hasToken(types, t));
   return types.find((type) => type.includes(token));

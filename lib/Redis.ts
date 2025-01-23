@@ -22,12 +22,7 @@ import {
   ScanStreamOptions,
   WriteableStream,
 } from "./types";
-import {
-  CONNECTION_CLOSED_ERROR_MSG,
-  Debug,
-  isInt,
-  parseURL,
-} from "./utils";
+import { CONNECTION_CLOSED_ERROR_MSG, Debug, isInt, parseURL } from "./utils";
 import applyMixin from "./utils/applyMixin";
 import Commander from "./utils/Commander";
 import { defaults, noop } from "./utils/lodash";
@@ -524,7 +519,10 @@ class Redis extends Commander implements DataHandledable {
         this.manuallyClosing = true;
       }
 
-      if (this.options.socketTimeout !== undefined && this.socketTimeoutTimer === undefined) {
+      if (
+        this.options.socketTimeout !== undefined &&
+        this.socketTimeoutTimer === undefined
+      ) {
         this.setSocketTimeout();
       }
     }
@@ -543,7 +541,11 @@ class Redis extends Commander implements DataHandledable {
 
   private setSocketTimeout() {
     this.socketTimeoutTimer = setTimeout(() => {
-      this.stream.destroy(new Error(`Socket timeout. Expecting data, but didn't receive any in ${this.options.socketTimeout}ms.`));
+      this.stream.destroy(
+        new Error(
+          `Socket timeout. Expecting data, but didn't receive any in ${this.options.socketTimeout}ms.`
+        )
+      );
       this.socketTimeoutTimer = undefined;
     }, this.options.socketTimeout);
 

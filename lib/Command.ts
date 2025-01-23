@@ -1,4 +1,4 @@
-import { exists, getKeyIndexes } from "@ioredis/commands";
+import { exists, getKeyIndexes } from "@iovalkey/commands";
 import * as calculateSlot from "cluster-key-slot";
 import asCallback from "standard-as-callback";
 import {
