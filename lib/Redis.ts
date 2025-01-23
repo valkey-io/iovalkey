@@ -1,4 +1,4 @@
-import { exists, hasFlag } from "@ioredis/commands";
+import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import asCallback from "standard-as-callback";
 import Cluster from "./cluster";

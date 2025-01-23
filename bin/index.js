@@ -14,7 +14,7 @@ const HEADER = `/**
 `;
 
 const ignoredCommands = ["monitor", "multi"];
-const commands = require("@ioredis/commands")
+const commands = require("@iovalkey/commands")
   .list.filter((name) => !ignoredCommands.includes(name))
   .sort();
 

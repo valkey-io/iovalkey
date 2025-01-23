@@ -1,4 +1,4 @@
-import { list } from "@ioredis/commands";
+import { list } from "@iovalkey/commands";
 import {
   executeWithAutoPipelining,
   shouldUseAutoPipelining,
