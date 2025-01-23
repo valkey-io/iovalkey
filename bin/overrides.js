@@ -1,3 +1,5 @@
+"use strict";
+
 const msetOverrides = {
   overwrite: false,
   defs: [
