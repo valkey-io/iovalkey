@@ -1,4 +1,4 @@
-import { exists, hasFlag } from "@ioredis/commands";
+import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import { AbortError, RedisError } from "redis-errors";
 import asCallback from "standard-as-callback";
