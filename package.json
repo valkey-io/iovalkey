@@ -1,6 +1,6 @@
 {
   "name": "iovalkey",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A robust, performance-focused and full-featured Valkey/Redis client for Node.js.",
   "main": "./built/index.js",
   "types": "./built/index.d.ts",
