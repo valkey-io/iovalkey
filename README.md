@@ -1079,7 +1079,42 @@ const cluster = new Valkey.Cluster(
 );
 ```
 
-This option is also useful when the cluster is running inside a Docker container.
+Or you can specify this parameter through function:
+```javascript
+const cluster = new Redis.Cluster(
+  [
+    {
+      host: "203.0.113.73",
+      port: 30001,
+    },
+  ],
+  {
+    natMap: (key) => {
+      if(key.indexOf('30001')) {
+        return { host: "203.0.113.73", port: 30001 };
+      }
+
+      return null;
+    },
+  }
+);
+```
+
+When is a dynamic natMap especially needed?
+- Dockerized Redis clusters where IPs change frequently.
+- Kubernetes-hosted Redis clusters with ephemeral Pods.
+- Cloud deployments where private subnets or NAT gateways are used for Redis communication where NAT mappings frequently change.
+- Scenarios with Redis node failover where failing nodes get replaced by new replicas and need rebalancing.
+
+Example of problem in a distributed Redis cluster with NAT in a Kubernetes environment:
+
+Your Redis client is configured to connect to 10.0.1.101:6379, but this is only accessible internally.
+The client uses static natMap to remap 10.0.1.101:6379 to 203.0.113.10:6379.
+A failure occurs, and the cluster rebalances, replacing 10.0.1.101:6379 with 10.0.1.105:6379.
+Without a function-based natMap, the static mapping is stale, and your client can no longer connect.
+With a function-based natMap, you dynamically fetch the new mapping for 10.0.1.105, ensuring continued access.
+
+Specifying through may be useful if you don't know concrete internal host and know only node port.
 
 ### Transaction and Pipeline in Cluster Mode
 
