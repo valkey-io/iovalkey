@@ -1112,7 +1112,7 @@ Your Redis client is configured to connect to 10.0.1.101:6379, but this is only 
 The client uses static natMap to remap 10.0.1.101:6379 to 203.0.113.10:6379.
 A failure occurs, and the cluster rebalances, replacing 10.0.1.101:6379 with 10.0.1.105:6379.
 Without a function-based natMap, the static mapping is stale, and your client can no longer connect.
-With a function-based natMap, you dynamically fetch the new mapping for 10.0.1.105, ensuring continued access
+With a function-based natMap, you dynamically fetch the new mapping for 10.0.1.105, ensuring continued access.
 
 Specifying through may be useful if you don't know concrete internal host and know only node port.
 
