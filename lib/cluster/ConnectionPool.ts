@@ -39,7 +39,7 @@ export default class ConnectionPool extends EventEmitter {
   getSampleInstance(role: NodeRole): Redis {
     const keys = Object.keys(this.nodeRecords[role]);
     const sampleKey = sample(keys);
-    return this.nodeRecords[role][sampleKey].redis;
+    return this.nodeRecords[role][sampleKey]?.redis;
   }
 
   /**
