@@ -29,7 +29,7 @@ export default class ConnectionPool extends EventEmitter {
 
   getNodes(role: NodeRole = "all"): Redis[] {
     const nodeRecords = this.nodeRecords[role];
-    return Object.keys(nodeRecords).map((key) => nodeRecords[key].redis);
+    return Object.keys(nodeRecords).map((key) => nodeRecords[key]?.redis);
   }
 
   getInstanceByKey(key: NodeKey): Redis {
@@ -39,7 +39,7 @@ export default class ConnectionPool extends EventEmitter {
   getSampleInstance(role: NodeRole): Redis {
     const keys = Object.keys(this.nodeRecords[role]);
     const sampleKey = sample(keys);
-    return this.nodeRecords[role][sampleKey].redis;
+    return this.nodeRecords[role][sampleKey]?.redis;
   }
 
   /**
