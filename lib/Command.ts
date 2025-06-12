@@ -339,6 +339,12 @@ export default class Command implements Respondable {
       } else {
         this.reject = reject;
       }
+    }).finally(() => {
+      const existingTimer = this._commandTimeoutTimer;
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+        delete this._commandTimeoutTimer;
+      }
     });
 
     this.promise = asCallback(promise, this.callback);
@@ -370,12 +376,6 @@ export default class Command implements Respondable {
   private _convertValue(resolve: Function): (result: any) => void {
     return (value) => {
       try {
-        const existingTimer = this._commandTimeoutTimer;
-        if (existingTimer) {
-          clearTimeout(existingTimer);
-          delete this._commandTimeoutTimer;
-        }
-
         resolve(this.transformReply(value));
         this.isResolved = true;
       } catch (err) {

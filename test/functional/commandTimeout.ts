@@ -34,4 +34,27 @@ describe("commandTimeout", () => {
     redis.disconnect();
     await server.disconnectPromise();
   });
+
+  it("does not leak timers on rejected commands", async () => {
+    const server = new MockServer(30001, (argv, socket, flags) => {
+      if (argv[0] === "evalsha") {
+        return new Error("test error");
+      }
+    });
+
+    const redis = new Redis({ port: 30001, commandTimeout: 1000000000 });
+    const clock = sinon.useFakeTimers();
+    let error: any;
+    try {
+      await redis.evalsha("asd", 0);
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error.message).to.eql("test error");
+    expect(clock.countTimers()).to.eql(0);
+    clock.restore();
+    redis.disconnect();
+    server.disconnect();
+  });
 });
