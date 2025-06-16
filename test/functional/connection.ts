@@ -106,7 +106,7 @@ describe("connection", function () {
         retryStrategy: null,
       });
       let isReady = false;
-      let timedoutCalled = false;
+      let timeoutCalled = false;
 
       // TODO: use spy
       sinon
@@ -117,14 +117,14 @@ describe("connection", function () {
             if (!isReady) {
               isReady = true;
             } else {
-              timedoutCalled = true;
+              timeoutCalled = true;
             }
             return;
           }
 
           setTimeout(() => {
             callback();
-            expect(timedoutCalled).to.eql(false);
+            expect(timeoutCalled).to.eql(false);
             redis.disconnect();
             done();
           }, timeout);
