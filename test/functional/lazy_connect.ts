@@ -62,7 +62,7 @@ describe("lazy connect", () => {
       pipeline.get("fool1").exec(() => {});
     });
 
-    it("should call connect when transction exec", (done) => {
+    it("should call connect when transaction exec", (done) => {
       const stub = sinon.stub(Cluster.prototype, "connect").callsFake(() => {
         stub.restore();
         done();
