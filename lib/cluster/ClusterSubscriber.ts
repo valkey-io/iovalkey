@@ -132,7 +132,7 @@ export default class ClusterSubscriber {
 
     // The node we lost connection to may not come back up in a
     // reasonable amount of time (e.g. a slave that's taken down
-    // for maintainence), we could potentially miss many published
+    // for maintenance), we could potentially miss many published
     // messages so we should reconnect as quickly as possible, to
     // a different node if needed.
     this.subscriber.once("end", this.onSubscriberEnd);
