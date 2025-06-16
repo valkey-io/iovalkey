@@ -125,7 +125,7 @@ export default class DataHandler {
     switch (replyType) {
       case "message":
         if (this.redis.listeners("message").length > 0) {
-          // Check if there're listeners to avoid unnecessary `toString()`.
+          // Check if there are listeners to avoid unnecessary `toString()`.
           this.redis.emit(
             "message",
             reply[1].toString(),
