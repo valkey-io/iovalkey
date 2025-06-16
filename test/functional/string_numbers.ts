@@ -15,7 +15,7 @@ describe("stringNumbers", () => {
       expect(await redis.incr("foo")).to.equal("9007199254740993");
       expect(await redis.incr("foo")).to.equal("9007199254740994");
 
-      // also works for small interger
+      // also works for small integer
       await redis.set("foo", 123);
       expect(await redis.incr("foo")).to.equal("124");
 
