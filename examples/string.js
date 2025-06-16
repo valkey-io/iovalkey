@@ -4,7 +4,7 @@ const redis = new Redis();
 async function main() {
   const user = {
     name: "Bob",
-    // The value of a Redis key can not be a number.
+    // The value of a Redis key cannot be a number.
     // We can write `age: 20` here but ioredis will convert it to a string anyway.
     age: "20",
     description: "I am a programmer",
