@@ -1013,7 +1013,7 @@ class Cluster extends Commander {
    * Normalize startup nodes, and resolving hostnames to IPs.
    *
    * This process happens every time when #connect() is called since
-   * #startupNodes and DNS records may chanage.
+   * #startupNodes and DNS records may change.
    */
   private async resolveStartupNodeHostnames(): Promise<RedisOptions[]> {
     if (!Array.isArray(this.startupNodes) || this.startupNodes.length === 0) {
