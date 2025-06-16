@@ -228,19 +228,19 @@ const Valkey = require("iovalkey");
 const valkey = new Valkey();
 
 const processMessage = (message) => {
-  console.log("Id: %s. Data: %O", message[0], message[1]);
+  console.log("ID: %s. Data: %O", message[0], message[1]);
 };
 
-async function listenForMessage(lastId = "$") {
+async function listenForMessage(lastID = "$") {
   // `results` is an array, each element of which corresponds to a key.
   // Because we only listen to one key (mystream) here, `results` only contains
   // a single element. See more: https://valkey.io/commands/xread/
-  const results = await valkey.xread("block", 0, "STREAMS", "mystream", lastId);
+  const results = await valkey.xread("block", 0, "STREAMS", "mystream", lastID);
   const [key, messages] = results[0]; // `key` equals "mystream"
 
   messages.forEach(processMessage);
 
-  // Pass the last id of the results to the next round.
+  // Pass the last ID of the results to the next round.
   await listenForMessage(messages[messages.length - 1][0]);
 }
 

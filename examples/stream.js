@@ -5,14 +5,14 @@ const pub = new Redis();
 
 // Usage 1: As message hub
 const processMessage = (message) => {
-  console.log("Id: %s. Data: %O", message[0], message[1]);
+  console.log("ID: %s. Data: %O", message[0], message[1]);
 };
 
-async function listenForMessage(lastId = "$") {
+async function listenForMessage(lastID = "$") {
   // `results` is an array, each element of which corresponds to a key.
   // Because we only listen to one key (mystream) here, `results` only contains
   // a single element. See more: https://redis.io/commands/xread#return-value
-  const results = await sub.xread("BLOCK", 0, "STREAMS", "user-stream", lastId);
+  const results = await sub.xread("BLOCK", 0, "STREAMS", "user-stream", lastID);
   const [key, messages] = results[0]; // `key` equals "user-stream"
 
   messages.forEach(processMessage);
