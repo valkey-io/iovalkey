@@ -74,7 +74,7 @@ describe("lazy connect", () => {
         .exec(() => {});
     });
 
-    it('should quit before "close" being emited', (done) => {
+    it('should quit before "close" being emitted', (done) => {
       const stub = sinon
         .stub(Cluster.prototype, "connect")
         .throws(new Error("`connect` should not be called"));
@@ -89,7 +89,7 @@ describe("lazy connect", () => {
       });
     });
 
-    it('should disconnect before "close" being emited', (done) => {
+    it('should disconnect before "close" being emitted', (done) => {
       const stub = sinon
         .stub(Cluster.prototype, "connect")
         .throws(new Error("`connect` should not be called"));
