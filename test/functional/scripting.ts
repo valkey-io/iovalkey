@@ -203,9 +203,9 @@ describe("scripting", () => {
       await redis.test("bar");
     });
 
-    const expectedComands = ["evalsha", "eval", "get", "evalsha", "get"];
+    const expectedCommands = ["evalsha", "eval", "get", "evalsha", "get"];
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
@@ -230,10 +230,10 @@ describe("scripting", () => {
       return redis.pipeline().testGet("foo").testSet("foo").get("foo").exec();
     });
 
-    const expectedComands = ["evalsha", "get", "eval", "set", "get"];
+    const expectedCommands = ["evalsha", "get", "eval", "set", "get"];
 
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
@@ -259,9 +259,9 @@ describe("scripting", () => {
     });
     spy.restore();
     expect(spy.callCount).to.equal(4);
-    const expectedComands = ["multi", "evalsha", "evalsha", "exec"];
+    const expectedCommands = ["multi", "evalsha", "evalsha", "exec"];
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
@@ -285,9 +285,9 @@ describe("scripting", () => {
     });
     spy.restore();
     expect(spy.callCount).to.equal(4);
-    const expectedComands = ["multi", "evalsha", "evalsha", "exec"];
+    const expectedCommands = ["multi", "evalsha", "evalsha", "exec"];
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
