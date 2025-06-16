@@ -236,7 +236,7 @@ async function listenForMessage(lastId = "$") {
   // Because we only listen to one key (mystream) here, `results` only contains
   // a single element. See more: https://valkey.io/commands/xread/
   const results = await valkey.xread("block", 0, "STREAMS", "mystream", lastId);
-  const [key, messages] = results[0]; // `key` equals to "mystream"
+  const [key, messages] = results[0]; // `key` equals "mystream"
 
   messages.forEach(processMessage);
 
@@ -465,7 +465,7 @@ valkey.myecho("k1", "k2", "a1", "a2", (err, result) => {
 
 // `myechoBuffer` is also defined automatically to return buffers instead of strings:
 valkey.myechoBuffer("k1", "k2", "a1", "a2", (err, result) => {
-  // result[0] equals to Buffer.from('k1');
+  // result[0] equals Buffer.from('k1');
 });
 
 // And of course it works with pipeline:
