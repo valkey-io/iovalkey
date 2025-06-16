@@ -106,7 +106,7 @@ class Cluster extends Commander {
   /**
    * Every time Cluster#connect() is called, this value will be
    * auto-incrementing. The purpose of this value is used for
-   * discarding previous connect attampts when creating a new
+   * discarding previous connect attempts when creating a new
    * connection.
    */
   private connectionEpoch = 0;
