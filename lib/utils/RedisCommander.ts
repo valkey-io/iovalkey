@@ -8978,7 +8978,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   /**
    * Synchronously saves the database(s) to disk and shuts down the server.
    * - _group_: server
-   * - _complexity_: O(N) when saving, where N is the total number of keys in all databases when saving data, otherwise O(1)
+   * - _complexity_: O(N) when saving, where N is the total number of keys in all databases when saving data; otherwise, O(1)
    * - _since_: 1.0.0
    */
   shutdown(callback?: Callback<"OK">): Result<"OK", Context>;
@@ -10009,7 +10009,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   /**
    * Returns one or more random members from a set after removing them. Deletes the set if the last member was popped.
    * - _group_: set
-   * - _complexity_: Without the count argument O(1), otherwise O(N) where N is the value of the passed count.
+   * - _complexity_: Without the count argument O(1); otherwise, O(N) where N is the value of the passed count.
    * - _since_: 1.0.0
    */
   spop(
@@ -10046,7 +10046,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   /**
    * Get one or multiple random members from a set
    * - _group_: set
-   * - _complexity_: Without the count argument O(1), otherwise O(N) where N is the absolute value of the passed count.
+   * - _complexity_: Without the count argument O(1); otherwise, O(N) where N is the absolute value of the passed count.
    * - _since_: 1.0.0
    */
   srandmember(
