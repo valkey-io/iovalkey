@@ -183,7 +183,7 @@ describe("scripting", () => {
     ]);
   });
 
-  it("should try to use EVALSHA and fallback to EVAL if fails", async () => {
+  it("should try to use EVALSHA and fall back to EVAL if fails", async () => {
     const redis = new Redis();
 
     redis.defineCommand("test", {
@@ -237,7 +237,7 @@ describe("scripting", () => {
     );
   });
 
-  it("does not fallback to EVAL in regular transaction", async () => {
+  it("does not fall back to EVAL in regular transaction", async () => {
     const redis = new Redis();
 
     redis.defineCommand("test", {
@@ -265,7 +265,7 @@ describe("scripting", () => {
     );
   });
 
-  it("does not fallback to EVAL in manual transaction", async () => {
+  it("does not fall back to EVAL in manual transaction", async () => {
     const redis = new Redis();
 
     redis.defineCommand("test", {
