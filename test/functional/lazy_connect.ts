@@ -58,8 +58,8 @@ describe("lazy connect", () => {
         done();
       });
       const cluster = new Cluster([], { lazyConnect: true });
-      const pipline = new Pipeline(cluster);
-      pipline.get("fool1").exec(() => {});
+      const pipeline = new Pipeline(cluster);
+      pipeline.get("fool1").exec(() => {});
     });
 
     it("should call connect when transction exec", (done) => {
