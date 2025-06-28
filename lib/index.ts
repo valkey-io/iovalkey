@@ -1,13 +1,16 @@
-exports = module.exports = require("./Redis").default;
+// eslint-disable-next-line import/extensions, @typescript-eslint/no-require-imports
+const Redis: typeof import('./Redis.js').default = require('./Redis').default
 
-export { default } from "./Redis";
-export { default as Redis } from "./Redis";
-export { default as Cluster } from "./cluster";
+exports = module.exports = Redis;
+
+export default Redis;
+export { Redis };
+export { default as Cluster } from "./cluster/index.js";
 
 /**
  * @ignore
  */
-export { default as Command } from "./Command";
+export { default as Command } from "./Command.js";
 
 /**
  * @ignore
@@ -16,22 +19,22 @@ export {
   default as RedisCommander,
   Result,
   ClientContext,
-} from "./utils/RedisCommander";
+} from "./utils/RedisCommander.js";
 
 /**
  * @ignore
  */
-export { default as ScanStream } from "./ScanStream";
+export { default as ScanStream } from "./ScanStream.js";
 
 /**
  * @ignore
  */
-export { default as Pipeline } from "./Pipeline";
+export { default as Pipeline } from "./Pipeline.js";
 
 /**
  * @ignore
  */
-export { default as AbstractConnector } from "./connectors/AbstractConnector";
+export { default as AbstractConnector } from "./connectors/AbstractConnector.js";
 
 /**
  * @ignore
@@ -39,36 +42,36 @@ export { default as AbstractConnector } from "./connectors/AbstractConnector";
 export {
   default as SentinelConnector,
   SentinelIterator,
-} from "./connectors/SentinelConnector";
+} from "./connectors/SentinelConnector/index.js";
 
 /**
  * @ignore
  */
-export { Callback } from "./types";
+export { Callback } from "./types.js";
 
 // Type Exports
 export {
   SentinelAddress,
   SentinelConnectionOptions,
-} from "./connectors/SentinelConnector";
-export { StandaloneConnectionOptions } from "./connectors/StandaloneConnector";
-export { RedisOptions, CommonRedisOptions } from "./redis/RedisOptions";
-export { ClusterNode } from "./cluster";
+} from "./connectors/SentinelConnector/index.js";
+export { StandaloneConnectionOptions } from "./connectors/StandaloneConnector.js";
+export { RedisOptions, CommonRedisOptions } from "./redis/RedisOptions.js";
+export { ClusterNode } from "./cluster/index.js";
 export {
   ClusterOptions,
   DNSLookupFunction,
   DNSResolveSrvFunction,
   NatMap,
-} from "./cluster/ClusterOptions";
-export { NodeRole } from "./cluster/util";
+} from "./cluster/ClusterOptions.js";
+export { NodeRole } from "./cluster/util.js";
 export type {
   RedisKey,
   RedisValue,
   ChainableCommander,
-} from "./utils/RedisCommander";
+} from "./utils/RedisCommander.js";
 
 // No TS typings
-export const ReplyError = require("redis-errors").ReplyError;
+export { ReplyError } from "redis-errors";
 
 /**
  * @ignore
@@ -87,13 +90,4 @@ Object.defineProperty(exports, "Promise", {
   },
 });
 
-/**
- * @ignore
- */
-export function print(err: Error | null, reply?: any) {
-  if (err) {
-    console.log("Error: " + err);
-  } else {
-    console.log("Reply: " + reply);
-  }
-}
+export { print } from "./print.js";

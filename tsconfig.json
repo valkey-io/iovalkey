@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2019",
     "declaration": true,
+    "esModuleInterop": true,
     "lib": [
       "es2019",
       "es2020.bigint",
@@ -10,7 +11,11 @@
     ],
     "moduleResolution": "node",
     "module": "commonjs",
-    "outDir": "./built"
+    "outDir": "./built",
   },
-  "include": ["./lib/**/*"]
+  "include": ["./lib/**/*"],
+  "exclude": ["node_modules", "built", "test"],
+  "ts-node": {
+    "experimentalResolver": true
+  }
 }

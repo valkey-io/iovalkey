@@ -1,9 +1,9 @@
 import MockServer from "../../helpers/mock_server";
 import { expect } from "chai";
 import { Cluster } from "../../../lib";
-import * as sinon from "sinon";
-import * as tls from "tls";
-import * as net from "net";
+import sinon from "sinon";
+import tls from "tls";
+import net from "net";
 
 describe("cluster:tls option", () => {
   it("supports tls", (done) => {

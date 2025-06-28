@@ -1,4 +1,4 @@
-import { SentinelAddress } from "./types";
+import { SentinelAddress } from "./types.js";
 
 function isSentinelEql(
   a: Partial<SentinelAddress>,

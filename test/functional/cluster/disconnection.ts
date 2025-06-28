@@ -1,4 +1,4 @@
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 import { Cluster } from "../../../lib";
 import MockServer from "../../helpers/mock_server";

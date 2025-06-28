@@ -1,4 +1,4 @@
-import { RedisOptions } from "../../redis/RedisOptions";
+import { RedisOptions } from "../../redis/RedisOptions.js";
 
 export interface SentinelAddress {
   port: number;

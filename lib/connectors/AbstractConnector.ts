@@ -1,5 +1,5 @@
-import { NetStream } from "../types";
-import { Debug } from "../utils";
+import { NetStream } from "../types.js";
+import { Debug } from "../utils/index.js";
 
 const debug = Debug("AbstractConnector");
 

@@ -1,8 +1,8 @@
 import { createConnection, IpcNetConnectOpts, TcpNetConnectOpts } from "net";
 import { connect as createTLSConnection, ConnectionOptions } from "tls";
-import { NetStream } from "../types";
-import { CONNECTION_CLOSED_ERROR_MSG } from "../utils";
-import AbstractConnector, { ErrorEmitter } from "./AbstractConnector";
+import { NetStream } from "../types.js";
+import { CONNECTION_CLOSED_ERROR_MSG } from "../utils/index.js";
+import AbstractConnector, { ErrorEmitter } from "./AbstractConnector.js";
 
 type TcpOptions = Pick<TcpNetConnectOpts, "port" | "host" | "family">;
 type IpcOptions = Pick<IpcNetConnectOpts, "path">;

@@ -1,6 +1,6 @@
 import Redis from "../../lib/Redis";
 import { expect } from "chai";
-import * as sinon from "sinon";
+import sinon from "sinon";
 
 describe("reconnectOnError", () => {
   it("should pass the error as the first param", (done) => {

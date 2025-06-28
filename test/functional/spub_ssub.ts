@@ -22,6 +22,7 @@ describe("spub/ssub", function () {
     redis.ssubscribe("foo", function () {
       redis.set("foo", "bar", function (err) {
         expect(err instanceof Error);
+        // @ts-expect-error
         expect(err.message).to.match(/subscriber mode/);
         redis.disconnect();
         done();
