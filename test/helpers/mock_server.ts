@@ -1,6 +1,6 @@
 import { createServer, Server, Socket } from "net";
 import { EventEmitter } from "events";
-import { convertBufferToString } from "../../lib/utils";
+import { convertBufferToString } from "../../lib/utils/index.js";
 import * as enableDestroy from "server-destroy";
 import * as Parser from "redis-parser";
 
@@ -111,6 +111,7 @@ export default class MockServer extends EventEmitter {
       });
 
       c.on("end", () => {
+        // @ts-expect-error
         this.clients[clientIndex] = null;
         this.emit("disconnect", c);
       });

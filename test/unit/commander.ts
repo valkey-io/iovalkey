@@ -1,4 +1,4 @@
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 import Commander from "../../lib/utils/Commander";
 import Command from "../../lib/Command";

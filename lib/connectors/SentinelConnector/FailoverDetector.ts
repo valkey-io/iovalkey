@@ -1,6 +1,6 @@
-import { Debug } from "../../utils";
-import SentinelConnector from "./index";
-import { Sentinel } from "./types";
+import { Debug } from "../../utils/index.js";
+import SentinelConnector from "./index.js";
+import { Sentinel } from "./types.js";
 
 const debug = Debug("FailoverDetector");
 

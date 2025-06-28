@@ -1,4 +1,4 @@
-import { CommandNameFlags } from "./Command";
+import { CommandNameFlags } from "./Command.js";
 
 type AddSet = CommandNameFlags["ENTER_SUBSCRIBER_MODE"][number];
 type DelSet = CommandNameFlags["EXIT_SUBSCRIBER_MODE"][number];

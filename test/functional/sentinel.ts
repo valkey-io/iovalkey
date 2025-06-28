@@ -4,7 +4,7 @@ import Redis from "../../lib/Redis";
 import MockServer from "../helpers/mock_server";
 import { once } from "events";
 import { expect } from "chai";
-import * as sinon from "sinon";
+import sinon from "sinon";
 
 function triggerParseError(socket: Socket) {
   // Valid first characters: '$', '+', '*', ':', '-'
