@@ -1,9 +1,9 @@
 import { SrvRecord, resolveSrv, lookup } from "dns";
-import { RedisOptions } from "../redis/RedisOptions.js";
+import { ValkeyOptions } from "../redis/ValkeyOptions.js";
 import { CommanderOptions } from "../utils/Commander.js"; 
 import { NodeRole } from "./util.js";
 import { type Command } from "../Command.js";
-import { type Redis } from "../Redis.js"; 
+import { type Valkey } from "../Valkey.js"; 
 
 export type DNSResolveSrvFunction = (
   hostname: string,
@@ -42,7 +42,7 @@ export interface ClusterOptions extends CommanderOptions {
   ) => number | void | null;
 
   /**
-   * See Redis class.
+   * See Valkey class.
    *
    * @default true
    */
@@ -61,7 +61,7 @@ export interface ClusterOptions extends CommanderOptions {
    *
    * @default "master"
    */
-  scaleReads?: NodeRole | ((nodes: Redis[], command: Command) => Redis);
+  scaleReads?: NodeRole | ((nodes: Valkey[], command: Command) => Valkey);
 
   /**
    * When a MOVED or ASK error is received, client will redirect the
@@ -74,7 +74,7 @@ export interface ClusterOptions extends CommanderOptions {
 
   /**
    * When an error is received when sending a command (e.g.
-   * "Connection is closed." when the target Redis node is down), client will retry
+   * "Connection is closed." when the target Valkey node is down), client will retry
    * if `retryDelayOnFailover` is valid delay time (in ms).
    *
    * @default 100
@@ -124,12 +124,12 @@ export interface ClusterOptions extends CommanderOptions {
   slotsRefreshInterval?: number;
 
   /**
-   * Passed to the constructor of `Redis`
+   * Passed to the constructor of `Valkey`
    *
    * @default null
    */
   redisOptions?: Omit<
-    RedisOptions,
+    ValkeyOptions,
     | "port"
     | "host"
     | "path"
@@ -141,7 +141,7 @@ export interface ClusterOptions extends CommanderOptions {
 
   /**
    * By default, When a new Cluster instance is created,
-   * it will connect to the Redis cluster automatically.
+   * it will connect to the Valkey cluster automatically.
    * If you want to keep the instance disconnected until the first command is called,
    * set this option to `true`.
    *
@@ -180,14 +180,14 @@ export interface ClusterOptions extends CommanderOptions {
   natMap?: NatMap;
 
   /**
-   * See Redis class.
+   * See Valkey class.
    *
    * @default false
    */
   enableAutoPipelining?: boolean;
 
   /**
-   * See Redis class.
+   * See Valkey class.
    *
    * @default []
    */

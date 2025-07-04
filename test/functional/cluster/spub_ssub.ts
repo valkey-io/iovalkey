@@ -1,8 +1,7 @@
 import MockServer, { getConnectionName } from "../../helpers/mock_server";
 import { expect } from "chai";
-import { Cluster } from "../../../lib";
+import { Cluster, Valkey } from "../../../lib";
 import sinon from "sinon";
-import Redis from "../../../lib/Redis";
 import { noop } from "../../../lib/utils";
 
 describe("cluster:spub/ssub", function () {
@@ -71,7 +70,7 @@ describe("cluster:spub/ssub", function () {
     };
     new MockServer(30001, handler);
 
-    const ssub = new Redis.Cluster([{ port: "30001", password: "abc" }]);
+    const ssub = new Cluster([{ port: "30001", password: "abc" }]);
 
     ssub.ssubscribe("test cluster", function () {
       ssub.disconnect();
@@ -91,13 +90,13 @@ describe("cluster:spub/ssub", function () {
 
     client.ssubscribe("test cluster", function () {
       const stub = sinon
-        .stub(Redis.prototype, "ssubscribe")
+        .stub(Valkey.prototype, "ssubscribe")
         .callsFake((channels) => {
           expect(channels).to.eql(["test cluster"]);
           stub.restore();
           client.disconnect();
           done();
-          return Redis.prototype.ssubscribe.apply(this, arguments);
+          return Valkey.prototype.ssubscribe.apply(this, arguments);
         });
       client.once("end", function () {
         client.connect().catch(noop);

@@ -6,7 +6,7 @@ import {
 import { Command, ArgumentType } from "../Command.js";
 import { Script } from "../Script.js";
 import { Callback, WriteableStream } from "../types.js";
-import { RedisCommander, ClientContext } from "./RedisCommander.js";
+import { ValkeyCommander, ClientContext } from "./ValkeyCommander.js";
 
 export interface CommanderOptions {
   keyPrefix?: string;
@@ -94,7 +94,7 @@ class Commander<Context extends ClientContext = { type: "default" }> {
 
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
-interface Commander<Context> extends RedisCommander<Context> {}
+interface Commander<Context> extends ValkeyCommander<Context> {}
 
 
 const commands = list.filter((command) => command !== "monitor");

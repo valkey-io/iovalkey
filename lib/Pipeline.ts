@@ -2,7 +2,7 @@ import calculateSlot from "cluster-key-slot";
 import { exists, hasFlag } from "@iovalkey/commands";
 import asCallback from "standard-as-callback";
 import { deprecate } from "util";
-import { Redis } from "./Redis.js";
+import { Valkey } from "./Valkey.js";
 import { Cluster } from "./cluster/index.js";
 import { Command } from "./Command.js";   
 import { Callback, PipelineWriteableStream } from "./types.js";
@@ -44,10 +44,10 @@ class Pipeline extends Commander<{ type: "pipeline" }> {
   private _shaToScript = {};
   private preferKey: string;
 
-  constructor(public redis: Redis | Cluster) {
+  constructor(public redis: Valkey | Cluster) {
     super();
     this.isCluster =
-      this.redis.constructor.name === "Cluster" || this.redis.isCluster;
+      redis.constructor.name === "Cluster" || redis.isCluster;
     this.options = redis.options;
 
     Object.keys(redis.scriptsSet).forEach((name) => {

@@ -1,12 +1,12 @@
 import sinon from "sinon";
 import { expect } from "chai";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 
-describe("Redis", () => {
+describe("Valkey", () => {
   describe("constructor", () => {
     it("should parse options correctly", () => {
       const stub = sinon
-        .stub(Redis.prototype, "connect")
+        .stub(Valkey.prototype, "connect")
         .returns(Promise.resolve());
 
       let option;
@@ -107,7 +107,7 @@ describe("Redis", () => {
 
       function getOption(...args) {
         // @ts-expect-error
-        const redis = new Redis(...args);
+        const redis = new Valkey(...args);
         return redis.options;
       }
     });
@@ -115,14 +115,14 @@ describe("Redis", () => {
     it("should throw when arguments is invalid", () => {
       expect(() => {
         // @ts-expect-error
-        new Redis(() => {});
+        new Valkey(() => {});
       }).to.throw(Error);
     });
   });
 
   describe(".createClient", () => {
     it("should redirect to constructor", () => {
-      const redis = Redis.createClient({ name: "pass", lazyConnect: true });
+      const redis = Valkey.createClient({ name: "pass", lazyConnect: true });
       expect(redis.options).to.have.property("name", "pass");
       expect(redis.options).to.have.property("lazyConnect", true);
     });
@@ -130,7 +130,7 @@ describe("Redis", () => {
 
   describe("#end", () => {
     it("should redirect to #disconnect", (done) => {
-      const redis = new Redis({ lazyConnect: true });
+      const redis = new Valkey({ lazyConnect: true });
       const stub = sinon.stub(redis, "disconnect").callsFake(() => {
         stub.restore();
         done();
@@ -141,7 +141,7 @@ describe("Redis", () => {
 
   describe("#flushQueue", () => {
     it("should flush all queues by default", () => {
-      const flushQueue = Redis.prototype.flushQueue;
+      const flushQueue = Valkey.prototype.flushQueue;
       const redis = {
         offlineQueue: [{ command: { reject: () => {} } }],
         commandQueue: [{ command: { reject: () => {} } }],
@@ -156,7 +156,7 @@ describe("Redis", () => {
     });
 
     it("should be able to ignore a queue", () => {
-      const flushQueue = Redis.prototype.flushQueue;
+      const flushQueue = Valkey.prototype.flushQueue;
       const redis = {
         offlineQueue: [{ command: { reject: () => {} } }],
         commandQueue: [{ command: { reject: () => {} } }],

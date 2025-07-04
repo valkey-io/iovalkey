@@ -1,7 +1,12 @@
 // eslint-disable-next-line import/extensions, @typescript-eslint/no-require-imports
-exports = module.exports = require('./Redis.js').Redis as unknown as typeof import('./Redis.js').Redis;
-export { Redis as default } from './Redis.js';
-export { Redis, Valkey } from './Redis.js';
+exports = module.exports = require('./Valkey.js').Valkey as unknown as typeof import('./Valkey.js').Valkey;
+export { Valkey as default } from './Valkey.js';
+export { Valkey } from './Valkey.js';
+
+/**
+ * @ignore
+ */
+export { Redis } from './Redis.js';
 
 export { Cluster } from "./cluster/index.js";
 
@@ -14,10 +19,16 @@ export { Command } from "./Command.js";
  * @ignore
  */
 export {
-  RedisCommander,
+  ValkeyCommander, 
   Result,
   ClientContext,
-} from "./utils/RedisCommander.js";
+} from "./utils/ValkeyCommander.js";
+
+/**
+ * @ignore
+ * @deprecated Use ValkeyCommander instead.
+ */
+export { RedisCommander } from "./utils/RedisCommander.js";
 
 /**
  * @ignore
@@ -53,7 +64,12 @@ export {
   SentinelConnectionOptions,
 } from "./connectors/SentinelConnector/index.js";
 export { StandaloneConnectionOptions } from "./connectors/StandaloneConnector.js";
-export { RedisOptions, CommonRedisOptions } from "./redis/RedisOptions.js";
+export { ValkeyOptions, CommonValkeyOptions } from "./redis/ValkeyOptions.js";
+/**
+ * @ignore
+ * @deprecated Use ValkeyOptions instead.
+ */
+export { RedisOptions } from "./redis/RedisOptions.js";
 export { ClusterNode } from "./cluster/index.js";
 export {
   ClusterOptions,
@@ -63,17 +79,18 @@ export {
 } from "./cluster/ClusterOptions.js";
 export { NodeRole } from "./cluster/util.js";
 export type {
-  RedisKey,
+  ValkeyKey,
   RedisValue,
   ChainableCommander,
-} from "./utils/RedisCommander.js";
+} from "./utils/ValkeyCommander.js";
 /**
  * @ignore
  */
 export { print } from "./print.js";
 
 // No TS typings
-export { ReplyError } from "redis-errors";
+import * as RedisErrors from "redis-errors";
+export const ReplyError: typeof RedisErrors.ReplyError = RedisErrors.ReplyError as unknown as typeof RedisErrors.ReplyError;
 
 /**
  * @ignore

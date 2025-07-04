@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 const CUSTOM_PROPERTY = "_myCustomProperty";
@@ -18,7 +18,7 @@ describe("hgetall", () => {
   });
 
   it("should handle special field names", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
     await redis.hmset(
       "test_key",
       "__proto__",

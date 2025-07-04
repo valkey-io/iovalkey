@@ -1,11 +1,11 @@
 import { expect, use } from "chai";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 
 use(require("chai-as-promised"));
 
 describe("autoPipelining for single node", () => {
   it("should automatic add commands to auto pipelines", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
 
     await redis.set("foo", "bar");
     expect(redis.autoPipelineQueueSize).to.eql(0);
@@ -19,7 +19,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should not add non-compatible commands to auto pipelines", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
 
     expect(redis.autoPipelineQueueSize).to.eql(0);
     const promises = [];
@@ -32,7 +32,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should work with db parameter", async () => {
-    const redis = new Redis({ enableAutoPipelining: true, db: 1 });
+    const redis = new Valkey({ enableAutoPipelining: true, db: 1 });
 
     redis.set("foo", "bar");
     await new Promise((resolve) => {
@@ -42,7 +42,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should not add blacklisted commands to auto pipelines", async () => {
-    const redis = new Redis({
+    const redis = new Valkey({
       enableAutoPipelining: true,
       autoPipeliningIgnoredCommands: ["hmget"],
     });
@@ -55,7 +55,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support buffer commands", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     const buffer = Buffer.from("bar");
     await redis.set("foo", buffer);
     const promise = redis.getBuffer("foo");
@@ -64,7 +64,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support custom commands", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
 
     redis.defineCommand("myecho", {
       numberOfKeys: 2,
@@ -81,7 +81,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support call()", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     await redis.call("set", "foo", "call()");
 
     expect(
@@ -96,7 +96,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support multiple commands", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     await redis.set("foo", "bar");
 
     expect(
@@ -111,7 +111,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support commands queued after a pipeline is already queued for execution", (done) => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     let value1;
     expect(redis.autoPipelineQueueSize).to.eql(0);
 
@@ -139,7 +139,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should correctly track pipeline length", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     expect(redis.autoPipelineQueueSize).to.eql(0);
     const promise1 = redis.set("foo", "bar");
     expect(redis.autoPipelineQueueSize).to.eql(1);
@@ -158,7 +158,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should handle rejections", async () => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     await redis.set("foo", "bar");
     // @ts-expect-error
     await expect(redis.set("foo")).to.eventually.be.rejectedWith(
@@ -167,7 +167,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support callbacks in the happy case", (done) => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     let value1;
     expect(redis.autoPipelineQueueSize).to.eql(0);
 
@@ -199,7 +199,7 @@ describe("autoPipelining for single node", () => {
   });
 
   it("should support callbacks in the failure case", (done) => {
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     expect(redis.autoPipelineQueueSize).to.eql(0);
 
     redis.set("foo1", "bar1", (err) => {
@@ -233,7 +233,7 @@ describe("autoPipelining for single node", () => {
       done();
     });
 
-    const redis = new Redis({ enableAutoPipelining: true });
+    const redis = new Valkey({ enableAutoPipelining: true });
     expect(redis.autoPipelineQueueSize).to.eql(0);
 
     redis.set("foo1", "bar1", (err) => {

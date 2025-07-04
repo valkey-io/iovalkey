@@ -9,11 +9,11 @@ import {
 } from "../../utils/index.js";
 import { connect as createTLSConnection, ConnectionOptions } from "tls";
 import { SentinelIterator } from "./SentinelIterator.js";
-import { RedisClient, SentinelAddress, Sentinel } from "./types.js";
+import { ValkeyClient, SentinelAddress, Sentinel } from "./types.js";
 import { AbstractConnector, ErrorEmitter } from "../AbstractConnector.js";
 import { NetStream } from "../../types.js";
-import { Redis } from "../../Redis.js"; 
-import { RedisOptions } from "../../redis/RedisOptions.js";
+import { Valkey } from "../../Valkey.js"; 
+import { ValkeyOptions } from "../../redis/ValkeyOptions.js";
 import { FailoverDetector } from "./FailoverDetector.js";
 
 const debug = Debug("SentinelConnector");
@@ -209,7 +209,7 @@ class SentinelConnector extends AbstractConnector {
     return connectToNext();
   }
 
-  private async updateSentinels(client: RedisClient): Promise<void> {
+  private async updateSentinels(client: ValkeyClient): Promise<void> {
     if (!this.options.updateSentinels) {
       return;
     }
@@ -243,7 +243,7 @@ class SentinelConnector extends AbstractConnector {
   }
 
   private async resolveMaster(
-    client: RedisClient
+    client: ValkeyClient
   ): Promise<TcpNetConnectOpts | null> {
     const result = await client.sentinel(
       "get-master-addr-by-name",
@@ -260,7 +260,7 @@ class SentinelConnector extends AbstractConnector {
   }
 
   private async resolveSlave(
-    client: RedisClient
+    client: ValkeyClient
   ): Promise<TcpNetConnectOpts | null> {
     const result = await client.sentinel("slaves", this.options.name);
 
@@ -299,9 +299,9 @@ class SentinelConnector extends AbstractConnector {
 
   private connectToSentinel(
     endpoint: Partial<SentinelAddress>,
-    options?: Partial<RedisOptions>
-  ): RedisClient {
-    const redis = new Redis({
+    options?: Partial<ValkeyOptions>
+  ): ValkeyClient {
+    const valkey = new Valkey({
       port: endpoint.port || 26379,
       host: endpoint.host,
       username: this.options.sentinelUsername || null,
@@ -320,7 +320,7 @@ class SentinelConnector extends AbstractConnector {
       ...options,
     });
     // @ts-expect-error
-    return redis;
+    return valkey;
   }
 
   private async resolve(

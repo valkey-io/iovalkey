@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 import { Readable } from "stream";
 import sinon from "sinon";
@@ -8,14 +8,14 @@ import { Cluster } from "../../lib";
 describe("*scanStream", () => {
   describe("scanStream", () => {
     it("should return a readable stream", () => {
-      const redis = new Redis();
+      const redis = new Valkey();
       const stream = redis.scanStream();
       expect(stream instanceof Readable).to.eql(true);
     });
 
     it("should iterate all keys", (done) => {
       let keys = [];
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.mset("foo1", 1, "foo2", 1, "foo3", 1, "foo4", 1, "foo10", 1, () => {
         const stream = redis.scanStream();
         stream.on("data", function (data) {
@@ -31,7 +31,7 @@ describe("*scanStream", () => {
 
     it("should recognize `MATCH`", (done) => {
       let keys = [];
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.mset("foo1", 1, "foo2", 1, "foo3", 1, "foo4", 1, "foo10", 1, () => {
         const stream = redis.scanStream({
           match: "foo??",
@@ -49,7 +49,7 @@ describe("*scanStream", () => {
 
     it("should recognize `TYPE`", async () => {
       let keys = [];
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.set("foo1", "bar");
       redis.set("foo2", "bar");
       redis.set("foo3", "bar");
@@ -73,8 +73,8 @@ describe("*scanStream", () => {
 
     it("should recognize `COUNT`", (done) => {
       let keys = [];
-      const redis = new Redis();
-      sinon.spy(Redis.prototype, "scan");
+      const redis = new Valkey();
+      sinon.spy(Valkey.prototype, "scan");
       redis.mset("foo1", 1, "foo2", 1, "foo3", 1, "foo4", 1, "foo10", 1, () => {
         const stream = redis.scanStream({
           count: 2,
@@ -84,7 +84,7 @@ describe("*scanStream", () => {
         });
         stream.on("end", () => {
           expect(keys.sort()).to.eql(["foo1", "foo10", "foo2", "foo3", "foo4"]);
-          const [args] = Redis.prototype.scan.getCall(0).args;
+          const [args] = Valkey.prototype.scan.getCall(0).args;
           let count;
           for (let i = 0; i < args.length; ++i) {
             if (
@@ -104,7 +104,7 @@ describe("*scanStream", () => {
 
     it("should emit an error when connection is down", (done) => {
       let keys = [];
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.mset("foo1", 1, "foo2", 1, "foo3", 1, "foo4", 1, "foo10", 1, () => {
         redis.disconnect();
         const stream = redis.scanStream({ count: 1 });
@@ -122,7 +122,7 @@ describe("*scanStream", () => {
   describe("scanBufferStream", () => {
     it("should return buffer", (done) => {
       let keys = [];
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.mset("foo1", 1, "foo2", 1, "foo3", 1, "foo4", 1, "foo10", 1, () => {
         const stream = redis.scanBufferStream();
         stream.on("data", function (data) {
@@ -146,7 +146,7 @@ describe("*scanStream", () => {
   describe("sscanStream", () => {
     it("should iterate all values in the set", (done) => {
       let keys = [];
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.sadd("set", "foo1", "foo2", "foo3", "foo4", "foo10", () => {
         const stream = redis.sscanStream("set", { match: "foo??" });
         stream.on("data", function (data) {

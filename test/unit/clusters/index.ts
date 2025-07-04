@@ -1,4 +1,4 @@
-import { nodeKeyToRedisOptions } from "../../../lib/cluster/util";
+import { nodeKeyToValkeyOptions } from "../../../lib/cluster/util";
 import { Cluster } from "../../../lib";
 import sinon from "sinon";
 import { expect } from "chai";
@@ -99,21 +99,21 @@ describe("cluster", () => {
 
 });
 
-describe("nodeKeyToRedisOptions()", () => {
+describe("nodeKeyToValkeyOptions()", () => {
   it("returns correct result", () => {
-    expect(nodeKeyToRedisOptions("127.0.0.1:6379")).to.eql({
+    expect(nodeKeyToValkeyOptions("127.0.0.1:6379")).to.eql({
       port: 6379,
       host: "127.0.0.1",
     });
-    expect(nodeKeyToRedisOptions("192.168.1.1:30001")).to.eql({
+    expect(nodeKeyToValkeyOptions("192.168.1.1:30001")).to.eql({
       port: 30001,
       host: "192.168.1.1",
     });
-    expect(nodeKeyToRedisOptions("::0:6379")).to.eql({
+    expect(nodeKeyToValkeyOptions("::0:6379")).to.eql({
       port: 6379,
       host: "::0",
     });
-    expect(nodeKeyToRedisOptions("0:0:6379")).to.eql({
+    expect(nodeKeyToValkeyOptions("0:0:6379")).to.eql({
       port: 6379,
       host: "0:0",
     });

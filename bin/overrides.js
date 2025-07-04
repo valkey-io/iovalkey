@@ -12,8 +12,8 @@ module.exports = {
   hgetall: {
     overwrite: true,
     defs: [
-      "$1(key: RedisKey, callback?: Callback<Record<string, string>>): Result<Record<string, string>, Context>",
-      "$1Buffer(key: RedisKey, callback?: Callback<Record<string, Buffer>>): Result<Record<string, Buffer>, Context>",
+      "$1(key: ValkeyKey, callback?: Callback<Record<string, string>>): Result<Record<string, string>, Context>",
+      "$1Buffer(key: ValkeyKey, callback?: Callback<Record<string, Buffer>>): Result<Record<string, Buffer>, Context>",
     ],
   },
   mset: msetOverrides,
@@ -21,15 +21,15 @@ module.exports = {
   hset: {
     overwrite: false,
     defs: [
-      "$1(key: RedisKey, object: object, callback?: Callback<number>): Result<number, Context>",
-      "$1(key: RedisKey, map: Map<string | Buffer | number, string | Buffer | number>, callback?: Callback<number>): Result<number, Context>",
+      "$1(key: ValkeyKey, object: object, callback?: Callback<number>): Result<number, Context>",
+      "$1(key: ValkeyKey, map: Map<string | Buffer | number, string | Buffer | number>, callback?: Callback<number>): Result<number, Context>",
     ],
   },
   hmset: {
     overwrite: false,
     defs: [
-      "$1(key: RedisKey, object: object, callback?: Callback<'OK'>): Result<'OK', Context>",
-      "$1(key: RedisKey, map: Map<string | Buffer | number, string | Buffer | number>, callback?: Callback<'OK'>): Result<'OK', Context>",
+      "$1(key: ValkeyKey, object: object, callback?: Callback<'OK'>): Result<'OK', Context>",
+      "$1(key: ValkeyKey, map: Map<string | Buffer | number, string | Buffer | number>, callback?: Callback<'OK'>): Result<'OK', Context>",
     ],
   },
   exec: {

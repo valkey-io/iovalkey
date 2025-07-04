@@ -23,7 +23,7 @@ export const notAllowedAutoPipelineCommands = [
 function executeAutoPipeline(client, slotKey: string) {
   /*
     If a pipeline is already executing, keep queueing up commands
-    since ioredis won't serve two pipelines at the same time
+    since iovalkey won't serve two pipelines at the same time
   */
   if (client._runningAutoPipelines.has(slotKey)) {
     return;
@@ -34,7 +34,7 @@ function executeAutoPipeline(client, slotKey: string) {
       call to executeAutoPipeline. 
      
       Maybe the callback in the pipeline.exec is sometimes called in the same tick,
-      e.g. if redis is disconnected?
+      e.g. if Valkey is disconnected?
     */
     return;
   }
@@ -48,7 +48,7 @@ function executeAutoPipeline(client, slotKey: string) {
   const callbacks = pipeline[kCallbacks];
   // Stop keeping a reference to callbacks immediately after the callbacks stop being used.
   // This allows the GC to reclaim objects referenced by callbacks, especially with 16384 slots
-  // in Redis.Cluster
+  // in Valkey.Cluster
   pipeline[kCallbacks] = null;
 
   // Perform the call
@@ -144,7 +144,7 @@ export function executeWithAutoPipelining(
 
   // If we have slot information, we can improve routing by grouping slots served by the same subset of nodes
   // Note that the first value in args may be a (possibly empty) array.
-  // ioredis will only flatten one level of the array, in the Command constructor.
+  // iovalkey will only flatten one level of the array, in the Command constructor.
   const prefix = client.options.keyPrefix || "";
   const slotKey = client.isCluster
     ? client.slots[

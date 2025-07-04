@@ -1,9 +1,9 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 describe("spub/ssub", function () {
   it("should invoke the callback when subscribe successfully", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     let pending = 1;
     redis.ssubscribe("foo", "bar", function (err, count) {
       expect(count).to.eql(2);
@@ -18,7 +18,7 @@ describe("spub/ssub", function () {
   });
 
   it("should reject when issue a command in the subscriber mode", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.ssubscribe("foo", function () {
       redis.set("foo", "bar", function (err) {
         expect(err instanceof Error);
@@ -31,7 +31,7 @@ describe("spub/ssub", function () {
   });
 
   it("should report being in 'subscriber' mode when subscribed", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.ssubscribe("foo", function () {
       expect(redis.mode).to.equal("subscriber");
       redis.disconnect();
@@ -40,7 +40,7 @@ describe("spub/ssub", function () {
   });
 
   it("should exit subscriber mode using sunsubscribe", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.ssubscribe("foo", "bar", function () {
       redis.sunsubscribe("foo", "bar", function (err, count) {
         expect(count).to.eql(0);
@@ -63,7 +63,7 @@ describe("spub/ssub", function () {
   });
 
   it("should report being in 'normal' mode after sunsubscribing", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.ssubscribe("foo", "bar", function () {
       redis.sunsubscribe("foo", "bar", function (err, count) {
         expect(redis.mode).to.equal("normal");
@@ -74,8 +74,8 @@ describe("spub/ssub", function () {
   });
 
   it("should receive messages when subscribe a shard channel", (done) => {
-    const redis = new Redis();
-    const pub = new Redis();
+    const redis = new Valkey();
+    const pub = new Valkey();
     let pending = 2;
     redis.ssubscribe("foo", function () {
       pub.spublish("foo", "bar");
@@ -101,7 +101,7 @@ describe("spub/ssub", function () {
   });
 
   it("should be able to send quit command in the subscriber mode", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     let pending = 1;
     redis.ssubscribe("foo", function () {
       redis.quit(function () {
@@ -117,8 +117,8 @@ describe("spub/ssub", function () {
 
   // TODO ready reconnect in redis stand
   it("should restore subscription after reconnecting(ssubscribe)", (done) => {
-    const redis = new Redis({ port: 6379, host: "127.0.0.1" });
-    const pub = new Redis({ port: 6379, host: "127.0.0.1" });
+    const redis = new Valkey({ port: 6379, host: "127.0.0.1" });
+    const pub = new Valkey({ port: 6379, host: "127.0.0.1" });
     // redis.ping(function (err, result) {
     //   // redis.on("message", function (channel, message) {
     //   console.log(`${err}-${result}`);

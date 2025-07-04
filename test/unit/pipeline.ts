@@ -2,11 +2,11 @@ import sinon from "sinon";
 import { expect } from "chai";
 import Pipeline from "../../lib/Pipeline";
 import Commander from "../../lib/utils/Commander";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 
 describe("Pipeline", () => {
   beforeEach(() => {
-    sinon.stub(Redis.prototype, "connect").resolves();
+    sinon.stub(Valkey.prototype, "connect").resolves();
     sinon.stub(Commander.prototype, "sendCommand").callsFake((command) => {
       return command;
     });
@@ -17,7 +17,7 @@ describe("Pipeline", () => {
   });
 
   it("should properly mark commands as transactions", () => {
-    const redis = new Redis();
+    const redis = new Valkey();
     const p = new Pipeline(redis);
     let i = 0;
 
@@ -45,7 +45,7 @@ describe("Pipeline", () => {
   });
 
   it("should properly set pipelineIndex on commands", () => {
-    const redis = new Redis();
+    const redis = new Valkey();
     const p = new Pipeline(redis);
     let i = 0;
 

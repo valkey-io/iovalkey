@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 import sinon from "sinon";
 import { Cluster } from "../../lib";
@@ -8,15 +8,15 @@ describe("lazy connect", () => {
   it("should not call `connect` when init", () => {
     // TODO: use spy
     const stub = sinon
-      .stub(Redis.prototype, "connect")
+      .stub(Valkey.prototype, "connect")
       .throws(new Error("`connect` should not be called"));
-    new Redis({ lazyConnect: true });
+    new Valkey({ lazyConnect: true });
 
     stub.restore();
   });
 
   it("should connect when calling a command", (done) => {
-    const redis = new Redis({ lazyConnect: true });
+    const redis = new Valkey({ lazyConnect: true });
     redis.set("foo", "bar");
     redis.get("foo", function (err, result) {
       expect(result).to.eql("bar");
@@ -25,7 +25,7 @@ describe("lazy connect", () => {
   });
 
   it("should not try to reconnect when disconnected manually", (done) => {
-    const redis = new Redis({ lazyConnect: true });
+    const redis = new Valkey({ lazyConnect: true });
     redis.get("foo", () => {
       redis.disconnect();
       redis.get("foo", function (err) {
@@ -36,7 +36,7 @@ describe("lazy connect", () => {
   });
 
   it("should be able to disconnect", (done) => {
-    const redis = new Redis({ lazyConnect: true });
+    const redis = new Valkey({ lazyConnect: true });
     redis.on("end", () => {
       done();
     });

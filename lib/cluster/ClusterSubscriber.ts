@@ -2,7 +2,7 @@ import { EventEmitter } from "events";
 import { ConnectionPool } from "./ConnectionPool.js";
 import { getConnectionName, getNodeKey } from "./util.js";
 import { sample, noop, Debug } from "../utils/index.js";  
-import { Redis } from "../Redis.js"; 
+import { Valkey } from "../Valkey.js"; 
 
 const debug = Debug("cluster:subscriber");
 
@@ -104,7 +104,7 @@ class ClusterSubscriber {
     debug("selected a subscriber %s:%s", options.host, options.port);
 
     /*
-     * Create a specialized Redis connection for the subscription.
+     * Create a specialized Valkey connection for the subscription.
      * Note that auto reconnection is enabled here.
      *
      * `enableReadyCheck` is also enabled because although subscription is allowed
@@ -112,7 +112,7 @@ class ClusterSubscriber {
      * provided for the subscriber is correct, and if not, the current subscriber
      * will be disconnected and a new subscriber will be selected.
      */
-    this.subscriber = new Redis({
+    this.subscriber = new Valkey({
       port: options.port,
       host: options.host,
       username: options.username,

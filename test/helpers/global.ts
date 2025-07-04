@@ -1,9 +1,9 @@
 import sinon from "sinon";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 
 afterEach((done) => {
   sinon.restore();
-  new Redis()
+  new Valkey()
     .pipeline()
     .flushall()
     .script("FLUSH")

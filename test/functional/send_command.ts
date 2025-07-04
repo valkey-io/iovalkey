@@ -1,9 +1,9 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 describe("send command", () => {
   it("should support callback", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set("foo", "bar");
     redis.get("foo", function (err, result) {
       expect(result).to.eql("bar");
@@ -12,7 +12,7 @@ describe("send command", () => {
   });
 
   it("should support promise", () => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set("foo", "bar");
     return redis.get("foo").then(function (result) {
       expect(result).to.eql("bar");
@@ -20,7 +20,7 @@ describe("send command", () => {
   });
 
   it("should keep the response order when mix using callback & promise", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     let order = 0;
     redis.get("foo").then(() => {
       expect(++order).to.eql(1);
@@ -38,7 +38,7 @@ describe("send command", () => {
   });
 
   it("should support get & set buffer", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set(Buffer.from("foo"), Buffer.from("bar"), function (err, res) {
       expect(res).to.eql("OK");
     });
@@ -50,7 +50,7 @@ describe("send command", () => {
   });
 
   it("should support get & set buffer via `call`", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.call(
       "set",
       Buffer.from("foo"),
@@ -67,7 +67,7 @@ describe("send command", () => {
   });
 
   it("should handle empty buffer", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set(Buffer.from("foo"), Buffer.from(""));
     redis.getBuffer(Buffer.from("foo"), function (err, result) {
       expect(result).to.be.instanceof(Buffer);
@@ -77,7 +77,7 @@ describe("send command", () => {
   });
 
   it("should support utf8", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set(Buffer.from("你好"), String("你好"));
     redis.getBuffer("你好", function (err, result) {
       expect(result.toString()).to.eql("你好");
@@ -89,7 +89,7 @@ describe("send command", () => {
   });
 
   it("should consider null as empty str", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set("foo", null, () => {
       redis.get("foo", function (err, res) {
         expect(res).to.eql("");
@@ -99,7 +99,7 @@ describe("send command", () => {
   });
 
   it("should support return int value", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.exists("foo", function (err, exists) {
       expect(typeof exists).to.eql("number");
       done();
@@ -107,7 +107,7 @@ describe("send command", () => {
   });
 
   it("should reject when disconnected", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.disconnect();
     redis.get("foo", function (err) {
       expect(err.message).to.match(/Connection is closed./);
@@ -116,7 +116,7 @@ describe("send command", () => {
   });
 
   it("should reject when enableOfflineQueue is disabled", (done) => {
-    const redis = new Redis({ enableOfflineQueue: false });
+    const redis = new Valkey({ enableOfflineQueue: false });
     redis.get("foo", function (err) {
       expect(err.message).to.match(/enableOfflineQueue options is false/);
       done();
@@ -124,7 +124,7 @@ describe("send command", () => {
   });
 
   it("should support key prefixing", (done) => {
-    const redis = new Redis({ keyPrefix: "foo:" });
+    const redis = new Valkey({ keyPrefix: "foo:" });
     redis.set("bar", "baz");
     redis.get("bar", function (err, result) {
       expect(result).to.eql("baz");
@@ -136,7 +136,7 @@ describe("send command", () => {
   });
 
   it("should support key prefixing with multiple keys", (done) => {
-    const redis = new Redis({ keyPrefix: "foo:" });
+    const redis = new Valkey({ keyPrefix: "foo:" });
     redis.lpush("app1", "test1");
     redis.lpush("app2", "test2");
     redis.lpush("app3", "test3");
@@ -150,7 +150,7 @@ describe("send command", () => {
   });
 
   it("should support prefixing buffer keys", async () => {
-    const redis = new Redis({ keyPrefix: "foo:" });
+    const redis = new Valkey({ keyPrefix: "foo:" });
     await redis.mset(
       Buffer.from("bar"),
       Buffer.from("baz"),
@@ -159,7 +159,7 @@ describe("send command", () => {
     );
     await redis.set(Buffer.from([0xff]), Buffer.from("baz"));
 
-    const redisWOPrefix = new Redis();
+    const redisWOPrefix = new Valkey();
     expect(await redisWOPrefix.get("foo:bar")).to.eql("baz");
     expect(await redisWOPrefix.get("foo:foo")).to.eql("baz");
     expect(
@@ -169,11 +169,11 @@ describe("send command", () => {
 
   it("should support buffer as keyPrefix", async () => {
     // @ts-expect-error
-    const redis = new Redis({ keyPrefix: Buffer.from([0xff]) });
+    const redis = new Valkey({ keyPrefix: Buffer.from([0xff]) });
     await redis.mset("bar", Buffer.from("baz"), "foo", Buffer.from("bar"));
     await redis.set(Buffer.from([0xff]), Buffer.from("baz"));
 
-    const redisWOPrefix = new Redis();
+    const redisWOPrefix = new Valkey();
     expect(
       await redisWOPrefix.get(Buffer.from([0xff, 0x62, 0x61, 0x72]))
     ).to.eql("baz");
@@ -184,7 +184,7 @@ describe("send command", () => {
   });
 
   it("should support key prefixing for zunionstore", (done) => {
-    const redis = new Redis({ keyPrefix: "foo:" });
+    const redis = new Valkey({ keyPrefix: "foo:" });
     redis.zadd("zset1", 1, "one");
     redis.zadd("zset1", 2, "two");
     redis.zadd("zset2", 1, "one");
@@ -209,7 +209,7 @@ describe("send command", () => {
   });
 
   it("should support key prefixing for sort", (done) => {
-    const redis = new Redis({ keyPrefix: "foo:" });
+    const redis = new Valkey({ keyPrefix: "foo:" });
     redis.hset("object_1", "name", "better");
     redis.hset("weight_1", "value", "20");
     redis.hset("object_2", "name", "best");
@@ -247,7 +247,7 @@ describe("send command", () => {
   });
 
   it("should allow sending the loading valid commands in connect event", (done) => {
-    const redis = new Redis({ enableOfflineQueue: false });
+    const redis = new Valkey({ enableOfflineQueue: false });
     redis.on("connect", () => {
       redis.select(2, function (err, res) {
         expect(res).to.eql("OK");
@@ -257,7 +257,7 @@ describe("send command", () => {
   });
 
   it("should reject loading invalid commands in connect event", (done) => {
-    const redis = new Redis({ enableOfflineQueue: false });
+    const redis = new Valkey({ enableOfflineQueue: false });
     redis.on("connect", () => {
       redis.get("foo", function (err) {
         expect(err.message).to.eql(
@@ -269,7 +269,7 @@ describe("send command", () => {
   });
 
   it("throws for invalid command", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
     const invalidCommand = "áéűáű";
     let err;
     try {
