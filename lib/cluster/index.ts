@@ -106,7 +106,7 @@ class Cluster extends Commander {
   /**
    * Every time Cluster#connect() is called, this value will be
    * auto-incrementing. The purpose of this value is used for
-   * discarding previous connect attampts when creating a new
+   * discarding previous connect attempts when creating a new
    * connection.
    */
   private connectionEpoch = 0;
@@ -1013,7 +1013,7 @@ class Cluster extends Commander {
    * Normalize startup nodes, and resolving hostnames to IPs.
    *
    * This process happens every time when #connect() is called since
-   * #startupNodes and DNS records may chanage.
+   * #startupNodes and DNS records may change.
    */
   private async resolveStartupNodeHostnames(): Promise<RedisOptions[]> {
     if (!Array.isArray(this.startupNodes) || this.startupNodes.length === 0) {

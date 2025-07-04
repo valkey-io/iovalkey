@@ -11,7 +11,7 @@ Nowadays, it is one of the most popular Redis clients, and more and more people 
 
 There are two user roles: contributors and collaborators. Everyone becomes a contributor when they are creating issues, pull requests, or helping to review code.
 
-In the meantime, there is a group of collaborators of ioredis who can not only contribute code but also approve and merge others' pull requests.
+In the meantime, there is a group of collaborators of ioredis who cannot only contribute code but also approve and merge others' pull requests.
 
 ## Note to collaborators
 

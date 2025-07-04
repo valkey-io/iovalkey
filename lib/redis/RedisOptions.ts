@@ -154,7 +154,7 @@ export interface CommonRedisOptions extends CommanderOptions {
    *
    * By default, if the connection to Redis server has not been established, commands are added to a queue
    * and are executed once the connection is "ready" (when `enableReadyCheck` is true, "ready" means
-   * the Redis server has loaded the database from disk, otherwise means the connection to the Redis
+   * the Redis server has loaded the database from disk; otherwise, means the connection to the Redis
    * server has been established). If this option is false, when execute the command when the connection
    * isn't ready, an error will be returned.
    *

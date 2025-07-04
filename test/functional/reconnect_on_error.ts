@@ -70,7 +70,7 @@ describe("reconnectOnError", () => {
     });
   });
 
-  it("should select the currect database", (done) => {
+  it("should select the correct database", (done) => {
     const redis = new Redis({
       reconnectOnError: () => {
         redis.select(3);

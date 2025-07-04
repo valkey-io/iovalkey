@@ -299,7 +299,7 @@ describe("cluster", () => {
   });
 
   describe("#nodes()", () => {
-    it("should return the corrent nodes", (done) => {
+    it("should return the current nodes", (done) => {
       const slotTable = [
         [0, 16381, ["127.0.0.1", 30001], ["127.0.0.1", 30003]],
         [16382, 16383, ["127.0.0.1", 30002]],

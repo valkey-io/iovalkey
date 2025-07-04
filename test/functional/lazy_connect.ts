@@ -58,11 +58,11 @@ describe("lazy connect", () => {
         done();
       });
       const cluster = new Cluster([], { lazyConnect: true });
-      const pipline = new Pipeline(cluster);
-      pipline.get("fool1").exec(() => {});
+      const pipeline = new Pipeline(cluster);
+      pipeline.get("fool1").exec(() => {});
     });
 
-    it("should call connect when transction exec", (done) => {
+    it("should call connect when transaction exec", (done) => {
       const stub = sinon.stub(Cluster.prototype, "connect").callsFake(() => {
         stub.restore();
         done();
@@ -74,7 +74,7 @@ describe("lazy connect", () => {
         .exec(() => {});
     });
 
-    it('should quit before "close" being emited', (done) => {
+    it('should quit before "close" being emitted', (done) => {
       const stub = sinon
         .stub(Cluster.prototype, "connect")
         .throws(new Error("`connect` should not be called"));
@@ -89,7 +89,7 @@ describe("lazy connect", () => {
       });
     });
 
-    it('should disconnect before "close" being emited', (done) => {
+    it('should disconnect before "close" being emitted', (done) => {
       const stub = sinon
         .stub(Cluster.prototype, "connect")
         .throws(new Error("`connect` should not be called"));

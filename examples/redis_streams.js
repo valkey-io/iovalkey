@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 const redis = new Redis();
 
 // you may find this read https://redis.io/topics/streams-intro
-// very helpfull as a starter to understand the usescases and the parameters used
+// very helpful as a starter to understand the usecases and the parameters used
 
 async function main() {
   const channel = "ioredis_channel";

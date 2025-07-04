@@ -183,7 +183,7 @@ describe("scripting", () => {
     ]);
   });
 
-  it("should try to use EVALSHA and fallback to EVAL if fails", async () => {
+  it("should try to use EVALSHA and fall back to EVAL if fails", async () => {
     const redis = new Redis();
 
     redis.defineCommand("test", {
@@ -203,9 +203,9 @@ describe("scripting", () => {
       await redis.test("bar");
     });
 
-    const expectedComands = ["evalsha", "eval", "get", "evalsha", "get"];
+    const expectedCommands = ["evalsha", "eval", "get", "evalsha", "get"];
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
@@ -230,14 +230,14 @@ describe("scripting", () => {
       return redis.pipeline().testGet("foo").testSet("foo").get("foo").exec();
     });
 
-    const expectedComands = ["evalsha", "get", "eval", "set", "get"];
+    const expectedCommands = ["evalsha", "get", "eval", "set", "get"];
 
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
-  it("does not fallback to EVAL in regular transaction", async () => {
+  it("does not fall back to EVAL in regular transaction", async () => {
     const redis = new Redis();
 
     redis.defineCommand("test", {
@@ -259,13 +259,13 @@ describe("scripting", () => {
     });
     spy.restore();
     expect(spy.callCount).to.equal(4);
-    const expectedComands = ["multi", "evalsha", "evalsha", "exec"];
+    const expectedCommands = ["multi", "evalsha", "evalsha", "exec"];
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
-  it("does not fallback to EVAL in manual transaction", async () => {
+  it("does not fall back to EVAL in manual transaction", async () => {
     const redis = new Redis();
 
     redis.defineCommand("test", {
@@ -285,9 +285,9 @@ describe("scripting", () => {
     });
     spy.restore();
     expect(spy.callCount).to.equal(4);
-    const expectedComands = ["multi", "evalsha", "evalsha", "exec"];
+    const expectedCommands = ["multi", "evalsha", "evalsha", "exec"];
     expect(commands.map((c) => c[0].toLowerCase())).to.have.members(
-      expectedComands
+      expectedCommands
     );
   });
 
