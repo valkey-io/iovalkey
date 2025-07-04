@@ -10,7 +10,7 @@ function isSentinelEql(
   );
 }
 
-export default class SentinelIterator
+class SentinelIterator
   implements Iterator<Partial<SentinelAddress>>
 {
   private cursor = 0;
@@ -51,3 +51,6 @@ export default class SentinelIterator
     return `${JSON.stringify(this.sentinels)} @${this.cursor}`;
   }
 }
+
+export { SentinelIterator };
+export default SentinelIterator;

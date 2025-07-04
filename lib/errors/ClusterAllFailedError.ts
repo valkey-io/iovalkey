@@ -1,6 +1,6 @@
 import { RedisError } from "redis-errors";
 
-export default class ClusterAllFailedError extends RedisError {
+class ClusterAllFailedError extends RedisError {
   static defaultMessage = "Failed to refresh slots cache.";
 
   constructor(message, public lastNodeError: RedisError) {
@@ -12,3 +12,6 @@ export default class ClusterAllFailedError extends RedisError {
     return this.constructor.name;
   }
 }
+
+export { ClusterAllFailedError };
+export default ClusterAllFailedError;

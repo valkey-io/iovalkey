@@ -1,5 +1,5 @@
 import { CommanderOptions } from "../utils/Commander.js";
-import ConnectorConstructor from "../connectors/ConnectorConstructor.js";
+import { ConnectorConstructor } from "../connectors/ConnectorConstructor.js";   
 import { SentinelConnectionOptions } from "../connectors/SentinelConnector/index.js";
 import { StandaloneConnectionOptions } from "../connectors/StandaloneConnector.js";
 

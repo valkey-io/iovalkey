@@ -2,12 +2,12 @@ import calculateSlot from "cluster-key-slot";
 import { exists, hasFlag } from "@iovalkey/commands";
 import asCallback from "standard-as-callback";
 import { deprecate } from "util";
-import Redis from "./Redis.js";
-import Cluster from "./cluster/index.js";
-import Command from "./Command.js";
+import { Redis } from "./Redis.js";
+import { Cluster } from "./cluster/index.js";
+import { Command } from "./Command.js";   
 import { Callback, PipelineWriteableStream } from "./types.js";
 import { noop } from "./utils/index.js";
-import Commander from "./utils/Commander.js";
+import { Commander } from "./utils/Commander.js"; 
 
 /*
   This function derives from the cluster-key-slot implementation.
@@ -234,8 +234,6 @@ class Pipeline extends Commander<{ type: "pipeline" }> {
   }
 }
 
-export default Pipeline;
-
 // @ts-expect-error
 const multi = Pipeline.prototype.multi;
 // @ts-expect-error
@@ -398,3 +396,6 @@ Pipeline.prototype.exec = function (callback: Callback): Promise<Array<any>> {
 interface Pipeline {
   length: number;
 }
+
+export { Pipeline };
+export default Pipeline;

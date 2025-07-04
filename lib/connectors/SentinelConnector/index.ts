@@ -8,11 +8,11 @@ import {
   Debug,
 } from "../../utils/index.js";
 import { connect as createTLSConnection, ConnectionOptions } from "tls";
-import SentinelIterator from "./SentinelIterator.js";
+import { SentinelIterator } from "./SentinelIterator.js";
 import { RedisClient, SentinelAddress, Sentinel } from "./types.js";
-import AbstractConnector, { ErrorEmitter } from "../AbstractConnector.js";
+import { AbstractConnector, ErrorEmitter } from "../AbstractConnector.js";
 import { NetStream } from "../../types.js";
-import Redis from "../../Redis.js";
+import { Redis } from "../../Redis.js"; 
 import { RedisOptions } from "../../redis/RedisOptions.js";
 import { FailoverDetector } from "./FailoverDetector.js";
 
@@ -31,7 +31,7 @@ type PreferredSlaves =
 
 export { SentinelAddress, SentinelIterator };
 
-export interface SentinelConnectionOptions {
+interface SentinelConnectionOptions {
   /**
    * Master group name of the Sentinel
    */
@@ -61,7 +61,7 @@ export interface SentinelConnectionOptions {
   failoverDetector?: boolean;
 }
 
-export default class SentinelConnector extends AbstractConnector {
+class SentinelConnector extends AbstractConnector {
   emitter: EventEmitter | null = null;
   protected sentinelIterator: SentinelIterator;
   private retryAttempts: number;
@@ -452,3 +452,6 @@ function addressResponseToAddress(input: AddressFromResponse): SentinelAddress {
 }
 
 function noop(): void {}
+
+export { SentinelConnector, SentinelConnectionOptions, FailoverDetector };
+export default SentinelConnector;

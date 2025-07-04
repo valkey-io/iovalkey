@@ -5,7 +5,7 @@
     "plugin:import/typescript",
     "prettier"
   ],
-  "ignorePatterns": ["bin/generateRedisCommander/template.ts"],
+  "ignorePatterns": ["bin/generateRedisCommander/template.ts", "built/"],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "eslint-plugin-import"],
   "env": { "node": true },

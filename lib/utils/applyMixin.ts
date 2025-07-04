@@ -1,5 +1,5 @@
 type Constructor = new (...args: any[]) => void;
-function applyMixin(
+export function applyMixin(
   derivedConstructor: Constructor,
   mixinConstructor: Constructor
 ) {

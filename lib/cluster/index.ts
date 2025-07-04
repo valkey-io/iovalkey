@@ -2,11 +2,11 @@ import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import { AbortError, RedisError } from "redis-errors";
 import asCallback from "standard-as-callback";
-import Command from "../Command.js";
-import ClusterAllFailedError from "../errors/ClusterAllFailedError.js";
-import Pipeline from "../Pipeline.js";
-import Redis from "../Redis.js";
-import ScanStream from "../ScanStream.js";
+import { Command } from "../Command.js";
+import { ClusterAllFailedError } from "../errors/ClusterAllFailedError.js";
+import { Pipeline } from "../Pipeline.js";
+import { Redis } from "../Redis.js";
+import { ScanStream } from "../ScanStream.js";
 import { addTransactionSupport, Transaction } from "../transaction.js";
 import { Callback, ScanStreamOptions, WriteableStream } from "../types.js";
 import {
@@ -20,11 +20,11 @@ import {
   zipMap,
 } from "../utils/index.js";
 import applyMixin from "../utils/applyMixin.js";
-import Commander from "../utils/Commander.js";
+import { Commander } from "../utils/Commander.js";
 import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions.js";
-import ClusterSubscriber from "./ClusterSubscriber.js";
-import ConnectionPool from "./ConnectionPool.js";
-import DelayQueue from "./DelayQueue.js";
+import { ClusterSubscriber } from "./ClusterSubscriber.js";
+import { ConnectionPool } from "./ConnectionPool.js";
+import { DelayQueue }  from "./DelayQueue.js";
 import {
   getConnectionName,
   getUniqueHostnamesFromOptions,
@@ -36,7 +36,7 @@ import {
   RedisOptions,
   weightSrvRecords,
 } from "./util.js";
-import Deque = require("denque");
+import { default as Deque } from "denque";
 
 const debug = Debug("cluster");
 
@@ -1072,4 +1072,5 @@ addTransactionSupport(Cluster.prototype);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Cluster extends Transaction {}
 
+export { Cluster };
 export default Cluster;

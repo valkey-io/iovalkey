@@ -1,22 +1,20 @@
 // eslint-disable-next-line import/extensions, @typescript-eslint/no-require-imports
-const Redis: typeof import('./Redis.js').default = require('./Redis').default
+exports = module.exports = require('./Redis.js').Redis as unknown as typeof import('./Redis.js').Redis;
+export { Redis as default } from './Redis.js';
+export { Redis } from './Redis.js';
 
-exports = module.exports = Redis;
-
-export default Redis;
-export { Redis };
-export { default as Cluster } from "./cluster/index.js";
+export { Cluster } from "./cluster/index.js";
 
 /**
  * @ignore
  */
-export { default as Command } from "./Command.js";
+export { Command } from "./Command.js";
 
 /**
  * @ignore
  */
 export {
-  default as RedisCommander,
+  RedisCommander,
   Result,
   ClientContext,
 } from "./utils/RedisCommander.js";
@@ -24,23 +22,23 @@ export {
 /**
  * @ignore
  */
-export { default as ScanStream } from "./ScanStream.js";
+export { ScanStream } from "./ScanStream.js";
 
 /**
  * @ignore
  */
-export { default as Pipeline } from "./Pipeline.js";
+export { Pipeline } from "./Pipeline.js";
 
 /**
  * @ignore
  */
-export { default as AbstractConnector } from "./connectors/AbstractConnector.js";
+export { AbstractConnector } from "./connectors/AbstractConnector.js";
 
 /**
  * @ignore
  */
 export {
-  default as SentinelConnector,
+  SentinelConnector,
   SentinelIterator,
 } from "./connectors/SentinelConnector/index.js";
 
@@ -69,6 +67,10 @@ export type {
   RedisValue,
   ChainableCommander,
 } from "./utils/RedisCommander.js";
+/**
+ * @ignore
+ */
+export { print } from "./print.js";
 
 // No TS typings
 export { ReplyError } from "redis-errors";
@@ -89,5 +91,3 @@ Object.defineProperty(exports, "Promise", {
     );
   },
 });
-
-export { print } from "./print.js";

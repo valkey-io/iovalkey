@@ -4,5 +4,5 @@
     "strict": false
   },
   "include": ["./**/*"],
-  "exclude": ["../node_modules", "../built"]
+  "exclude": ["../node_modules"]
 }
