@@ -910,5 +910,5 @@ addTransactionSupport(Redis.prototype);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Redis extends Transaction {}
 
-export { Redis, Transaction };
+export { Redis, Transaction, Redis as Valkey };
 export default Redis;
