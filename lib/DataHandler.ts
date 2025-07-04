@@ -3,7 +3,7 @@ import { default as Deque } from "denque";
 import { EventEmitter } from "events";
 import { Command } from "./Command.js";
 import { Debug } from "./utils/index.js";
-import { default as RedisParser } from "redis-parser";
+import { default as ValkeyParser } from "redis-parser";
 import { SubscriptionSet } from "./SubscriptionSet.js";
 
 const debug = Debug("dataHandler");
@@ -42,7 +42,7 @@ interface ParserOptions {
 
 class DataHandler {
   constructor(private redis: DataHandledable, parserOptions: ParserOptions) {
-    const parser = new RedisParser({
+    const parser = new ValkeyParser({
       stringNumbers: parserOptions.stringNumbers,
       returnBuffers: true,
       returnError: (err: Error) => {
@@ -132,7 +132,7 @@ class DataHandler {
             reply[2] ? reply[2].toString() : ""
           );
         }
-        this.redis.emit("messageBuffer", reply[1], reply[2]);
+          this.redis.emit("messageBuffer", reply[1], reply[2]);
         break;
       case "pmessage": {
         const pattern = reply[1].toString();

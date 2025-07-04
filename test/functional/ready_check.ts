@@ -1,10 +1,10 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { noop } from "../../lib/utils";
 import sinon from "sinon";
 import { expect } from "chai";
 
 const stubInfo = (
-  redis: Redis,
+  redis: Valkey,
   response: [Error | null, string | undefined]
 ) => {
   sinon.stub(redis, "info").callsFake((section, callback) => {
@@ -17,7 +17,7 @@ const stubInfo = (
 
 describe("ready_check", () => {
   it("should retry when redis is not ready", (done) => {
-    const redis = new Redis({ lazyConnect: true });
+    const redis = new Valkey({ lazyConnect: true });
 
     stubInfo(redis, [null, "loading:1\r\nloading_eta_seconds:7"]);
 
@@ -31,7 +31,7 @@ describe("ready_check", () => {
   });
 
   it("should reconnect when info return a error", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       lazyConnect: true,
       retryStrategy: () => {
         done();
@@ -45,7 +45,7 @@ describe("ready_check", () => {
   });
 
   it("warns for NOPERM error", async () => {
-    const redis = new Redis({
+      const redis = new Valkey({
       lazyConnect: true,
     });
 

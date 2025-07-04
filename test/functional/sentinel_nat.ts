@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import MockServer from "../helpers/mock_server";
 
 describe("sentinel_nat", () => {
@@ -9,7 +9,7 @@ describe("sentinel_nat", () => {
       }
     });
 
-    const redis = new Redis({
+    const redis = new Valkey({
       sentinels: [{ host: "127.0.0.1", port: 27379 }],
       natMap: {
         "127.0.0.1:17380": {
@@ -45,7 +45,7 @@ describe("sentinel_nat", () => {
       }
     });
 
-    const redis = new Redis({
+    const redis = new Valkey({
       sentinels: [{ host: "127.0.0.1", port: 27379 }],
       natMap: {
         "127.0.0.1:17381": {

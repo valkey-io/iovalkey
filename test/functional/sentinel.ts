@@ -1,6 +1,6 @@
 import { Socket } from "net";
 
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import MockServer from "../helpers/mock_server";
 import { once } from "events";
 import { expect } from "chai";
@@ -21,7 +21,7 @@ describe("sentinel", () => {
         sentinel.disconnect(done);
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
       });
@@ -34,7 +34,7 @@ describe("sentinel", () => {
         sentinel.disconnect(done);
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1" }],
         name: "master",
       });
@@ -47,7 +47,7 @@ describe("sentinel", () => {
         sentinel.disconnect(done);
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -70,7 +70,7 @@ describe("sentinel", () => {
       const master = new MockServer(17380);
       const clock = sinon.useFakeTimers();
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -93,7 +93,7 @@ describe("sentinel", () => {
 
     it("should call sentinelRetryStrategy when all sentinels are unreachable", (done) => {
       let t = 0;
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -112,7 +112,7 @@ describe("sentinel", () => {
     });
 
     it("should raise error when all sentinel are unreachable and retry is disabled", (done) => {
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -151,7 +151,7 @@ describe("sentinel", () => {
         sentinel.disconnect(done);
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
       });
@@ -178,7 +178,7 @@ describe("sentinel", () => {
       });
       const master = new MockServer(17380);
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: sentinels,
         name: "master",
       });
@@ -207,7 +207,7 @@ describe("sentinel", () => {
       });
       const master = new MockServer(17380);
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: sentinels,
         updateSentinels: false,
         name: "master",
@@ -241,7 +241,7 @@ describe("sentinel", () => {
         }
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinelPassword: "pass",
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
@@ -265,7 +265,7 @@ describe("sentinel", () => {
         });
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
       });
@@ -278,7 +278,7 @@ describe("sentinel", () => {
         }
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
         sentinelRetryStrategy: null,
@@ -314,7 +314,7 @@ describe("sentinel", () => {
         });
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -348,7 +348,7 @@ describe("sentinel", () => {
         }
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -377,7 +377,7 @@ describe("sentinel", () => {
         });
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
         role: "slave",
@@ -407,7 +407,7 @@ describe("sentinel", () => {
         });
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
         role: "slave",
@@ -439,7 +439,7 @@ describe("sentinel", () => {
         done();
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
         role: "slave",
@@ -474,7 +474,7 @@ describe("sentinel", () => {
         });
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -511,7 +511,7 @@ describe("sentinel", () => {
         }
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [
           { host: "127.0.0.1", port: 27379 },
           { host: "127.0.0.1", port: 27380 },
@@ -552,7 +552,7 @@ describe("sentinel", () => {
         };
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ host: "127.0.0.1", port: 27379 }],
         name: "master",
       });
@@ -568,7 +568,7 @@ describe("sentinel", () => {
         const master = new MockServer(17380);
         const newMaster = new MockServer(17381);
 
-        const redis = new Redis({
+        const redis = new Valkey({
           sentinels: [{ host: "127.0.0.1", port: 27379 }],
           failoverDetector: true,
           name: "master",
@@ -616,7 +616,7 @@ describe("sentinel", () => {
         const master = new MockServer(17380);
         const newMaster = new MockServer(17381);
 
-        const redis = new Redis({
+        const redis = new Valkey({
           sentinels: [
             { host: "127.0.0.1", port: 27379 },
             { host: "127.0.0.1", port: 27380 },
@@ -687,7 +687,7 @@ describe("sentinel", () => {
         const master = new MockServer(17380);
         const newMaster = new MockServer(17381);
 
-        const redis = new Redis({
+        const redis = new Valkey({
           sentinels: [
             { host: "127.0.0.1", port: 27379 },
             { host: "127.0.0.1", port: 27380 },
@@ -749,7 +749,7 @@ describe("sentinel", () => {
         const master = new MockServer(17380);
         const newMaster = new MockServer(17381);
 
-        const redis = new Redis({
+        const redis = new Valkey({
           sentinels: [{ host: "127.0.0.1", port: 27379 }],
           name: "master",
           sentinelReconnectStrategy: () => 1000,

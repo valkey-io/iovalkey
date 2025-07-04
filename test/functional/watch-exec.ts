@@ -1,9 +1,9 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 describe("watch-exec", () => {
   it("should support watch/exec transactions", () => {
-    const redis1 = new Redis();
+    const redis1 = new Valkey();
     return redis1
       .watch("watchkey")
       .then(() => {
@@ -16,8 +16,8 @@ describe("watch-exec", () => {
   });
 
   it("should support watch/exec transaction rollback", () => {
-    const redis1 = new Redis();
-    const redis2 = new Redis();
+    const redis1 = new Valkey();
+    const redis2 = new Valkey();
     return redis1
       .watch("watchkey")
       .then(() => {

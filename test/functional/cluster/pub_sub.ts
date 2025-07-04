@@ -2,7 +2,7 @@ import MockServer, { getConnectionName } from "../../helpers/mock_server";
 import { expect } from "chai";
 import { Cluster } from "../../../lib";
 import sinon from "sinon";
-import Redis from "../../../lib/Redis";
+import Valkey from "../../../lib/Valkey";
 import { noop } from "../../../lib/utils";
 
 describe("cluster:pub/sub", function () {
@@ -91,13 +91,13 @@ describe("cluster:pub/sub", function () {
 
     client.subscribe("test cluster", function () {
       const stub = sinon
-        .stub(Redis.prototype, "subscribe")
+        .stub(Valkey.prototype, "subscribe")
         .callsFake((channels) => {
           expect(channels).to.eql(["test cluster"]);
           stub.restore();
           client.disconnect();
           done();
-          return Redis.prototype.subscribe.apply(this, arguments);
+          return Valkey.prototype.subscribe.apply(this, arguments);
         });
       client.once("end", function () {
         client.connect().catch(noop);
@@ -118,13 +118,13 @@ describe("cluster:pub/sub", function () {
 
     client.psubscribe("test?", function () {
       const stub = sinon
-        .stub(Redis.prototype, "psubscribe")
+        .stub(Valkey.prototype, "psubscribe")
         .callsFake((channels) => {
           expect(channels).to.eql(["test?"]);
           stub.restore();
           client.disconnect();
           done();
-          return Redis.prototype.psubscribe.apply(this, arguments);
+          return Valkey.prototype.psubscribe.apply(this, arguments);
         });
       client.once("end", function () {
         client.connect().catch(noop);

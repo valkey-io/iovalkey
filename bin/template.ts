@@ -1,6 +1,6 @@
-import { Callback } from "../types";
+import { Callback } from "../types.js";
 
-export type RedisKey = string | Buffer;
+export type ValkeyKey = string | Buffer;
 export type RedisValue = string | Buffer | number;
 
 // Inspired by https://github.com/mmkal/handy-redis/blob/main/src/generated/interface.ts.
@@ -12,7 +12,7 @@ export interface ResultTypes<Result, Context> {
 }
 
 export interface ChainableCommander
-  extends RedisCommander<{ type: "pipeline" }> {
+  extends ValkeyCommander<{ type: "pipeline" }> {
   length: number;
 }
 
@@ -21,17 +21,17 @@ export type Result<T, Context extends ClientContext> =
   // prettier-break
   ResultTypes<T, Context>[Context["type"]];
 
-interface RedisCommander<Context extends ClientContext = { type: "default" }> {
+interface ValkeyCommander<Context extends ClientContext = { type: "default" }> {
   /**
    * Call arbitrary commands.
    *
-   * `redis.call('set', 'foo', 'bar')` is the same as `redis.set('foo', 'bar')`,
+   * `valkey.call('set', 'foo', 'bar')` is the same as `valkey.set('foo', 'bar')`,
    * so the only case you need to use this method is when the command is not
-   * supported by ioredis.
+   * supported by iovalkey.
    *
    * ```ts
-   * redis.call('set', 'foo', 'bar');
-   * redis.call('get', 'foo', (err, value) => {
+   * valkey.call('set', 'foo', 'bar');
+   * valkey.call('get', 'foo', (err, value) => {
    *   // value === 'bar'
    * });
    * ```
@@ -75,4 +75,5 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   ////
 }
 
-export default RedisCommander;
+export { ValkeyCommander };
+export default ValkeyCommander;

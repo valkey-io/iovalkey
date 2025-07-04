@@ -67,7 +67,7 @@ export interface CommandNameFlags {
  *   console.log('result', result);
  * });
  *
- * redis.sendCommand(infoCommand);
+ * valkey.sendCommand(infoCommand);
  *
  * // When no callback provided, Command instance will have a `promise` property,
  * // which will resolve/reject with the result of the command.
@@ -418,6 +418,7 @@ Command.setArgumentTransformer("hmset", hsetArgumentTransformer);
 
 Command.setReplyTransformer("hgetall", function (result) {
   if (Array.isArray(result)) {
+    // Consider using Object.create(null)
     const obj = {};
     for (let i = 0; i < result.length; i += 2) {
       const key = result[i];

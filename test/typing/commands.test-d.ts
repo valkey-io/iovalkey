@@ -1,7 +1,7 @@
 import { expectError, expectType } from "tsd";
-import { Redis } from "../../built";
+import { Valkey } from "../../built";
 
-const redis = new Redis();
+const redis = new Valkey();
 
 // call
 expectType<Promise<unknown>>(redis.call("info"));

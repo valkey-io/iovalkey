@@ -1,6 +1,6 @@
 import MockServer from "../helpers/mock_server";
 import { expect } from "chai";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import sinon from "sinon";
 
 describe("auth", () => {
@@ -16,7 +16,7 @@ describe("auth", () => {
         done();
       }
     });
-    const redis = new Redis({ port: 17379, password: "pass" });
+    const redis = new Valkey({ port: 17379, password: "pass" });
     redis.get("foo").catch(() => {});
   });
 
@@ -35,7 +35,7 @@ describe("auth", () => {
         done();
       }
     });
-    const redis = new Redis({ port: 17379, password: "pass" });
+    const redis = new Valkey({ port: 17379, password: "pass" });
     redis.once("ready", () => {
       begin = true;
       redis.disconnect(true);
@@ -53,7 +53,7 @@ describe("auth", () => {
           done();
         }
       });
-      redis = new Redis(`redis://:${password}@localhost:17379/`);
+      redis = new Valkey(`redis://:${password}@localhost:17379/`);
     });
 
     it('should not emit "error" when the server doesn\'t need auth', (done) => {
@@ -63,7 +63,7 @@ describe("auth", () => {
         }
       });
       let errorEmitted = false;
-      const redis = new Redis({ port: 17379, password: "pass" });
+      const redis = new Valkey({ port: 17379, password: "pass" });
       redis.on("error", () => {
         errorEmitted = true;
       });
@@ -85,7 +85,7 @@ describe("auth", () => {
           return new Error("ERR invalid password");
         }
       });
-      const redis = new Redis({ port: 17379, password: "pass" });
+      const redis = new Valkey({ port: 17379, password: "pass" });
       let pending = 2;
       function check() {
         if (!--pending) {
@@ -109,7 +109,7 @@ describe("auth", () => {
           return new Error("NOAUTH Authentication required.");
         }
       });
-      const redis = new Redis({ port: 17379 });
+      const redis = new Valkey({ port: 17379 });
       redis.on("error", (error) => {
         expect(error).to.have.property(
           "message",
@@ -134,7 +134,7 @@ describe("auth", () => {
         }
       });
 
-      const redis = new Redis({ port: 17379, username, password });
+      const redis = new Valkey({ port: 17379, username, password });
       const stub = sinon.stub(console, "warn").callsFake((warn) => {
         if (
           warn.indexOf(
@@ -167,7 +167,7 @@ describe("auth", () => {
           done();
         }
       });
-      redis = new Redis({ port: 17379, username, password });
+      redis = new Valkey({ port: 17379, username, password });
     });
 
     it("should handle auth with Redis URL string with username and password (Redis >=6) (redis://foo:bar@baz.com/) correctly", (done) => {
@@ -184,7 +184,7 @@ describe("auth", () => {
           done();
         }
       });
-      redis = new Redis(
+      redis = new Valkey(
         `redis://user:pass@localhost:17379/?allowUsernameInURI=true`
       );
     });
@@ -198,7 +198,7 @@ describe("auth", () => {
         }
       });
       let errorEmited = false;
-      const redis = new Redis({ port: 17379, password: "pass" });
+      const redis = new Valkey({ port: 17379, password: "pass" });
       redis.on("error", () => {
         errorEmited = true;
       });
@@ -227,7 +227,7 @@ describe("auth", () => {
           }
         }
       });
-      redis = new Redis({ port: 17379, username });
+      redis = new Valkey({ port: 17379, username });
       redis.on("error", (error) => {
         expect(error).to.have.property(
           "message",
@@ -251,7 +251,7 @@ describe("auth", () => {
           }
         }
       });
-      redis = new Redis({ port: 17379, username, password: "notpass" });
+      redis = new Valkey({ port: 17379, username, password: "notpass" });
       redis.on("error", (error) => {
         expect(error).to.have.property(
           "message",
@@ -268,7 +268,7 @@ describe("auth", () => {
           return new Error("NOAUTH Authentication required.");
         }
       });
-      const redis = new Redis({ port: 17379 });
+      const redis = new Valkey({ port: 17379 });
       redis.on("error", (error) => {
         expect(error).to.have.property(
           "message",

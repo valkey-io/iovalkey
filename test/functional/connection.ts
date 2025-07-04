@@ -1,5 +1,5 @@
 import net from "net";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import sinon from "sinon";
 import { expect } from "chai";
 import MockServer from "../helpers/mock_server";
@@ -8,7 +8,7 @@ import { CONNECTION_CLOSED_ERROR_MSG } from "../../lib/utils";
 
 describe("connection", function () {
   it('should emit "connect" when connected', (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.on("connect", function () {
       redis.disconnect();
       done();
@@ -16,7 +16,7 @@ describe("connection", function () {
   });
 
   it('should emit "close" when disconnected', (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.once("end", done);
     redis.once("connect", function () {
       redis.disconnect();
@@ -24,7 +24,7 @@ describe("connection", function () {
   });
 
   it("should send AUTH command before any other commands", (done) => {
-    const redis = new Redis({ password: "123" });
+    const redis = new Valkey({ password: "123" });
     redis.get("foo");
     let times = 0;
     sinon.stub(redis, "sendCommand").callsFake((command) => {
@@ -42,7 +42,7 @@ describe("connection", function () {
   });
 
   it("should receive replies after connection is disconnected", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.set("foo", "bar", function () {
       redis.stream.end();
     });
@@ -54,7 +54,7 @@ describe("connection", function () {
   });
 
   it("connects successfully immediately after end", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.once("end", async () => {
       await redis.connect();
       done();
@@ -64,7 +64,7 @@ describe("connection", function () {
   });
 
   it("connects successfully immediately after quit", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.once("end", async () => {
       await redis.connect();
       done();
@@ -79,7 +79,7 @@ describe("connection", function () {
   describe("connectTimeout", () => {
     it("should clear the timeout when connected", (done) => {
       const connectTimeout = 10000;
-      const redis = new Redis({ connectTimeout });
+      const redis = new Valkey({ connectTimeout });
       let set = false;
 
       // TODO: use spy
@@ -100,7 +100,7 @@ describe("connection", function () {
     });
 
     it("should ignore timeout if connect", (done) => {
-      const redis = new Redis({
+      const redis = new Valkey({
         port: 6379,
         connectTimeout: 500,
         retryStrategy: null,
@@ -135,7 +135,7 @@ describe("connection", function () {
   describe("#connect", function () {
     it("should return a promise", (done) => {
       let pending = 2;
-      const redis = new Redis({ lazyConnect: true });
+      const redis = new Valkey({ lazyConnect: true });
       redis.connect().then(function () {
         redis.disconnect();
         if (!--pending) {
@@ -143,7 +143,7 @@ describe("connection", function () {
         }
       });
 
-      const redis2 = new Redis(6390, {
+      const redis2 = new Valkey(6390, {
         lazyConnect: true,
         retryStrategy: null,
       });
@@ -156,7 +156,7 @@ describe("connection", function () {
     });
 
     it("should stop reconnecting when disconnected", (done) => {
-      const redis = new Redis(8999, {
+      const redis = new Valkey(8999, {
         retryStrategy: function () {
           return 0;
         },
@@ -165,17 +165,17 @@ describe("connection", function () {
       redis.on("close", function () {
         redis.disconnect();
         sinon
-          .stub(Redis.prototype, "connect")
+          .stub(Valkey.prototype, "connect")
           .throws(new Error("`connect` should not be called"));
         setTimeout(function () {
-          Redis.prototype.connect.restore();
+          Valkey.prototype.connect.restore();
           done();
         }, 1);
       });
     });
 
     it("should reject when connected", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.connect().catch(function (err) {
         expect(err.message).to.match(/Redis is already connecting/);
         redis.disconnect();
@@ -184,7 +184,7 @@ describe("connection", function () {
     });
 
     it("should resolve when the status become ready", (done) => {
-      const redis = new Redis({ lazyConnect: true });
+      const redis = new Valkey({ lazyConnect: true });
       redis.connect().then(function () {
         expect(redis.status).to.eql("ready");
         redis.disconnect();
@@ -193,7 +193,7 @@ describe("connection", function () {
     });
 
     it("should reject when closed (reconnecting)", (done) => {
-      const redis = new Redis({
+      const redis = new Valkey({
         port: 8989,
         lazyConnect: true,
         retryStrategy: function () {
@@ -209,7 +209,7 @@ describe("connection", function () {
     });
 
     it("should reject when closed (end)", (done) => {
-      const redis = new Redis({
+      const redis = new Valkey({
         port: 8989,
         lazyConnect: true,
         retryStrategy: null,
@@ -236,7 +236,7 @@ describe("connection", function () {
       let closed = false;
       let errored = false;
 
-      const redis = new Redis({ lazyConnect: true });
+      const redis = new Valkey({ lazyConnect: true });
       redis
         .connect(() => {})
         .catch((err) => {
@@ -260,7 +260,7 @@ describe("connection", function () {
   describe("retryStrategy", function () {
     it("should pass the correct retry times", (done) => {
       let t = 0;
-      new Redis({
+      new Valkey({
         port: 1,
         retryStrategy: function (times) {
           expect(times).to.eql(++t);
@@ -274,7 +274,7 @@ describe("connection", function () {
     });
 
     it("should skip reconnecting when retryStrategy doesn't return a number", (done) => {
-      var redis = new Redis({
+      var redis = new Valkey({
         port: 1,
         retryStrategy: function () {
           process.nextTick(function () {
@@ -289,7 +289,7 @@ describe("connection", function () {
 
     it("should skip reconnecting if quitting before connecting", (done) => {
       let count = 0;
-      const redis = new Redis({
+      const redis = new Valkey({
         port: 8999,
         retryStrategy: function () {
           count++;
@@ -305,7 +305,7 @@ describe("connection", function () {
     });
 
     it("should skip reconnecting if quitting before connecting (buffer)", (done) => {
-      const redis = new Redis({
+      const redis = new Valkey({
         port: 8999,
         retryStrategy: function () {
           throw new Error("should not reconnect");
@@ -323,7 +323,7 @@ describe("connection", function () {
 
   describe("connectionName", function () {
     it("should name the connection if options.connectionName is not null", (done) => {
-      const redis = new Redis({ connectionName: "niceName" });
+      const redis = new Valkey({ connectionName: "niceName" });
       redis.once("ready", function () {
         redis.client("getname", function (err, res) {
           expect(res).to.eql("niceName");
@@ -335,7 +335,7 @@ describe("connection", function () {
     });
 
     it("should set the name before any subscribe command if reconnected", (done) => {
-      const redis = new Redis({ connectionName: "niceName" });
+      const redis = new Valkey({ connectionName: "niceName" });
       redis.once("ready", function () {
         redis.subscribe("l", function () {
           redis.disconnect(true);
@@ -354,7 +354,7 @@ describe("connection", function () {
   describe("readOnly", function () {
     it("should send readonly command before other commands", (done) => {
       let called = false;
-      const redis = new Redis({
+      const redis = new Valkey({
         port: 30001,
         readOnly: true,
         showFriendlyErrorStack: true,
@@ -376,8 +376,8 @@ describe("connection", function () {
 
   describe("autoResendUnfulfilledCommands", function () {
     it("should resend unfulfilled commands to the correct db when reconnected", (done) => {
-      const redis = new Redis({ db: 3 });
-      const pub = new Redis({ db: 3 });
+      const redis = new Valkey({ db: 3 });
+      const pub = new Valkey({ db: 3 });
       redis.once("ready", function () {
         let pending = 2;
         redis.blpop("l", 0, function (err, res) {
@@ -408,8 +408,8 @@ describe("connection", function () {
     });
 
     it("should resend previous subscribes before sending unfulfilled commands", (done) => {
-      const redis = new Redis({ db: 4 });
-      const pub = new Redis({ db: 4 });
+      const redis = new Valkey({ db: 4 });
+      const pub = new Valkey({ db: 4 });
       redis.once("ready", function () {
         pub.pubsub("channels", function (err, channelsBefore) {
           redis.subscribe("l", function () {
@@ -432,7 +432,7 @@ describe("connection", function () {
       const socket = new net.Socket();
       sinon.stub(StandaloneConnector.prototype, "connect").resolves(socket);
       socket.connect(6379, "127.0.0.1").on("connect", () => {
-        new Redis().on("connect", () => done());
+        new Valkey().on("connect", () => done());
       });
     });
 
@@ -441,7 +441,7 @@ describe("connection", function () {
       const socket = new net.Socket();
       sinon.stub(StandaloneConnector.prototype, "connect").resolves(socket);
       socket.connect(6379, "127.0.0.1").on("connect", () => {
-        const redis = new Redis({
+        const redis = new Valkey({
           connectTimeout: 1,
         });
         redis.on("error", () =>
@@ -457,7 +457,7 @@ describe("connection", function () {
 
   describe("multiple reconnect", function () {
     it("should reconnect after multiple consecutive disconnect(true) are called", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.once("reconnecting", function () {
         redis.disconnect(true);
       });
@@ -487,7 +487,7 @@ describe("disconnection", function () {
         return new Error(errMessage);
       }
     });
-    const redis = new Redis({ port: 30001, db: 2 });
+    const redis = new Valkey({ port: 30001, db: 2 });
     redis.on("error", (err) => {
       if (err.message === errMessage) {
         redis.disconnect();

@@ -1,10 +1,10 @@
 import { expect } from "chai";
-import { Redis } from "../../lib/Redis";
+import { Valkey } from "../../lib/Valkey";
 import { MaxRetriesPerRequestError } from "../../lib/errors";
 
 describe("maxRetriesPerRequest", () => {
   it("throw the correct error when reached the limit", (done) => {
-    const redis = new Redis(9999, {
+    const redis = new Valkey(9999, {
       connectTimeout: 1,
       retryStrategy() {
         return 1;
@@ -18,7 +18,7 @@ describe("maxRetriesPerRequest", () => {
   });
 
   it("defaults to max 20 retries", (done) => {
-    const redis = new Redis(9999, {
+    const redis = new Valkey(9999, {
       connectTimeout: 1,
       retryStrategy() {
         return 1;
@@ -35,7 +35,7 @@ describe("maxRetriesPerRequest", () => {
   });
 
   it("can be changed", (done) => {
-    const redis = new Redis(9999, {
+    const redis = new Valkey(9999, {
       maxRetriesPerRequest: 1,
       retryStrategy() {
         return 1;
@@ -52,7 +52,7 @@ describe("maxRetriesPerRequest", () => {
   });
 
   it("allows 0", (done) => {
-    const redis = new Redis(9999, {
+    const redis = new Valkey(9999, {
       maxRetriesPerRequest: 0,
       retryStrategy() {
         return 1;

@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 const MAX_NUMBER = 9007199254740991; // Number.MAX_SAFE_INTEGER
@@ -6,7 +6,7 @@ const MAX_NUMBER = 9007199254740991; // Number.MAX_SAFE_INTEGER
 describe("stringNumbers", () => {
   context("enabled", () => {
     it("returns numbers as strings", async () => {
-      const redis = new Redis({
+      const redis = new Valkey({
         stringNumbers: true,
       });
 
@@ -32,7 +32,7 @@ describe("stringNumbers", () => {
 
   context("disabled", () => {
     it("returns numbers", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
 
       redis.set("foo", "123");
       redis.incr("foo", function (err, res) {

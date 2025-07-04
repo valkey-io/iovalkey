@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import sinon from "sinon";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import MockServer from "../helpers/mock_server";
 
 describe("commandTimeout", () => {
@@ -12,7 +12,7 @@ describe("commandTimeout", () => {
       }
     });
 
-    const redis = new Redis({ port: 30001, commandTimeout: 1000 });
+    const redis = new Valkey({ port: 30001, commandTimeout: 1000 });
     const clock = sinon.useFakeTimers();
     redis.hget("foo", (err) => {
       expect(err.message).to.eql("Command timed out");
@@ -26,7 +26,7 @@ describe("commandTimeout", () => {
   it("does not leak timers for commands in offline queue", async () => {
     const server = new MockServer(30001);
 
-    const redis = new Redis({ port: 30001, commandTimeout: 1000 });
+    const redis = new Valkey({ port: 30001, commandTimeout: 1000 });
     const clock = sinon.useFakeTimers();
     await redis.hget("foo");
     expect(clock.countTimers()).to.eql(0);
@@ -42,7 +42,7 @@ describe("commandTimeout", () => {
       }
     });
 
-    const redis = new Redis({ port: 30001, commandTimeout: 1000000000 });
+    const redis = new Valkey({ port: 30001, commandTimeout: 1000000000 });
     const clock = sinon.useFakeTimers();
     let error: any;
     try {

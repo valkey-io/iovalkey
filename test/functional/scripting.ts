@@ -1,11 +1,11 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 import sinon from "sinon";
 import { getCommandsFromMonitor } from "../helpers/util";
 
 describe("scripting", () => {
   it("accepts constructor options", async () => {
-    const redis = new Redis({
+    const redis = new Valkey({
       scripts: {
         test: {
           numberOfKeys: 2,
@@ -36,7 +36,7 @@ describe("scripting", () => {
 
   describe("#numberOfKeys", () => {
     it("should recognize the numberOfKeys property", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
 
       redis.defineCommand("test", {
         numberOfKeys: 2,
@@ -52,7 +52,7 @@ describe("scripting", () => {
     });
 
     it("should support dynamic key count", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
 
       redis.defineCommand("test", {
         lua: "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}",
@@ -67,7 +67,7 @@ describe("scripting", () => {
     });
 
     it("should support numberOfKeys being 0", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
 
       redis.defineCommand("test", {
         numberOfKeys: 0,
@@ -83,7 +83,7 @@ describe("scripting", () => {
     });
 
     it("should throw when numberOfKeys is omit", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
 
       redis.defineCommand("test", {
         lua: "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}",
@@ -100,7 +100,7 @@ describe("scripting", () => {
   });
 
   it("should have a buffer version", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", {
       numberOfKeys: 2,
@@ -121,7 +121,7 @@ describe("scripting", () => {
   });
 
   it("should work well with pipeline", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", {
       numberOfKeys: 1,
@@ -144,7 +144,7 @@ describe("scripting", () => {
   });
 
   it("should following pipeline style when throw", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", {
       lua: 'return redis.call("get", KEYS[1])',
@@ -165,7 +165,7 @@ describe("scripting", () => {
   });
 
   it("should use evalsha when script is loaded", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", { lua: "return 1" });
     // @ts-expect-error
@@ -184,7 +184,7 @@ describe("scripting", () => {
   });
 
   it("should try to use EVALSHA and fall back to EVAL if fails", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", {
       numberOfKeys: 1,
@@ -210,7 +210,7 @@ describe("scripting", () => {
   });
 
   it("should load scripts first before execution of pipeline", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("testGet", {
       numberOfKeys: 1,
@@ -238,7 +238,7 @@ describe("scripting", () => {
   });
 
   it("does not fall back to EVAL in regular transaction", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", {
       numberOfKeys: 1,
@@ -266,7 +266,7 @@ describe("scripting", () => {
   });
 
   it("does not fall back to EVAL in manual transaction", async () => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.defineCommand("test", {
       numberOfKeys: 1,
@@ -292,7 +292,7 @@ describe("scripting", () => {
   });
 
   it("should support key prefixing", (done) => {
-    const redis = new Redis({ keyPrefix: "foo:" });
+    const redis = new Valkey({ keyPrefix: "foo:" });
 
     redis.defineCommand("echo", {
       numberOfKeys: 2,

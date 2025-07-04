@@ -1,2 +1,2 @@
 export * from "./index.js";
-export { Redis as default } from "./Redis.js";
+export { Valkey as default } from "./Valkey.js";

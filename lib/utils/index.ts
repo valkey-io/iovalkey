@@ -200,7 +200,7 @@ export function optimizeErrorStack(
 }
 
 /**
- * Parse the redis protocol url
+ * Parse the valkey protocol url
  */
 export function parseURL(url: string): Record<string, unknown> {
   if (isInt(url)) {

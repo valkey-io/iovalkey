@@ -1,4 +1,4 @@
-import { RedisOptions } from "../../redis/RedisOptions.js";
+import { ValkeyOptions } from "../../redis/ValkeyOptions.js";
 
 export interface SentinelAddress {
   port: number;
@@ -7,8 +7,8 @@ export interface SentinelAddress {
 }
 
 // TODO: A proper typedef. This one only declares a small subset of all the members.
-export interface RedisClient {
-  options: RedisOptions;
+interface ValkeyClient {
+  options: ValkeyOptions;
   sentinel(subcommand: "sentinels", name: string): Promise<string[]>;
   sentinel(
     subcommand: "get-master-addr-by-name",
@@ -27,8 +27,13 @@ export interface RedisClient {
 
 interface Sentinel {
   address: Partial<SentinelAddress>;
-  client: RedisClient;
+  client: ValkeyClient;
 }
 
-export { Sentinel };
+export { Sentinel, ValkeyClient };
+/**
+ * @ignore
+ * @deprecated Use ValkeyClient instead.
+ */
+export type { ValkeyClient as RedisClient };
 export default Sentinel;

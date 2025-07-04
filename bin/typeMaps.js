@@ -1,5 +1,5 @@
 module.exports = {
-  key: "RedisKey",
+  key: "ValkeyKey",
   string: (name) =>
     [
       "value",

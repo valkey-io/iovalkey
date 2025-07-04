@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 import sinon from "sinon";
 
@@ -13,7 +13,7 @@ describe("reconnectOnError", () => {
         done();
       }
     }
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: function (err) {
         assert(err);
         return 1;
@@ -26,7 +26,7 @@ describe("reconnectOnError", () => {
   });
 
   it("should not reconnect if reconnectOnError returns false", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: function (err) {
         return false;
       },
@@ -42,7 +42,7 @@ describe("reconnectOnError", () => {
   });
 
   it("should reconnect if reconnectOnError returns true or 1", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: () => {
         return true;
       },
@@ -56,7 +56,7 @@ describe("reconnectOnError", () => {
   });
 
   it("should reconnect and retry the command if reconnectOnError returns 2", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: () => {
         redis.del("foo");
         return 2;
@@ -71,7 +71,7 @@ describe("reconnectOnError", () => {
   });
 
   it("should select the correct database", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: () => {
         redis.select(3);
         redis.del("foo");
@@ -93,7 +93,7 @@ describe("reconnectOnError", () => {
   });
 
   it("should work with pipeline", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: () => {
         redis.del("foo");
         return 2;
@@ -115,7 +115,7 @@ describe("reconnectOnError", () => {
   });
 
   it("should work with pipelined multi", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       reconnectOnError: () => {
         // deleting foo allows sadd below to succeed on the second try
         redis.del("foo");
