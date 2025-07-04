@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/extensions, @typescript-eslint/no-require-imports
 exports = module.exports = require('./Redis.js').Redis as unknown as typeof import('./Redis.js').Redis;
 export { Redis as default } from './Redis.js';
-export { Redis } from './Redis.js';
+export { Redis, Valkey } from './Redis.js';
 
 export { Cluster } from "./cluster/index.js";
 
