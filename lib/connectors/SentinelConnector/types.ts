@@ -25,7 +25,10 @@ export interface RedisClient {
   disconnect(): void;
 }
 
-export interface Sentinel {
+interface Sentinel {
   address: Partial<SentinelAddress>;
   client: RedisClient;
 }
+
+export { Sentinel };
+export default Sentinel;

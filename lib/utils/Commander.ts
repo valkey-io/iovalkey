@@ -3,18 +3,18 @@ import {
   executeWithAutoPipelining,
   shouldUseAutoPipelining,
 } from "../autoPipelining.js";
-import Command, { ArgumentType } from "../Command.js";
-import Script from "../Script.js";
+import { Command, ArgumentType } from "../Command.js";
+import { Script } from "../Script.js";
 import { Callback, WriteableStream } from "../types.js";
-import RedisCommander, { ClientContext } from "./RedisCommander.js";
+import { RedisCommander, ClientContext } from "./RedisCommander.js";
 
 export interface CommanderOptions {
   keyPrefix?: string;
   showFriendlyErrorStack?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
-class Commander<Context extends ClientContext = { type: "default" }> {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-unsafe-declaration-merging
+class Commander<Context extends ClientContext = { type: "default" }> { 
   options: CommanderOptions = {};
 
   /**
@@ -92,8 +92,10 @@ class Commander<Context extends ClientContext = { type: "default" }> {
   }
 }
 
+
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Commander<Context> extends RedisCommander<Context> {}
+
 
 const commands = list.filter((command) => command !== "monitor");
 commands.push("sentinel");
@@ -205,4 +207,5 @@ function generateScriptingFunction(
   };
 }
 
-export default Commander;
+  export { Commander };
+  export default Commander;

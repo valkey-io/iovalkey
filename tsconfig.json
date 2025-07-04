@@ -11,10 +11,10 @@
     ],
     "moduleResolution": "node",
     "module": "commonjs",
-    "outDir": "./built",
+    "outDir": "./built"
   },
   "include": ["./lib/**/*"],
-  "exclude": ["node_modules", "built", "test"],
+  "exclude": ["node_modules"],
   "ts-node": {
     "experimentalResolver": true
   }

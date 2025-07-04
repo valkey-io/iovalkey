@@ -1,6 +1,6 @@
 import MockServer from "../../helpers/mock_server";
 import { expect } from "chai";
-import { Cluster, default as Redis } from "../../../lib";
+import { Cluster, Redis } from "../../../lib";
 import * as utils from "../../../lib/utils";
 import sinon from "sinon";
 

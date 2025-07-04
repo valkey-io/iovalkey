@@ -16023,4 +16023,5 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   ): Result<number, Context>;
 }
 
+export { RedisCommander };
 export default RedisCommander;

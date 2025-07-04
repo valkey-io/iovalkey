@@ -1,19 +1,19 @@
 import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import asCallback from "standard-as-callback";
-import Cluster from "./cluster/index.js";
-import Command from "./Command.js";
+import { Cluster } from "./cluster/index.js";
+import { Command } from "./Command.js";
 import { DataHandledable, FlushQueueOptions, Condition } from "./DataHandler.js";
 import { StandaloneConnector } from "./connectors/index.js";
-import AbstractConnector from "./connectors/AbstractConnector.js";
-import SentinelConnector from "./connectors/SentinelConnector/index.js";
+import { AbstractConnector } from "./connectors/AbstractConnector.js";
+import { SentinelConnector } from "./connectors/SentinelConnector/index.js";
 import * as eventHandler from "./redis/event_handler.js";
 import {
   DEFAULT_REDIS_OPTIONS,
   ReconnectOnError,
   RedisOptions,
 } from "./redis/RedisOptions.js";
-import ScanStream from "./ScanStream.js";
+import { ScanStream } from "./ScanStream.js";
 import { addTransactionSupport, Transaction } from "./transaction.js";
 import {
   Callback,
@@ -24,9 +24,10 @@ import {
 } from "./types.js";
 import { CONNECTION_CLOSED_ERROR_MSG, Debug, isInt, parseURL } from "./utils/index.js";
 import applyMixin from "./utils/applyMixin.js";
-import Commander from "./utils/Commander.js";
+import { Commander } from "./utils/Commander.js";
 import { defaults, noop } from "./utils/lodash.js";
-import Deque = require("denque");
+import { default as Deque } from "denque";
+
 const debug = Debug("redis");
 
 type RedisStatus =
@@ -909,4 +910,5 @@ addTransactionSupport(Redis.prototype);
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Redis extends Transaction {}
 
+export { Redis, Transaction };
 export default Redis;

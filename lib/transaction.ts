@@ -1,6 +1,6 @@
 import { wrapMultiResult, noop } from "./utils/index.js";
 import asCallback from "standard-as-callback";
-import Pipeline from "./Pipeline.js";
+import { Pipeline } from "./Pipeline.js";
 import { Callback } from "./types.js";
 import { ChainableCommander } from "./utils/RedisCommander.js";
 

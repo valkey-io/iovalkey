@@ -81,7 +81,7 @@ export interface CommandNameFlags {
  * });
  * ```
  */
-export default class Command implements Respondable {
+class Command implements Respondable {
   static FLAGS: {
     [key in keyof CommandNameFlags]: CommandNameFlags[key];
   } = {
@@ -242,7 +242,7 @@ export default class Command implements Respondable {
   /**
    * Convert command to writable buffer or string
    */
-  toWritable(_socket: object): string | Buffer {
+  toWritable(_socket?: object): string | Buffer {
     let result;
     const commandStr =
       "*" +
@@ -487,3 +487,6 @@ class MixedBuffers {
     return result;
   }
 }
+
+export { Command };
+export default Command;

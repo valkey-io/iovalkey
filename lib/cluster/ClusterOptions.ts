@@ -2,8 +2,8 @@ import { SrvRecord, resolveSrv, lookup } from "dns";
 import { RedisOptions } from "../redis/RedisOptions.js";
 import { CommanderOptions } from "../utils/Commander.js"; 
 import { NodeRole } from "./util.js";
-import type Command from "../Command.js";
-import type Redis from "../Redis.js";
+import { type Command } from "../Command.js";
+import { type Redis } from "../Redis.js"; 
 
 export type DNSResolveSrvFunction = (
   hostname: string,
@@ -61,7 +61,7 @@ export interface ClusterOptions extends CommanderOptions {
    *
    * @default "master"
    */
-  scaleReads?: NodeRole | ((nodes: Redis[], command: Command) => NodeRole);
+  scaleReads?: NodeRole | ((nodes: Redis[], command: Command) => Redis);
 
   /**
    * When a MOVED or ASK error is received, client will redirect the

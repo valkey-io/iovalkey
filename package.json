@@ -2,8 +2,8 @@
   "name": "iovalkey",
   "version": "0.3.3",
   "description": "A robust, performance-focused and full-featured Valkey/Redis client for Node.js.",
-  "main": "./built/index.js",
-  "types": "./built/index.d.ts",
+  "main": "built/index.js",
+  "types": "built/index.d.mts",
   "files": [
     "built/"
   ],
@@ -14,7 +14,7 @@
     "test:js:cluster": "TS_NODE_TRANSPILE_ONLY=true NODE_ENV=test mocha \"test/cluster/**/*.ts\"",
     "test": "npm run lint && npm run test:js && npm run test:tsd",
     "lint": "eslint --ext .js,.ts ./lib",
-    "docs": "npx typedoc --logLevel Error --excludeExternals --excludeProtected --excludePrivate --readme none lib/index.ts",
+    "docs": "npx typedoc --disableGit --sourceLinkTemplate 'https://github.com/valkey-io/iovalkey/blob/main/lib/{path}#L{line}' --logLevel Error --excludeExternals --excludeProtected --excludePrivate --readme none lib/index.ts",
     "format": "prettier --write \"{,!(node_modules)/**/}*.{js,ts}\"",
     "format-check": "prettier --check \"{,!(node_modules)/**/}*.{js,ts}\"",
     "build": "rm -rf built && ./node_modules/.bin/tsc",

@@ -32,6 +32,10 @@ expectType<Promise<unknown>>(
 // GET
 expectType<Promise<string | null>>(redis.get("key"));
 expectType<Promise<Buffer | null>>(redis.getBuffer("key"));
+expectType<Promise<string | null>>(redis.get("key", (err, value) => {
+  expectType<Error | undefined | null>(err);
+  expectType<string | null | undefined>(value);
+}));
 expectError(redis.get("key", "bar"));
 
 // SET
