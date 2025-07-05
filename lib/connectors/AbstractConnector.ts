@@ -1,11 +1,11 @@
-import { NetStream } from "../types";
-import { Debug } from "../utils";
+import { NetStream } from "../types.js";
+import { Debug } from "../utils/index.js";
 
 const debug = Debug("AbstractConnector");
 
-export type ErrorEmitter = (type: string, err: Error) => void;
+type ErrorEmitter = (type: string, err: Error) => void;
 
-export default abstract class AbstractConnector {
+abstract class AbstractConnector {
   firstError?: Error;
   protected connecting = false;
   protected stream: NetStream;
@@ -42,3 +42,6 @@ export default abstract class AbstractConnector {
 
   abstract connect(_: ErrorEmitter): Promise<NetStream>;
 }
+
+export { AbstractConnector, ErrorEmitter };
+export default AbstractConnector;

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import Redis, { Cluster } from "../../lib";
+import { Redis, Cluster } from "../../lib/index.js";
 
 const masters = [30000, 30001, 30002];
 const replicas = [30003, 30004, 30005];

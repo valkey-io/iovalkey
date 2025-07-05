@@ -1,7 +1,7 @@
 import { EventEmitter } from "events";
-import { sample, Debug, noop, defaults } from "../utils";
-import { RedisOptions, getNodeKey, NodeKey, NodeRole } from "./util";
-import Redis from "../Redis";
+import { sample, Debug, noop, defaults } from "../utils/index.js";
+import { RedisOptions, getNodeKey, NodeKey, NodeRole } from "./util.js";
+import { Redis } from "../Redis.js";
 
 const debug = Debug("cluster:connectionPool");
 
@@ -13,7 +13,7 @@ type NodeRecord = {
   errorListener: (error: unknown) => void;
 };
 
-export default class ConnectionPool extends EventEmitter {
+class ConnectionPool extends EventEmitter {  
   // master + slave = all
   private nodeRecords: { [key in NODE_TYPE]: { [key: string]: NodeRecord } } = {
     all: {},
@@ -162,3 +162,6 @@ export default class ConnectionPool extends EventEmitter {
     }
   }
 }
+
+export { ConnectionPool };
+export default ConnectionPool;

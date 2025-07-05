@@ -1,8 +1,8 @@
-import * as calculateSlot from "cluster-key-slot";
+import calculateSlot from "cluster-key-slot";
 import MockServer from "../../helpers/mock_server";
 import { expect } from "chai";
 import { Cluster } from "../../../lib";
-import * as sinon from "sinon";
+import sinon from "sinon";
 
 describe("NAT", () => {
   it("works for normal case with object", (done) => {

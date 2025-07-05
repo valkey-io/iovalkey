@@ -1,7 +1,7 @@
 import Redis from "../../lib/Redis";
 import { expect } from "chai";
 import { Readable } from "stream";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import MockServer from "../helpers/mock_server";
 import { Cluster } from "../../lib";
 

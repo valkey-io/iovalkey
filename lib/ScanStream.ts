@@ -13,7 +13,7 @@ interface Options extends ReadableOptions {
 /**
  * Convenient class to convert the process of scanning keys to a readable stream.
  */
-export default class ScanStream extends Readable {
+class ScanStream extends Readable {
   private _redisCursor = "0";
   private _redisDrained = false;
 
@@ -61,3 +61,6 @@ export default class ScanStream extends Readable {
     this._redisDrained = true;
   }
 }
+
+export { ScanStream };
+export default ScanStream;
