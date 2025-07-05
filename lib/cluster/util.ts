@@ -1,4 +1,4 @@
-import { parseURL } from "../utils";
+import { parseURL } from "../utils/index.js";
 import { isIP } from "net";
 import { SrvRecord } from "dns";
 

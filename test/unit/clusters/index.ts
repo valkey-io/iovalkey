@@ -1,6 +1,6 @@
 import { nodeKeyToRedisOptions } from "../../../lib/cluster/util";
 import { Cluster } from "../../../lib";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 
 describe("cluster", () => {

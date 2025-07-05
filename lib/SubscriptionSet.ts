@@ -1,4 +1,4 @@
-import { CommandNameFlags } from "./Command";
+import { CommandNameFlags } from "./Command.js";
 
 type AddSet = CommandNameFlags["ENTER_SUBSCRIBER_MODE"][number];
 type DelSet = CommandNameFlags["EXIT_SUBSCRIBER_MODE"][number];
@@ -6,7 +6,7 @@ type DelSet = CommandNameFlags["EXIT_SUBSCRIBER_MODE"][number];
 /**
  * Tiny class to simplify dealing with subscription set
  */
-export default class SubscriptionSet {
+class SubscriptionSet {
   private set: { [key: string]: { [channel: string]: boolean } } = {
     subscribe: {},
     psubscribe: {},
@@ -46,3 +46,6 @@ function mapSet(set: AddSet | DelSet): AddSet {
   }
   return set;
 }
+
+export { SubscriptionSet };
+export default SubscriptionSet;
