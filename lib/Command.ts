@@ -1,5 +1,5 @@
 import { exists, getKeyIndexes } from "@iovalkey/commands";
-import * as calculateSlot from "cluster-key-slot";
+import calculateSlot from "cluster-key-slot";
 import asCallback from "standard-as-callback";
 import {
   convertBufferToString,
@@ -7,8 +7,8 @@ import {
   toArg,
   convertMapToArray,
   convertObjectToArray,
-} from "./utils";
-import { Callback, Respondable, CommandParameter } from "./types";
+} from "./utils/index.js";
+import { Callback, Respondable, CommandParameter } from "./types.js";
 
 export type ArgumentType =
   | string
@@ -67,7 +67,7 @@ export interface CommandNameFlags {
  *   console.log('result', result);
  * });
  *
- * redis.sendCommand(infoCommand);
+ * valkey.sendCommand(infoCommand);
  *
  * // When no callback provided, Command instance will have a `promise` property,
  * // which will resolve/reject with the result of the command.
@@ -77,7 +77,7 @@ export interface CommandNameFlags {
  * });
  * ```
  */
-export default class Command implements Respondable {
+class Command implements Respondable {
   static FLAGS: {
     [key in keyof CommandNameFlags]: CommandNameFlags[key];
   } = {
@@ -225,7 +225,7 @@ export default class Command implements Respondable {
   /**
    * Convert command to writable buffer or string
    */
-  toWritable(_socket: object): string | Buffer {
+  toWritable(_socket?: object): string | Buffer {
     let result;
     const commandStr =
       "*" +
@@ -373,7 +373,7 @@ export default class Command implements Respondable {
   /**
    * Convert the value from buffer to the target encoding.
    */
-  private _convertValue(resolve: Function): (result: any) => void {
+  private _convertValue(resolve: (value: any) => void): (result: any) => void {
     return (value) => {
       try {
         resolve(this.transformReply(value));
@@ -418,6 +418,7 @@ Command.setArgumentTransformer("hmset", hsetArgumentTransformer);
 
 Command.setReplyTransformer("hgetall", function (result) {
   if (Array.isArray(result)) {
+    // Consider using Object.create(null)
     const obj = {};
     for (let i = 0; i < result.length; i += 2) {
       const key = result[i];
@@ -454,11 +455,16 @@ class MixedBuffers {
     let offset = 0;
     for (const item of this.items) {
       const length = Buffer.byteLength(item);
-      Buffer.isBuffer(item)
-        ? (item as Buffer).copy(result, offset)
-        : result.write(item, offset, length);
+      if (Buffer.isBuffer(item)) {
+        (item as Buffer).copy(result, offset);
+      } else {
+        result.write(item, offset, length);
+      }
       offset += length;
     }
     return result;
   }
 }
+
+export { Command };
+export default Command;

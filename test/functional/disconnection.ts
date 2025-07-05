@@ -1,5 +1,5 @@
-import Redis from "../../lib/Redis";
-import * as sinon from "sinon";
+import Valkey from "../../lib/Valkey";
+import sinon from "sinon";
 import { expect } from "chai";
 import MockServer from "../helpers/mock_server";
 
@@ -14,7 +14,7 @@ describe("disconnection", () => {
     const setIntervalCalls = sinon.spy(global, "setInterval");
     const clearIntervalCalls = sinon.spy(global, "clearInterval");
 
-    const redis = new Redis({});
+    const redis = new Valkey({});
     redis.on("connect", () => {
       redis.disconnect();
     });
@@ -32,7 +32,7 @@ describe("disconnection", () => {
     const setIntervalCalls = sinon.spy(global, "setInterval");
     const clearIntervalCalls = sinon.spy(global, "clearInterval");
 
-    const redis = new Redis({
+    const redis = new Valkey({
       port: 30000,
       retryStrategy: null,
     });

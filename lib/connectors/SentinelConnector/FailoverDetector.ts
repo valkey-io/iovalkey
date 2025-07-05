@@ -1,12 +1,12 @@
-import { Debug } from "../../utils";
-import SentinelConnector from "./index";
-import { Sentinel } from "./types";
+import { Debug } from "../../utils/index.js";
+import { SentinelConnector } from "./index.js";   
+import { Sentinel } from "./types.js";
 
 const debug = Debug("FailoverDetector");
 
 const CHANNEL_NAME = "+switch-master";
 
-export class FailoverDetector {
+class FailoverDetector {
   private connector: SentinelConnector;
   private sentinels: Sentinel[];
   private isDisconnected = false;
@@ -63,3 +63,6 @@ export class FailoverDetector {
     this.connector.disconnect();
   }
 }
+
+export { FailoverDetector };
+export default FailoverDetector;

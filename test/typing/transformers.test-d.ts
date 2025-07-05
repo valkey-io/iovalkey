@@ -1,5 +1,5 @@
 import { expectType } from "tsd";
-import { Redis } from "../../built";
+import { Valkey } from "../../built";
 
 interface User {
   name: string;
@@ -16,7 +16,7 @@ const mixedMap = new Map<string | Buffer | number, string>([
   ["field", "value"],
 ]);
 
-const redis = new Redis();
+const redis = new Valkey();
 
 // mset
 expectType<Promise<"OK">>(redis.mset("key1", "value1", "key2", "value2"));

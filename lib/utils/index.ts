@@ -1,7 +1,7 @@
 import { parse as urllibParse } from "url";
-import { defaults, noop } from "./lodash";
-import { Callback } from "../types";
-import Debug from "./debug";
+import { defaults, noop } from "./lodash.js";
+import { Callback } from "../types.js";
+import Debug from "./debug.js";
 
 /**
  * Convert a buffer to string, supports buffer array
@@ -200,7 +200,7 @@ export function optimizeErrorStack(
 }
 
 /**
- * Parse the redis protocol url
+ * Parse the valkey protocol url
  */
 export function parseURL(url: string): Record<string, unknown> {
   if (isInt(url)) {

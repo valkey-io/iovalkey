@@ -1,8 +1,8 @@
-import * as tls from "tls";
-import * as net from "net";
-import Redis from "../../lib/Redis";
+import tls from "tls";
+import net from "net";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import MockServer from "../helpers/mock_server";
 
 describe("tls option", () => {
@@ -27,7 +27,7 @@ describe("tls option", () => {
         return stream;
       });
 
-      redis = new Redis({
+      redis = new Valkey({
         tls: { ca: "123", servername: "localhost", rejectUnauthorized: false },
       });
       redis.on("ready", () => {
@@ -50,7 +50,7 @@ describe("tls option", () => {
         throw new Error("called");
       });
 
-      const redis = new Redis({
+      const redis = new Valkey({
         sentinels: [{ port: 27379 }],
         name: "my",
         tls: { ca: "123" },
@@ -84,7 +84,7 @@ describe("tls option", () => {
         return tls.connect(op);
       });
 
-      redis = new Redis({
+      redis = new Valkey({
         sentinels: [{ port: 27379 }],
         name: "my",
         tls: { ca: "123", servername: "localhost", rejectUnauthorized: false },
@@ -118,7 +118,7 @@ describe("tls option", () => {
         return stream;
       });
 
-      redis = new Redis({
+        redis = new Valkey({
         sentinels: [{ port: 27379 }],
         name: "my",
         sentinelTLS: {

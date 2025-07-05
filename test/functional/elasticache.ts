@@ -1,4 +1,4 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 import MockServer from "../helpers/mock_server";
 
@@ -25,7 +25,7 @@ function simulateElasticache(options: {
     }
   });
 
-  return new Redis({
+  return new Valkey({
     port: 30000,
     reconnectOnError(err: Error): boolean | number {
       // bring the mock server back up

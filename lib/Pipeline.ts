@@ -1,13 +1,13 @@
-import * as calculateSlot from "cluster-key-slot";
+import calculateSlot from "cluster-key-slot";
 import { exists, hasFlag } from "@iovalkey/commands";
 import asCallback from "standard-as-callback";
 import { deprecate } from "util";
-import Redis from "./Redis";
-import Cluster from "./cluster";
-import Command from "./Command";
-import { Callback, PipelineWriteableStream } from "./types";
-import { noop } from "./utils";
-import Commander from "./utils/Commander";
+import { Valkey } from "./Valkey.js";
+import { Cluster } from "./cluster/index.js";
+import { Command } from "./Command.js";   
+import { Callback, PipelineWriteableStream } from "./types.js";
+import { noop } from "./utils/index.js";
+import { Commander } from "./utils/Commander.js"; 
 
 /*
   This function derives from the cluster-key-slot implementation.
@@ -27,6 +27,7 @@ function generateMultiWithNodes(redis, keys) {
   return slot;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class Pipeline extends Commander<{ type: "pipeline" }> {
   isCluster: boolean;
   isPipeline = true;
@@ -43,10 +44,10 @@ class Pipeline extends Commander<{ type: "pipeline" }> {
   private _shaToScript = {};
   private preferKey: string;
 
-  constructor(public redis: Redis | Cluster) {
+  constructor(public redis: Valkey | Cluster) {
     super();
     this.isCluster =
-      this.redis.constructor.name === "Cluster" || this.redis.isCluster;
+      redis.constructor.name === "Cluster" || redis.isCluster;
     this.options = redis.options;
 
     Object.keys(redis.scriptsSet).forEach((name) => {
@@ -233,8 +234,6 @@ class Pipeline extends Commander<{ type: "pipeline" }> {
   }
 }
 
-export default Pipeline;
-
 // @ts-expect-error
 const multi = Pipeline.prototype.multi;
 // @ts-expect-error
@@ -393,6 +392,10 @@ Pipeline.prototype.exec = function (callback: Callback): Promise<Array<any>> {
   }
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 interface Pipeline {
   length: number;
 }
+
+export { Pipeline };
+export default Pipeline;

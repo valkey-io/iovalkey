@@ -50,7 +50,7 @@ async function main() {
   });
 
   fs.writeFileSync(
-    path.join(__dirname, "..", "lib/utils/RedisCommander.ts"),
+    path.join(__dirname, "..", "lib/utils/ValkeyCommander.ts"), 
     HEADER + template.replace("////", () => i)
   );
 }

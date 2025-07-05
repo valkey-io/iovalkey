@@ -1,19 +1,19 @@
 import { EventEmitter } from "events";
-import { sample, Debug, noop, defaults } from "../utils";
-import { RedisOptions, getNodeKey, NodeKey, NodeRole } from "./util";
-import Redis from "../Redis";
+import { sample, Debug, noop, defaults } from "../utils/index.js";
+import { ValkeyOptions, getNodeKey, NodeKey, NodeRole } from "./util.js";
+import { Valkey } from "../Valkey.js";
 
 const debug = Debug("cluster:connectionPool");
 
 type NODE_TYPE = "all" | "master" | "slave";
 
 type NodeRecord = {
-  redis: Redis;
+  redis: Valkey;
   endListener: () => void;
   errorListener: (error: unknown) => void;
 };
 
-export default class ConnectionPool extends EventEmitter {
+class ConnectionPool extends EventEmitter {  
   // master + slave = all
   private nodeRecords: { [key in NODE_TYPE]: { [key: string]: NodeRecord } } = {
     all: {},
@@ -27,16 +27,16 @@ export default class ConnectionPool extends EventEmitter {
     super();
   }
 
-  getNodes(role: NodeRole = "all"): Redis[] {
+  getNodes(role: NodeRole = "all"): Valkey[] {
     const nodeRecords = this.nodeRecords[role];
     return Object.keys(nodeRecords).map((key) => nodeRecords[key]?.redis);
   }
 
-  getInstanceByKey(key: NodeKey): Redis {
+  getInstanceByKey(key: NodeKey): Valkey {
     return this.nodeRecords.all[key]?.redis;
   }
 
-  getSampleInstance(role: NodeRole): Redis {
+  getSampleInstance(role: NodeRole): Valkey {
     const keys = Object.keys(this.nodeRecords[role]);
     const sampleKey = sample(keys);
     return this.nodeRecords[role][sampleKey]?.redis;
@@ -45,7 +45,7 @@ export default class ConnectionPool extends EventEmitter {
   /**
    * Find or create a connection to the node
    */
-  findOrCreate(redisOptions: RedisOptions, readOnly = false): NodeRecord {
+  findOrCreate(redisOptions: ValkeyOptions, readOnly = false): NodeRecord {
     const key = getNodeKey(redisOptions);
     readOnly = Boolean(readOnly);
 
@@ -72,7 +72,7 @@ export default class ConnectionPool extends EventEmitter {
       }
     } else {
       debug("Connecting to %s as %s", key, readOnly ? "slave" : "master");
-      const redis = new Redis(
+      const redis = new Valkey(
         defaults(
           {
             // Never try to reconnect when a node is lose,
@@ -115,7 +115,7 @@ export default class ConnectionPool extends EventEmitter {
    * Reset the pool with a set of nodes.
    * The old node will be removed.
    */
-  reset(nodes: RedisOptions[]): void {
+  reset(nodes: ValkeyOptions[]): void {
     debug("Reset with %O", nodes);
     const newNodes = {};
     nodes.forEach((node) => {
@@ -162,3 +162,6 @@ export default class ConnectionPool extends EventEmitter {
     }
   }
 }
+
+export { ConnectionPool };
+export default ConnectionPool;

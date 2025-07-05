@@ -1,27 +1,27 @@
-import { NetStream, CommandItem, Respondable } from "./types";
-import Deque = require("denque");
+import { NetStream, CommandItem, Respondable } from "./types.js";
+import { default as Deque } from "denque";
 import { EventEmitter } from "events";
-import Command from "./Command";
-import { Debug } from "./utils";
-import * as RedisParser from "redis-parser";
-import SubscriptionSet from "./SubscriptionSet";
+import { Command } from "./Command.js";
+import { Debug } from "./utils/index.js";
+import { default as ValkeyParser } from "redis-parser";
+import { SubscriptionSet } from "./SubscriptionSet.js";
 
 const debug = Debug("dataHandler");
 
 type ReplyData = string | Buffer | number | Array<string | Buffer | number>;
 
-export interface Condition {
+interface Condition {
   select: number;
   auth?: string | [string, string];
   subscriber: false | SubscriptionSet;
 }
 
-export type FlushQueueOptions = {
+type FlushQueueOptions = {
   offlineQueue?: boolean;
   commandQueue?: boolean;
 };
 
-export interface DataHandledable extends EventEmitter {
+interface DataHandledable extends EventEmitter {
   stream: NetStream;
   status: string;
   condition: Condition | null;
@@ -40,9 +40,9 @@ interface ParserOptions {
   stringNumbers: boolean;
 }
 
-export default class DataHandler {
+class DataHandler {
   constructor(private redis: DataHandledable, parserOptions: ParserOptions) {
-    const parser = new RedisParser({
+    const parser = new ValkeyParser({
       stringNumbers: parserOptions.stringNumbers,
       returnBuffers: true,
       returnError: (err: Error) => {
@@ -132,7 +132,7 @@ export default class DataHandler {
             reply[2] ? reply[2].toString() : ""
           );
         }
-        this.redis.emit("messageBuffer", reply[1], reply[2]);
+          this.redis.emit("messageBuffer", reply[1], reply[2]);
         break;
       case "pmessage": {
         const pattern = reply[1].toString();
@@ -290,3 +290,6 @@ function fillUnsubCommand(command: Respondable, count: number) {
   remainingRepliesMap.set(command, remainingReplies);
   return false;
 }
+
+export { DataHandler, Condition, FlushQueueOptions, DataHandledable };
+export default DataHandler;

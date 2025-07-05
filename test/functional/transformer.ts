@@ -1,17 +1,17 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 describe("transformer", () => {
   describe("default transformer", () => {
     describe("hmset", () => {
       it("should support object", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         expect(await redis.hmset("foo", { a: 1, b: "2" })).to.eql("OK");
         expect(await redis.hget("foo", "b")).to.eql("2");
       });
 
       it("should support Map with string keys", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         const map = new Map();
         map.set("a", 1);
         map.set("b", "2");
@@ -27,7 +27,7 @@ describe("transformer", () => {
       });
 
       it("should not affect the old way", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         expect(await redis.hmset("foo", "a", 1, "b", "2")).to.eql("OK");
         expect(await redis.hget("foo", "b")).to.eql("2");
       });
@@ -35,13 +35,13 @@ describe("transformer", () => {
 
     describe("mset", () => {
       it("should support object", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         expect(await redis.mset({ a: 1, b: "2" })).to.eql("OK");
         expect(await redis.mget("a", "b")).to.eql(["1", "2"]);
       });
 
       it("should support Map", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         const map = new Map();
         map.set("a", 1);
         map.set("b", "2");
@@ -50,23 +50,23 @@ describe("transformer", () => {
       });
 
       it("should not affect the old way", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         expect(await redis.mset("a", 1, "b", "2")).to.eql("OK");
         expect(await redis.mget("a", "b")).to.eql(["1", "2"]);
       });
 
       it("should work with keyPrefix option", async () => {
-        const redis = new Redis({ keyPrefix: "foo:" });
+        const redis = new Valkey({ keyPrefix: "foo:" });
         expect(await redis.mset({ a: 1, b: "2" })).to.eql("OK");
 
-        const otherRedis = new Redis();
+        const otherRedis = new Valkey();
         expect(await otherRedis.mget("foo:a", "foo:b")).to.eql(["1", "2"]);
       });
     });
 
     describe("msetnx", () => {
       it("should support object", (done) => {
-        const redis = new Redis();
+        const redis = new Valkey();
         redis.msetnx({ a: 1, b: "2" }, function (err, result) {
           expect(result).to.eql(1);
           redis.mget("a", "b", function (err, result) {
@@ -76,7 +76,7 @@ describe("transformer", () => {
         });
       });
       it("should support Map", (done) => {
-        const redis = new Redis();
+        const redis = new Valkey();
         const map = new Map();
         map.set("a", 1);
         map.set("b", "2");
@@ -89,7 +89,7 @@ describe("transformer", () => {
         });
       });
       it("should not affect the old way", (done) => {
-        const redis = new Redis();
+        const redis = new Valkey();
         redis.msetnx("a", 1, "b", "2", function (err, result) {
           expect(result).to.eql(1);
           redis.mget("a", "b", function (err, result) {
@@ -99,10 +99,10 @@ describe("transformer", () => {
         });
       });
       it("should work with keyPrefix option", (done) => {
-        const redis = new Redis({ keyPrefix: "foo:" });
+        const redis = new Valkey({ keyPrefix: "foo:" });
         redis.msetnx({ a: 1, b: "2" }, function (err, result) {
           expect(result).to.eql(1);
-          const otherRedis = new Redis();
+          const otherRedis = new Valkey();
           otherRedis.mget("foo:a", "foo:b", function (err, result) {
             expect(result).to.eql(["1", "2"]);
             done();
@@ -113,7 +113,7 @@ describe("transformer", () => {
 
     describe("hgetall", () => {
       it("should return an object", (done) => {
-        const redis = new Redis();
+        const redis = new Valkey();
         redis.hmset("foo", "k1", "v1", "k2", "v2", () => {
           redis.hgetall("foo", function (err, result) {
             expect(result).to.eql({ k1: "v1", k2: "v2" });
@@ -123,7 +123,7 @@ describe("transformer", () => {
       });
 
       it("should return {} when key not exists", (done) => {
-        const redis = new Redis();
+        const redis = new Valkey();
         redis.hgetall("foo", function (err, result) {
           expect(result).to.eql({});
           done();
@@ -133,7 +133,7 @@ describe("transformer", () => {
 
     describe("hset", () => {
       it("should support object", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         // NOTE: could simplify these tests using await redis.hset instead,
         // but not sure if this is deliberately testing the transformers with callbacks
         return new Promise((resolve, reject) => {
@@ -150,7 +150,7 @@ describe("transformer", () => {
         });
       });
       it("should support Map", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         const map = new Map();
         map.set("a", 1);
         map.set("b", "e");
@@ -171,7 +171,7 @@ describe("transformer", () => {
         });
       });
       it("should affect the old way", async () => {
-        const redis = new Redis();
+        const redis = new Valkey();
         return new Promise((resolve) => {
           redis.hset("foo", "a", 1, "b", "e", function (err, result) {
             expect(result).to.eql(2);

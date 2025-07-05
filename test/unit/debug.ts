@@ -1,5 +1,5 @@
 import rDebug = require("debug");
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 import debug, {
   getStringValue,

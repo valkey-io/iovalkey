@@ -1,8 +1,8 @@
 import { createHash } from "crypto";
-import Command from "./Command";
+import { Command } from "./Command.js"; 
 import asCallback from "standard-as-callback";
-import { Callback } from "./types";
-export default class Script {
+import { Callback } from "./types.js";
+class Script {
   private sha: string;
   private Command: new (...args: any[]) => Command;
 
@@ -69,3 +69,6 @@ export default class Script {
     return container.sendCommand(evalsha);
   }
 }
+
+export { Script };
+export default Script;

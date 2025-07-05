@@ -1,8 +1,8 @@
 import MockServer from "../../helpers/mock_server";
 import { expect } from "chai";
-import { Cluster, default as Redis } from "../../../lib";
+import { Cluster, Valkey } from "../../../lib";
 import * as utils from "../../../lib/utils";
-import * as sinon from "sinon";
+import sinon from "sinon";
 
 describe("cluster", () => {
   it("should return the error successfully", (done) => {
@@ -202,7 +202,7 @@ describe("cluster", () => {
           scaleReads: "slave",
         });
         cluster.on("ready", () => {
-          const redis: Redis = cluster;
+          const redis: Valkey = cluster;
           redis.defineCommand("test", {
             numberOfKeys: 1,
             lua: "return {KEYS[1],ARGV[1],ARGV[2]}",

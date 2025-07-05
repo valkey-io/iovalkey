@@ -2,13 +2,13 @@ import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import { AbortError, RedisError } from "redis-errors";
 import asCallback from "standard-as-callback";
-import Command from "../Command";
-import ClusterAllFailedError from "../errors/ClusterAllFailedError";
-import Pipeline from "../Pipeline";
-import Redis from "../Redis";
-import ScanStream from "../ScanStream";
-import { addTransactionSupport, Transaction } from "../transaction";
-import { Callback, ScanStreamOptions, WriteableStream } from "../types";
+import { Command } from "../Command.js";
+import { ClusterAllFailedError } from "../errors/ClusterAllFailedError.js";
+import { Pipeline } from "../Pipeline.js";
+import { Valkey } from "../Valkey.js";
+import { ScanStream } from "../ScanStream.js";
+import { addTransactionSupport, Transaction } from "../transaction.js";
+import { Callback, ScanStreamOptions, WriteableStream } from "../types.js";
 import {
   CONNECTION_CLOSED_ERROR_MSG,
   Debug,
@@ -18,25 +18,25 @@ import {
   shuffle,
   timeout,
   zipMap,
-} from "../utils";
-import applyMixin from "../utils/applyMixin";
-import Commander from "../utils/Commander";
-import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions";
-import ClusterSubscriber from "./ClusterSubscriber";
-import ConnectionPool from "./ConnectionPool";
-import DelayQueue from "./DelayQueue";
+} from "../utils/index.js";
+import applyMixin from "../utils/applyMixin.js";
+import { Commander } from "../utils/Commander.js";
+import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions.js";
+import { ClusterSubscriber } from "./ClusterSubscriber.js";
+import { ConnectionPool } from "./ConnectionPool.js";
+import { DelayQueue }  from "./DelayQueue.js";
 import {
   getConnectionName,
   getUniqueHostnamesFromOptions,
   groupSrvRecords,
   NodeKey,
-  nodeKeyToRedisOptions,
+  nodeKeyToValkeyOptions,
   NodeRole,
   normalizeNodeOptions,
-  RedisOptions,
+  ValkeyOptions,
   weightSrvRecords,
-} from "./util";
-import Deque = require("denque");
+} from "./util.js";
+import { default as Deque } from "denque";
 
 const debug = Debug("cluster");
 
@@ -53,7 +53,8 @@ export type ClusterNode =
   | number
   | {
       host?: string | undefined;
-      port?: number | undefined;
+      port?: string | number | undefined;
+      password?: string | undefined;
     };
 
 type ClusterStatus =
@@ -69,6 +70,8 @@ type ClusterStatus =
 /**
  * Client for the official Redis Cluster
  */
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class Cluster extends Commander {
   options: ClusterOptions;
   slots: NodeKey[][] = [];
@@ -262,7 +265,7 @@ class Cluster extends Commander {
 
           this.refreshSlotsCache((err) => {
             if (err && err.message === ClusterAllFailedError.defaultMessage) {
-              Redis.prototype.silentEmit.call(this, "error", err);
+              Valkey.prototype.silentEmit.call(this, "error", err);
               this.connectionPool.reset([]);
             }
           });
@@ -356,7 +359,7 @@ class Cluster extends Commander {
    *
    * @example
    * ```js
-   * var cluster = new Redis.Cluster([{ host: "127.0.0.1", port: "30001" }]);
+   * var cluster = new Valkey.Cluster([{ host: "127.0.0.1", port: "30001" }]);
    * var anotherCluster = cluster.duplicate();
    * ```
    */
@@ -372,7 +375,7 @@ class Cluster extends Commander {
   /**
    * Get nodes with the specified role
    */
-  nodes(role: NodeRole = "all"): Redis[] {
+  nodes(role: NodeRole = "all"): Valkey[] {
     if (role !== "all" && role !== "master" && role !== "slave") {
       throw new Error(
         'Invalid role "' + role + '". Expected "all", "master" or "slave"'
@@ -786,7 +789,7 @@ class Cluster extends Commander {
     }
   }
 
-  private natMapper(nodeKey: NodeKey | RedisOptions): RedisOptions {
+  private natMapper(nodeKey: NodeKey | ValkeyOptions): ValkeyOptions {
     const key =
       typeof nodeKey === "string"
         ? nodeKey
@@ -805,11 +808,11 @@ class Cluster extends Commander {
     }
 
     return typeof nodeKey === "string"
-      ? nodeKeyToRedisOptions(nodeKey)
+      ? nodeKeyToValkeyOptions(nodeKey)
       : nodeKey;
   }
 
-  private getInfoFromNode(redis: Redis, callback: Callback<void>) {
+  private getInfoFromNode(redis: Valkey, callback: Callback<void>) {
     if (!redis) {
       return callback(new Error("Node is disconnected"));
     }
@@ -851,7 +854,7 @@ class Cluster extends Commander {
           callback();
           return;
         }
-        const nodes: RedisOptions[] = [];
+        const nodes: ValkeyOptions[] = [];
 
         debug("cluster slots result count: %d", result.length);
 
@@ -950,7 +953,7 @@ class Cluster extends Commander {
     });
   }
 
-  private resolveSrv(hostname: string): Promise<RedisOptions> {
+  private resolveSrv(hostname: string): Promise<ValkeyOptions> {
     return new Promise((resolve, reject) => {
       this.options.resolveSrv(hostname, (err, records) => {
         if (err) {
@@ -1015,7 +1018,7 @@ class Cluster extends Commander {
    * This process happens every time when #connect() is called since
    * #startupNodes and DNS records may change.
    */
-  private async resolveStartupNodeHostnames(): Promise<RedisOptions[]> {
+  private async resolveStartupNodeHostnames(): Promise<ValkeyOptions[]> {
     if (!Array.isArray(this.startupNodes) || this.startupNodes.length === 0) {
       throw new Error("`startupNodes` should contain at least one node.");
     }
@@ -1061,10 +1064,13 @@ class Cluster extends Commander {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Cluster extends EventEmitter {}
 applyMixin(Cluster, EventEmitter);
 
 addTransactionSupport(Cluster.prototype);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Cluster extends Transaction {}
 
+export { Cluster };
 export default Cluster;

@@ -1,10 +1,10 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 import Command from "../../lib/Command";
 
 describe("transaction", () => {
   it("should works like pipeline by default", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis
       .multi()
       .set("foo", "transaction")
@@ -20,7 +20,7 @@ describe("transaction", () => {
   });
 
   it("should handle runtime errors correctly", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis
       .multi()
       .set("foo", "bar")
@@ -36,7 +36,7 @@ describe("transaction", () => {
   });
 
   it("should handle compile-time errors correctly", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis
       .multi()
       .set("foo")
@@ -51,7 +51,7 @@ describe("transaction", () => {
   });
 
   it("should also support command callbacks", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     let pending = 1;
     redis
       .multi()
@@ -71,7 +71,7 @@ describe("transaction", () => {
   });
 
   it("should also handle errors in command callbacks", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     let pending = 1;
     redis
       .multi()
@@ -90,7 +90,7 @@ describe("transaction", () => {
   });
 
   it("should work without pipeline", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.multi({ pipeline: false });
     redis.set("foo", "bar");
     redis.get("foo");
@@ -105,7 +105,7 @@ describe("transaction", () => {
 
   describe("transformer", () => {
     it("should trigger transformer", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
       let pending = 2;
       const data = { name: "Bob", age: "17" };
       redis
@@ -143,7 +143,7 @@ describe("transaction", () => {
     });
 
     it("should trigger transformer inside pipeline", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
       const data = { name: "Bob", age: "17" };
       redis
         .pipeline()
@@ -171,7 +171,7 @@ describe("transaction", () => {
         throw new Error(transformError);
       };
 
-      const redis = new Redis();
+      const redis = new Valkey();
       redis
         .multi()
         .get("foo")
@@ -186,7 +186,7 @@ describe("transaction", () => {
 
   describe("#addBatch", () => {
     it("should accept commands in constructor", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
       let pending = 1;
       redis
         .multi([
@@ -210,7 +210,7 @@ describe("transaction", () => {
 
   describe("#exec", () => {
     it("should batch all commands before ready event", (done) => {
-      const redis = new Redis();
+      const redis = new Valkey();
       redis.on("connect", () => {
         redis
           .multi()

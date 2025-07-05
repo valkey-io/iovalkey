@@ -1,3 +1,3 @@
-import MaxRetriesPerRequestError from "./MaxRetriesPerRequestError";
+import { MaxRetriesPerRequestError } from "./MaxRetriesPerRequestError.js";
 
 export { MaxRetriesPerRequestError };
