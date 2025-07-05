@@ -54,7 +54,11 @@ npm install --save-dev @types/node
 // if your project is a TypeScript project,
 // Note that `import Valkey from "iovalkey"` is still supported,
 // but will be deprecated in the next major version.
-const Valkey = require("iovalkey");
+
+// you can also use const iovalkey = require("iovalkey");
+// const { Valkey, Cluster } = iovalkey
+
+const { Valkey, Cluster } = require("iovalkey"); 
 
 // Create a Valkey instance.
 // By default, it will connect to localhost:6379.
@@ -110,6 +114,7 @@ a connection to Valkey will be created at the same time.
 You can specify which Valkey to connect to by:
 
 ```javascript
+const { Valkey } = require("iovalkey");
 new Valkey(); // Connect to 127.0.0.1:6379
 new Valkey(6380); // 127.0.0.1:6380
 new Valkey(6379, "192.168.1.1"); // 192.168.1.1:6379
@@ -126,6 +131,7 @@ new Valkey({
 You can also specify connection options as a [`redis://` URL](http://www.iana.org/assignments/uri-schemes/prov/redis) or [`rediss://` URL](https://www.iana.org/assignments/uri-schemes/prov/rediss) when using [TLS encryption](#tls-options):
 
 ```javascript
+const { Valkey } = require("iovalkey");
 // Connect to 127.0.0.1:6380, db 4, using password "authpassword":
 new Valkey("redis://:authpassword@127.0.0.1:6380/4");
 
@@ -144,7 +150,7 @@ By leveraging Node.js's built-in events module, iovalkey makes pub/sub very stra
 ```javascript
 // publisher.js
 
-const Valkey = require("iovalkey");
+const { Valkey } = require("iovalkey");
 const valkey = new Valkey();
 
 setInterval(() => {
@@ -161,7 +167,7 @@ setInterval(() => {
 ```javascript
 // subscriber.js
 
-const Valkey = require("iovalkey");
+const { Valkey } = require("iovalkey");
 const valkey = new Valkey();
 
 valkey.subscribe("my-channel-1", "my-channel-2", (err, count) => {
@@ -195,7 +201,7 @@ It's worth noticing that a connection (aka a `Valkey` instance) can't play both 
 If you want to do pub/sub in the same file/process, you should create a separate connection:
 
 ```javascript
-const Valkey = require("iovalkey");
+const { Valkey } = require("iovalkey");
 const sub = new Valkey();
 const pub = new Valkey();
 
@@ -224,7 +230,8 @@ valkey.on("pmessageBuffer", (pattern, channel, message) => {});
 Valkey v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `valkey.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://valkey.io/topics/streams-intro/) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
 
 ```javascript
-const Valkey = require("iovalkey");
+const { Valkey } = require("iovalkey");
+
 const valkey = new Valkey();
 
 const processMessage = (message) => {
@@ -449,6 +456,8 @@ care of script caching and to detect when to use `EVAL` and when to use `EVALSHA
 iovalkey exposes a `defineCommand` method to make scripting much easier to use:
 
 ```javascript
+const { Valkey } = require("iovalkey");
+
 const valkey = new Valkey();
 
 // This will define a command myecho:
@@ -495,6 +504,8 @@ valkey.echoDynamicKeyNumber(2, "k1", "k2", "a1", "a2", (err, result) => {
 Besides `defineCommand()`, you can also define custom commands with the `scripts` constructor option:
 
 ```javascript
+const { Valkey } = require("iovalkey");
+
 const valkey = new Valkey({
   scripts: {
     myecho: {
@@ -519,6 +530,8 @@ namespaces.
 and this feature also won't apply to the replies of commands even if they are key names ([#325](https://github.com/mcollina/iovalkey/issues/325)).
 
 ```javascript
+const { Valkey } = require("iovalkey");
+
 const fooValkey = new Valkey({ keyPrefix: "foo:" });
 fooValkey.set("bar", "baz"); // Actually sends SET foo:bar baz
 
@@ -549,7 +562,9 @@ iovalkey has a flexible system for transforming arguments and replies. There are
 of transformers, argument transformer and reply transformer:
 
 ```javascript
-const Valkey = require("iovalkey");
+const { Command } = require("iovalkey");
+
+const valkey = new Valkey();
 
 // Here's the built-in argument transformer converting
 // hmset('key', { k1: 'v1', k2: 'v2' })
@@ -557,7 +572,7 @@ const Valkey = require("iovalkey");
 // hmset('key', new Map([['k1', 'v1'], ['k2', 'v2']]))
 // into
 // hmset('key', 'k1', 'v1', 'k2', 'v2')
-Valkey.Command.setArgumentTransformer("hmset", (args) => {
+Command.setArgumentTransformer("hmset", (args) => {
   if (args.length === 2) {
     if (args[1] instanceof Map) {
       // utils is a internal module of iovalkey
@@ -574,7 +589,7 @@ Valkey.Command.setArgumentTransformer("hmset", (args) => {
 // ['k1', 'v1', 'k2', 'v2']
 // into
 // { k1: 'v1', 'k2': 'v2' }
-Valkey.Command.setReplyTransformer("hgetall", (result) => {
+Command.setReplyTransformer("hgetall", (result) => {
   if (Array.isArray(result)) {
     const obj = {};
     for (let i = 0; i < result.length; i += 2) {
@@ -591,6 +606,10 @@ a reply transformer for `hgetall`. Transformers for `hmset` and `hgetall` were m
 above, and the transformer for `mset` is similar to the one for `hmset`:
 
 ```javascript
+const { Valkey } = require("iovalkey");
+
+const valkey = new Valkey();
+
 valkey.mset({ k1: "v1", k2: "v2" });
 valkey.get("k1", (err, result) => {
   // result === 'v1';
@@ -610,7 +629,11 @@ valkey.get("k3", (err, result) => {
 Another useful example of a reply transformer is one that changes `hgetall` to return array of arrays instead of objects which avoids an unwanted conversation of hash keys to strings when dealing with binary hash keys:
 
 ```javascript
-Valkey.Command.setReplyTransformer("hgetall", (result) => {
+const { Valkey, Command } = require("iovalkey");
+
+const valkey = new Valkey();
+
+Command.setReplyTransformer("hgetall", (result) => {
   const arr = [];
   for (let i = 0; i < result.length; i += 2) {
     arr.push([result[i], result[i + 1]]);
@@ -935,9 +958,9 @@ Valkey Cluster provides a way to run a Valkey installation where data is automat
 You can connect to a Valkey Cluster like this:
 
 ```javascript
-const Valkey = require("iovalkey");
+const { Cluster } = require("iovalkey");
 
-const cluster = new Valkey.Cluster([
+const cluster = new Cluster([
   {
     port: 6380,
     host: "127.0.0.1",
@@ -1015,7 +1038,8 @@ A typical valkey cluster contains three or more masters and several slaves for e
 For example:
 
 ```javascript
-const cluster = new Valkey.Cluster(
+const { Cluster } = require("iovalkey");
+const cluster = new Cluster(
   [
     /* nodes */
   ],
@@ -1062,7 +1086,9 @@ Sometimes the cluster is hosted within a internal network that can only be acces
 You can specify nat mapping rules via `natMap` option:
 
 ```javascript
-const cluster = new Valkey.Cluster(
+const { Cluster } = require("iovalkey");
+
+const cluster = new Cluster(
   [
     {
       host: "203.0.113.73",
@@ -1081,7 +1107,9 @@ const cluster = new Valkey.Cluster(
 
 Or you can specify this parameter through function:
 ```javascript
-const cluster = new Redis.Cluster(
+const { Cluster } = require("iovalkey");
+
+const cluster = new Cluster(
   [
     {
       host: "203.0.113.73",
@@ -1134,11 +1162,13 @@ When any commands in a pipeline receives a `MOVED` or `ASK` error, iovalkey will
 Pub/Sub in cluster mode works exactly as the same as in standalone mode. Internally, when a node of the cluster receives a message, it will broadcast the message to the other nodes. iovalkey makes sure that each message will only be received once by strictly subscribing one node at the same time.
 
 ```javascript
+const { Cluster } = require("iovalkey");
+
 const nodes = [
   /* nodes */
 ];
-const pub = new Valkey.Cluster(nodes);
-const sub = new Valkey.Cluster(nodes);
+const pub = new Cluster(nodes);
+const sub = new Cluster(nodes);
 sub.on("message", (channel, message) => {
   console.log(channel, message);
 });
@@ -1167,8 +1197,8 @@ sub.subscribe("news", () => {
 Setting the `password` option to access password-protected clusters:
 
 ```javascript
-const Valkey = require("iovalkey");
-const cluster = new Valkey.Cluster(nodes, {
+const { Cluster } = require("iovalkey");
+const cluster = new Cluster(nodes, {
   redisOptions: {
     password: "your-cluster-password",
   },
@@ -1178,8 +1208,8 @@ const cluster = new Valkey.Cluster(nodes, {
 If some of nodes in the cluster using a different password, you should specify them in the first parameter:
 
 ```javascript
-const Valkey = require("iovalkey");
-const cluster = new Valkey.Cluster(
+const { Cluster } = require("iovalkey");
+const cluster = new Cluster(
   [
     // Use password "password-for-30001" for 30001
     { port: 30001, password: "password-for-30001" },
@@ -1202,7 +1232,9 @@ this, you may encounter errors with invalid certificates. To resolve this
 issue, construct the `Cluster` with the `dnsLookup` option as follows:
 
 ```javascript
-const cluster = new Valkey.Cluster(
+const { Cluster } = require("iovalkey");
+
+const cluster = new Cluster(
   [
     {
       host: "clustercfg.myCluster.abcdefg.xyz.cache.amazonaws.com",
@@ -1245,7 +1277,8 @@ Note that the same slot limitation within a single command still holds, as it is
 This sample code uses iovalkey with automatic pipeline enabled.
 
 ```javascript
-const Valkey = require("./built");
+const { Valkey } = require("iovalkey");
+
 const http = require("http");
 
 const db = new Valkey({ enableAutoPipelining: true });
@@ -1309,11 +1342,12 @@ And here's the same test for a cluster of 3 masters and 3 replicas:
 All the errors returned by the Valkey server are instances of `ReplyError`, which can be accessed via `Valkey`:
 
 ```javascript
-const Valkey = require("iovalkey");
+const { Valkey, ReplyError } = require("iovalkey");
+
 const valkey = new Valkey();
 // This command causes a reply error since the SET command requires two arguments.
 valkey.set("foo", (err) => {
-  err instanceof Valkey.ReplyError;
+  err instanceof ReplyError;
 });
 ```
 
@@ -1336,7 +1370,7 @@ iovalkey provides an option `showFriendlyErrorStack` to solve the problem. When 
 `showFriendlyErrorStack`, iovalkey will optimize the error stack for you:
 
 ```javascript
-const Valkey = require("iovalkey");
+const { Valkey } = require("iovalkey");
 const valkey = new Valkey({ showFriendlyErrorStack: true });
 valkey.set("foo");
 ```
