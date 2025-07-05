@@ -22,7 +22,7 @@ describe("exports", () => {
 
   describe(".Valkey", () => {
     it("should be `Valkey`", () => {
-      expect(Valkey).to.eql(require("../../lib").default);
+      expect(Valkey).to.eql(require("../../lib/Valkey").default);
     });
   });
 });
