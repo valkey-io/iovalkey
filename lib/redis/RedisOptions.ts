@@ -192,7 +192,9 @@ export interface CommonRedisOptions extends CommanderOptions {
 
 export type RedisOptions = CommonRedisOptions &
   SentinelConnectionOptions &
-  StandaloneConnectionOptions;
+  StandaloneConnectionOptions & {
+    familyFallback?: boolean;
+  };
 
 export const DEFAULT_REDIS_OPTIONS: RedisOptions = {
   // Connection

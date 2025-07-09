@@ -128,6 +128,159 @@ describe("Redis", () => {
     });
   });
 
+  describe(".options.familyFallback", () => {
+    it("should fail to connect to invalid host", (done) => {
+      let errorEmitted = false;
+
+      const redis = new Redis({
+        host: "invalid-hostname",
+        retryStrategy: null,
+        reconnectOnError: () => false,
+      });
+
+      redis.on("error", (err) => {
+        if (!errorEmitted) {
+          try {
+            expect(err).to.be.instanceOf(Error);
+            expect(err.message).to.contain("ENOTFOUND");
+            done();
+          } catch (assertionError) {
+            done(assertionError);
+          }
+        }
+      });
+    });
+
+    it("should connect via IPv6 if family is 0", (done) => {
+      const redis = new Redis({
+        host: "localhost",
+        family: 0,
+        retryStrategy: null,
+        reconnectOnError: () => false,
+      });
+
+      redis.on("connect", () => {
+        try {
+          const remoteAddress = redis.stream.remoteAddress;
+          const remotePort = redis.stream.remotePort;
+          expect(redis.options.family).to.equal(0);
+          expect(remoteAddress).not.to.equal("127.0.0.1");
+          expect(remoteAddress).to.equal("::1");
+          expect(remotePort).to.equal(6379);
+          done();
+        } catch (err) {
+          done(err);
+        } finally {
+          redis.disconnect();
+        }
+      });
+
+      redis.on("error", done);
+    });
+
+    it("should continue to connect via family 0 after connection failure", (done) => {
+      let errorEmitted = false;
+      let attempts = 0;
+
+      const redis = new Redis({
+        host: "invalid-hostname",
+        family: 0,
+        // Make the test faster by reducing the initial delay
+        retryStrategy: (times) => (times > 1 ? null : 10), // Only retry once after 10ms
+      });
+
+      redis.on("close", () => {
+        try {
+          const family = redis.options.family;
+          if (attempts === 0) {
+            expect(family).to.equal(0);
+          } else {
+            expect(family).to.equal(6);
+          }
+          attempts++;
+        } catch (err) {
+          done(err);
+        } finally {
+          if (attempts === 2) {
+            redis.disconnect();
+            done();
+          }
+        }
+      });
+
+      redis.on("error", (err) => {
+        if (!errorEmitted) {
+          try {
+            expect(err).to.be.instanceOf(Error);
+            expect(err.message).to.contain("ENOTFOUND");
+            errorEmitted = true;
+          } catch (assertionError) {
+            done(assertionError);
+          }
+        }
+      });
+    });
+
+    it("should attempt to reconnect with another family", (done) => {
+      let attempts = 0;
+
+      const redis = new Redis({
+        familyFallback: true,
+        host: "invalid-hostname",
+        // Make the test faster by reducing the initial delay
+        retryStrategy: (times) => (times > 1 ? null : 10), // Only retry once after 10ms
+      });
+
+      redis.on("close", () => {
+        try {
+          expect(redis.options.familyFallback).to.equal(true);
+          let testFamily = attempts === 0 ? 4 : 6;
+          const family = redis.options.family;
+          // testFamily should be 4 on the first attempt and 6 on the second
+          expect(family).to.equal(testFamily);
+          testFamily = family === 6 ? 4 : 6;
+        } catch (err) {
+          done(err);
+        } finally {
+          if (attempts++ === 1) {
+            done();
+            redis.disconnect();
+          }
+        }
+      });
+    });
+
+    it("should attempt to reconnect with another family (custom)", (done) => {
+      let attempts = 0;
+      let testFamily = 6;
+
+      const redis = new Redis({
+        familyFallback: true,
+        host: "invalid-hostname",
+        family: testFamily,
+        // Make the test faster by reducing the initial delay
+        retryStrategy: (times) => (times > 1 ? null : 10), // Only retry once after 10ms
+      });
+
+      redis.on("close", () => {
+        try {
+          expect(redis.options.familyFallback).to.equal(true);
+          const family = redis.options.family;
+          // testFamily should be 6 on the first attempt and 4 on the second
+          expect(family).to.equal(testFamily);
+          testFamily = family === 6 ? 4 : 6;
+        } catch (err) {
+          done(err);
+        } finally {
+          if (attempts++ === 1) {
+            done();
+            redis.disconnect();
+          }
+        }
+      });
+    });
+  });
+
   describe("#end", () => {
     it("should redirect to #disconnect", (done) => {
       const redis = new Redis({ lazyConnect: true });

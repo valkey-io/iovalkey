@@ -198,6 +198,11 @@ export function closeHandler(self) {
     self.setStatus("reconnecting", retryDelay);
     self.reconnectTimeout = setTimeout(function () {
       self.reconnectTimeout = null;
+      if (self.options.familyFallback === true) {
+        // alternate between 4 and 6
+        const family = self.options.family;
+        self.options.family = family === 6 ? 4 : 6;
+      }
       self.connect().catch(noop);
     }, retryDelay);
 
