@@ -27,6 +27,7 @@ import applyMixin from "./utils/applyMixin";
 import Commander from "./utils/Commander";
 import { defaults, noop } from "./utils/lodash";
 import Deque = require("denque");
+import { updateTriedFamilies, validateFamilyFallbackOptions } from "./redis/event_handler";
 const debug = Debug("redis");
 
 type RedisStatus =
@@ -179,6 +180,8 @@ class Redis extends Commander implements DataHandledable {
 
       this.connectionEpoch += 1;
       this.setStatus("connecting");
+      validateFamilyFallbackOptions(this);
+      updateTriedFamilies(this, this.options.family as 4 | 6);
 
       const { options } = this;
 
