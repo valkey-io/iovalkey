@@ -786,6 +786,19 @@ This feature is useful when using Amazon ElastiCache instances with Auto-failove
 
 On ElastiCache instances with Auto-failover enabled, `reconnectOnError` does not execute. Instead of returning a Valkey error, AWS closes all connections to the master endpoint until the new primary node is ready. iovalkey reconnects via `retryStrategy` instead of `reconnectOnError` after about a minute. On ElastiCache instances with Auto-failover enabled, test failover events with the `Failover primary` option in the AWS console.
 
+## Family Fallback
+
+iovalkey supports family fallback, which allows the client to attempt family 4 or 6 if initial connection fails. This is enabled by default. By default alternate is false, which means it will attempt to use the other family (if `options.family = undefined or 4, it will attempt to use 6, and vice versa). If alternate is true, it will alternate between family 4 and 6, possibly leading to a lot of error logs.
+
+```js
+const redis = new Redis({
+  familyFallback: {
+    enabled: true,
+    alternate: false,
+  },
+});
+```
+
 ## Connection Events
 
 The Valkey instance will emit some events about the state of the connection to the Valkey server.
