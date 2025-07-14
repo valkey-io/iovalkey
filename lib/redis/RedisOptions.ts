@@ -188,6 +188,7 @@ export interface CommonRedisOptions extends CommanderOptions {
     string,
     { lua: string; numberOfKeys?: number; readOnly?: boolean }
   >;
+  availabilityZone?: string;
 }
 
 export type RedisOptions = CommonRedisOptions &
