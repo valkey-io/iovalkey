@@ -1087,9 +1087,7 @@ class Cluster extends Commander {
     const keys = slot !== undefined ? this.slots[slot] || [] : [];
     const instances = keys
       .map((k) => this.connectionPool.getInstanceByKey(k))
-      .filter(
-        (r): r is Redis => !!r && r.status !== "close" && r.status !== "end"
-      );
+      .filter(Boolean); 
 
     const replicas = instances.filter((n) => n.options.readOnly);
     const primaries = instances.filter((n) => !n.options.readOnly);
