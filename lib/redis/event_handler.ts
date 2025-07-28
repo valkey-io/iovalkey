@@ -4,7 +4,9 @@ import Deque = require("denque");
 import { AbortError } from "redis-errors";
 import Command from "../Command";
 import { MaxRetriesPerRequestError } from "../errors";
+import Redis from "../Redis";
 import { CommandItem, Respondable } from "../types";
+import { FamilyFallback } from "./RedisOptions";
 import { Debug, noop, CONNECTION_CLOSED_ERROR_MSG } from "../utils";
 import DataHandler from "../DataHandler";
 
@@ -198,6 +200,7 @@ export function closeHandler(self) {
     self.setStatus("reconnecting", retryDelay);
     self.reconnectTimeout = setTimeout(function () {
       self.reconnectTimeout = null;
+      handleFamilyFallbackOptions(self);
       self.connect().catch(noop);
     }, retryDelay);
 
@@ -336,4 +339,78 @@ export function readyHandler(self) {
       self.select(finalSelect);
     }
   };
+}
+
+/**
+ * Handles the family fallback logic for reconnection attempts
+ * @param self - The Redis client instance
+ */
+export function handleFamilyFallbackOptions(self: Redis): void {
+  validateFamilyFallbackOptions(self);
+  const fallback = self.options.familyFallback;
+  if (!fallback.enabled) {
+    return;
+  }
+
+  const currentFamily = self.options.family as 4 | 6;
+  const nextFamily = getNextFamilyToTry(fallback, currentFamily);
+
+  self.options.family = nextFamily;
+  updateTriedFamilies(self, nextFamily);
+}
+
+/**
+ * Validates and normalizes the family fallback options
+ * @param self - The Redis client instance
+ * @throws {Error} If validation fails
+ */
+export function validateFamilyFallbackOptions(self: Redis) {
+  const { familyFallback: options } = self.options;
+  const initialFamily =
+    options?._initialFamily ?? (self.options.family as 4 | 6);
+
+  const fallback: FamilyFallback = {
+    enabled: true,
+    alternate: false,
+    _initialFamily: initialFamily,
+    _triedFamilyFour: false,
+    _triedFamilySix: false,
+    ...options,
+  };
+  self.options.familyFallback = fallback;
+}
+
+/**
+ * Determines the next IP family to try based on the fallback strategy
+ * @param fallback - The family fallback configuration
+ * @param currentFamily - The current IP family (4 or 6)
+ * @returns The next IP family to try (4 or 6)
+ */
+export function getNextFamilyToTry(
+  fallback: FamilyFallback,
+  currentFamily: 4 | 6
+): 4 | 6 {
+  if (fallback.alternate) {
+    return currentFamily === 4 ? 6 : 4;
+  }
+
+  if (!fallback._triedFamilyFour) return 4;
+  if (!fallback._triedFamilySix) return 6;
+
+  return fallback._initialFamily;
+}
+
+/**
+ * Updates the tried families tracking in the fallback options
+ * @param self - The Redis client instance
+ * @param family - The family that was just tried (4 or 6)
+ */
+export function updateTriedFamilies(self: Redis, family: 4 | 6): void {
+  const { familyFallback } = self.options;
+
+  if (family === 4 && !familyFallback._triedFamilyFour) {
+    familyFallback._triedFamilyFour = true;
+  } else if (family === 6 && !familyFallback._triedFamilySix) {
+    familyFallback._triedFamilySix = true;
+  }
 }
