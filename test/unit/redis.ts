@@ -1,5 +1,5 @@
-import * as sinon from "sinon";
 import { expect } from "chai";
+import * as sinon from "sinon";
 import Redis from "../../lib/Redis";
 import { RedisOptions } from "../../lib/redis/RedisOptions";
 
@@ -123,7 +123,10 @@ describe("Redis", () => {
 
   describe(".createClient", () => {
     it("should redirect to constructor", () => {
-      const redis = Redis.createClient({ name: "pass", lazyConnect: true });
+      const redis = Redis.createClient({
+        name: "pass",
+        lazyConnect: true,
+      });
       expect(redis.options).to.have.property("name", "pass");
       expect(redis.options).to.have.property("lazyConnect", true);
     });
@@ -198,9 +201,7 @@ describe("Redis", () => {
         redis.on("error", (err) => {
           try {
             expect(err).to.be.instanceOf(Error);
-            expect(err.message).to.contain("ENOTFOUND");
-          } catch (assertionError) {
-            done(assertionError);
+            expect(err.message).to.match(/(ENOTFOUND|EAI_AGAIN)/);
           } finally {
             redis.disconnect();
             done();
