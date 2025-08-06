@@ -5,6 +5,24 @@ import { StandaloneConnectionOptions } from "../connectors/StandaloneConnector";
 
 export type ReconnectOnError = (err: Error) => boolean | 1 | 2;
 
+export type FamilyFallback = {
+  /**
+   * If true, the client will attempt family 4 and 6 once.
+   * If false, the client will only attempt to connect using options.family or default (family: 4).
+   * @default true
+   */
+  enabled?: boolean;
+  /**
+   * If true, the client will alternate between family 4 and 6.
+   * If false, the client will attempt family 4 and 6 once.
+   * @default false
+   */
+  alternate?: boolean;
+  _initialFamily?: 4 | 6;
+  _triedFamilyFour?: boolean;
+  _triedFamilySix?: boolean;
+};
+
 export interface CommonRedisOptions extends CommanderOptions {
   Connector?: ConnectorConstructor;
   retryStrategy?: (times: number) => number | void | null;
@@ -188,6 +206,21 @@ export interface CommonRedisOptions extends CommanderOptions {
     string,
     { lua: string; numberOfKeys?: number; readOnly?: boolean }
   >;
+
+  /**
+   * Allows the client to attempt family 4 or 6 if initial connection fails.
+   * @example
+   * ```js
+   * const redis = new Redis({
+   *   familyFallback: {
+   *     enabled: true,
+   *     alternate: false,
+   *   },
+   * });
+   * ```
+   * @default undefined
+   */
+  familyFallback?: FamilyFallback;
 }
 
 export type RedisOptions = CommonRedisOptions &
