@@ -29,7 +29,11 @@ interface CommandOptions {
   readOnly?: boolean;
 }
 
-type ArgumentTransformer = (args: any[]) => any[];
+type ArgumentTransformerFunction = (args: any[]) => any[];
+type ArgumentTransformer = {
+  transformerFunction: ArgumentTransformerFunction;
+  includeCommand: boolean;
+}
 type ReplyTransformer = (reply: any) => any;
 interface FlagMap {
   [flag: string]: { [command: string]: true };
@@ -116,12 +120,23 @@ export default class Command implements Respondable {
     return !!this.getFlagMap()[flagName][commandName];
   }
 
-  static setArgumentTransformer(name: string, func: ArgumentTransformer) {
-    this._transformer.argument[name] = func;
+  static setArgumentTransformer(name: string, func?: ArgumentTransformerFunction, includeCmd?: boolean) {
+    if (func) {
+      this._transformer.argument[name] = {
+        transformerFunction: func,
+        includeCommand: includeCmd
+      }
+    } else {
+      delete this._transformer.argument[name];
+    }
   }
 
-  static setReplyTransformer(name: string, func: ReplyTransformer) {
-    this._transformer.reply[name] = func;
+  static setReplyTransformer(name: string, func?: ReplyTransformer) {
+    if (func) {
+      this._transformer.reply[name] = func;
+    } else {
+      delete this._transformer.reply[name];
+    }
   }
 
   private static getFlagMap(): FlagMap {
@@ -326,7 +341,12 @@ export default class Command implements Respondable {
         this.transformed = true;
         const transformer = Command._transformer.argument[this.name];
         if (transformer) {
-          this.args = transformer(this.args);
+          if (transformer.includeCommand) {
+            this.args = transformer.transformerFunction([].concat(this.name, this.args));
+            this.name = this.args.shift() as string;
+          } else {
+            this.args = transformer.transformerFunction(this.args);
+          }
         }
         this.stringifyArguments();
       }

@@ -558,19 +558,18 @@ const Valkey = require("iovalkey");
 // into
 // hmset('key', 'k1', 'v1', 'k2', 'v2')
 Valkey.Command.setArgumentTransformer("hmset", (args) => {
-  if (args.length === 2) {
-    if (args[1] instanceof Map) {
-      // utils is a internal module of iovalkey
-      return [args[0], ...utils.convertMapToArray(args[1])];
+    if (args.length === 1) {
+        if (args[0] instanceof Map) {
+            return utils.convertMapToArray(args[0]);
+        }
+        if (typeof args[0] === "object" && args[0] !== null) {
+            return utils.convertObjectToArray(args[0]);
+        }
     }
-    if (typeof args[1] === "object" && args[1] !== null) {
-      return [args[0], ...utils.convertObjectToArray(args[1])];
-    }
-  }
-  return args;
+    return args;
 });
 
-// Here's the built-in reply transformer converting the HGETALL reply
+// Here's a simplified version of the built-in reply transformer converting the HGETALL reply
 // ['k1', 'v1', 'k2', 'v2']
 // into
 // { k1: 'v1', 'k2': 'v2' }
@@ -622,6 +621,18 @@ valkey.hset("h1", Buffer.from([0x03]), Buffer.from([0x04]));
 valkey.hgetallBuffer("h1", (err, result) => {
   // result === [ [ <Buffer 01>, <Buffer 02> ], [ <Buffer 03>, <Buffer 04> ] ];
 });
+```
+
+`setArgumentTransformer` can also be configured to allow the ability to rewrite command names in the transformer callback function by setting the third parameter to `true`.
+For example, you can create a transformer for the `del` command that rewrites it to `unlink` when there are more than 5 keys to delete:
+```javascript
+Valkey.Command.setArgumentTransformer("del", (args) => {
+    // args is now an array of command and its arguments, e.g. ['del', 'key1', 'key2', ...]
+    if (args.length > 6) {
+        args[0] = "unlink";
+    }
+    return args;
+}, true);
 ```
 
 ## Monitor

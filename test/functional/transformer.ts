@@ -184,4 +184,19 @@ describe("transformer", () => {
       });
     });
   });
+  describe("custom transformer", () => {
+    it("should support rewriting command names in argument transformer", async () => {
+      try {
+        const redis = new Redis();
+        Redis.Command.setArgumentTransformer("customNonStandardRedisCommand", args => {
+          return ["set", ...args.slice(1)];
+        }, true);
+        redis.addBuiltinCommand("customNonStandardRedisCommand");
+        expect(await redis.customNonStandardRedisCommand('foo', 'bar')).to.eql("OK");
+        expect(await redis.get('foo')).to.eql('bar');
+      } finally {
+        Redis.Command.setArgumentTransformer('customNonStandardRedisCommand');
+      }
+    });
+  });
 });
