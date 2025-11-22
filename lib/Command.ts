@@ -315,7 +315,7 @@ export default class Command implements Respondable {
     if (this.replyEncoding) {
       result = convertBufferToString(result, this.replyEncoding);
     }
-    const transformer = Command._transformer.reply[this.preTransformedName ?? this.name];
+    const transformer = Command._transformer.reply[this.preTransformedName] ?? Command._transformer.reply[this.name];
     if (transformer) {
       result = transformer(result);
     }
