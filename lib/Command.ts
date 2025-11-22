@@ -177,6 +177,8 @@ export default class Command implements Respondable {
   private slot?: number | null;
   private keys?: Array<string | Buffer>;
 
+  private preTransformedName?: string;
+
   /**
    * Creates an instance of Command.
    * @param name Command name
@@ -313,7 +315,7 @@ export default class Command implements Respondable {
     if (this.replyEncoding) {
       result = convertBufferToString(result, this.replyEncoding);
     }
-    const transformer = Command._transformer.reply[this.name];
+    const transformer = Command._transformer.reply[this.preTransformedName ?? this.name];
     if (transformer) {
       result = transformer(result);
     }
@@ -343,6 +345,7 @@ export default class Command implements Respondable {
         if (transformer) {
           if (transformer.includeCommand) {
             this.args = transformer.transformerFunction([].concat(this.name, this.args));
+            this.preTransformedName = this.name;
             this.name = this.args.shift() as string;
           } else {
             this.args = transformer.transformerFunction(this.args);

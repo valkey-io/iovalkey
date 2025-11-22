@@ -191,8 +191,11 @@ describe("transformer", () => {
         Redis.Command.setArgumentTransformer("customNonStandardRedisCommand", args => {
           return ["set", ...args.slice(1)];
         }, true);
+        Redis.Command.setReplyTransformer("customNonStandardRedisCommand", reply => {
+          return reply + reply;
+        });
         redis.addBuiltinCommand("customNonStandardRedisCommand");
-        expect(await redis.customNonStandardRedisCommand('foo', 'bar')).to.eql("OK");
+        expect(await redis.customNonStandardRedisCommand('foo', 'bar')).to.eql("OKOK");
         expect(await redis.get('foo')).to.eql('bar');
       } finally {
         Redis.Command.setArgumentTransformer('customNonStandardRedisCommand');
