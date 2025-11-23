@@ -628,11 +628,11 @@ valkey.hgetallBuffer("h1", (err, result) => {
 For example, you can create a transformer for the `del` command that rewrites it to `unlink` when there are more than 5 keys to delete:
 ```javascript
 Valkey.Command.setArgumentTransformer("del", (args) => {
-    // args is now an array of command and its arguments, e.g. ['del', 'key1', 'key2', ...]
-    if (args.length > 6) {
-        args[0] = "unlink";
-    }
-    return args;
+  // args is now an array of command and its arguments, e.g. ['del', 'key1', 'key2', ...]
+  if (args.length > 6) {
+    args[0] = "unlink";
+  }
+  return args;
 }, true);
 ```
 
