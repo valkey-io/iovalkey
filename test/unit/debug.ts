@@ -1,4 +1,4 @@
-import rDebug = require("debug");
+import rDebug from "debug";
 import * as sinon from "sinon";
 import { expect } from "chai";
 import debug, {

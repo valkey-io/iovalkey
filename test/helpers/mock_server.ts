@@ -1,8 +1,8 @@
 import { createServer, Server, Socket } from "net";
 import { EventEmitter } from "events";
 import { convertBufferToString } from "../../lib/utils";
-import enableDestroy = require("server-destroy");
-import Parser = require("redis-parser");
+import * as enableDestroy from "server-destroy";
+import * as Parser from "redis-parser";
 
 let createdMockServers: MockServer[] = [];
 const RAW_DATA_KEY = "___IOREDIS_MOCK_ROW_DATA___";
@@ -51,15 +51,21 @@ export default class MockServer extends EventEmitter {
     };
   }
 
+  handler?: MockServerHandler;
   private clients: Socket[] = [];
   private socket?: Server;
+  private readonly port: number;
+  private readonly slotTable?: any;
 
   constructor(
-    private port: number,
-    public handler?: MockServerHandler,
-    private slotTable?: any
+      port: number,
+      handler?: MockServerHandler,
+      slotTable?: any
   ) {
     super();
+    this.port = port;
+    this.handler = handler;
+    this.slotTable = slotTable;
     this.connect();
     createdMockServers.push(this);
   }
@@ -71,7 +77,7 @@ export default class MockServer extends EventEmitter {
         this.emit("connect", c);
       });
 
-      const parser = new Parser({
+      const parser = new (Parser as any)({
         returnBuffers: true,
         stringNumbers: false,
         returnReply: (reply: any) => {
