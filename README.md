@@ -558,13 +558,13 @@ const Valkey = require("iovalkey");
 // into
 // hmset('key', 'k1', 'v1', 'k2', 'v2')
 Valkey.Command.setArgumentTransformer("hmset", (args) => {
-  if (args.length === 1) {
-    if (args[0] instanceof Map) {
+  if (args.length === 2) {
+    if (args[1] instanceof Map) {
       // utils is a internal module of iovalkey
-      return utils.convertMapToArray(args[0]);
+      return [args[0], ...utils.convertMapToArray(args[1])];
     }
-    if (typeof args[0] === "object" && args[0] !== null) {
-      return utils.convertObjectToArray(args[0]);
+    if (typeof args[1] === "object" && args[1] !== null) {
+      return [args[0], ...utils.convertObjectToArray(args[1])];
     }
   }
   return args;
