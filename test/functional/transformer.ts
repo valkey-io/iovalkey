@@ -185,21 +185,42 @@ describe("transformer", () => {
     });
   });
   describe("custom transformer", () => {
-    it("should support rewriting command names in argument transformer", async () => {
-      try {
-        const redis = new Redis();
-        Redis.Command.setArgumentTransformer("customNonStandardRedisCommand", args => {
-          return ["set", ...args.slice(1)];
-        }, true);
-        Redis.Command.setReplyTransformer("customNonStandardRedisCommand", reply => {
-          return reply + reply;
-        });
-        redis.addBuiltinCommand("customNonStandardRedisCommand");
-        expect(await redis.customNonStandardRedisCommand('foo', 'bar')).to.eql("OKOK");
-        expect(await redis.get('foo')).to.eql('bar');
-      } finally {
-        Redis.Command.setArgumentTransformer('customNonStandardRedisCommand');
-      }
+    describe("rewriting command names in argument transformer", () => {
+      it("simple commands", async () => {
+        try {
+          const redis = new Redis();
+          Redis.Command.setArgumentTransformer("customNonStandardRedisCommand", args => {
+            return ["set", ...args.slice(1)];
+          }, true);
+          Redis.Command.setReplyTransformer("customNonStandardRedisCommand", reply => {
+            return reply + reply;
+          });
+          redis.addBuiltinCommand("customNonStandardRedisCommand");
+          expect(await redis.customNonStandardRedisCommand('foo', 'bar')).to.eql("OKOK");
+          expect(await redis.get('foo')).to.eql('bar');
+        } finally {
+          Redis.Command.setArgumentTransformer('customNonStandardRedisCommand');
+        }
+      });
+      it("pipelined multi/exec commands", async() => {
+        try {
+          const redis = new Redis();
+          Redis.Command.setArgumentTransformer("customNonStandardRedisCommand", args => {
+            return ["set", ...args.slice(1)];
+          }, true);
+          Redis.Command.setReplyTransformer("customNonStandardRedisCommand", reply => {
+            return reply + reply;
+          });
+          redis.addBuiltinCommand("customNonStandardRedisCommand");
+          const multi = redis.multi();
+          multi.customNonStandardRedisCommand('foo', 'bar');
+          multi.get('foo');
+          const results = await multi.exec();
+          expect(results).to.eql([[null, "OKOK"], [null, "bar"]]);
+        } finally {
+          Redis.Command.setArgumentTransformer('customNonStandardRedisCommand');
+        }
+      })
     });
   });
 });
