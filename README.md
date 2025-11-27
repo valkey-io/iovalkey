@@ -3,7 +3,7 @@
 A robust, performance-focused and full-featured [Valkey](https://valkey.io) client for [Node.js](https://nodejs.org).
 This is a friendly fork of [ioredis](https://github.com/redis/ioredis) after [this commit](https://github.com/redis/ioredis/commit/ec42c82ceab1957db00c5175dfe37348f1856a93).
 
-Supports Valkey >= 2.6.12. Completely compatible with Valkey 7.x.
+Supports Valkey >= 2.6.12.
 
 # Features
 
@@ -48,10 +48,10 @@ npm install --save-dev @types/node
 
 ## Basic Usage
 
-```javascript
+```js
 // Import iovalkey.
 // You can also use `import { Valkey } from "iovalkey"`
-// if your project is a TypeScript project,
+// if your project is using ESM
 // Note that `import Valkey from "iovalkey"` is still supported,
 // but will be deprecated in the next major version.
 const Valkey = require("iovalkey");
@@ -109,7 +109,7 @@ When a new `Valkey` instance is created,
 a connection to Valkey will be created at the same time.
 You can specify which Valkey to connect to by:
 
-```javascript
+```js
 new Valkey(); // Connect to 127.0.0.1:6379
 new Valkey(6380); // 127.0.0.1:6380
 new Valkey(6379, "192.168.1.1"); // 192.168.1.1:6379
@@ -141,7 +141,7 @@ Valkey provides several commands for developers to implement the [Publish–subs
 
 By leveraging Node.js's built-in events module, iovalkey makes pub/sub very straightforward to use. Below is a simple example that consists of two files, one is publisher.js that publishes messages to a channel, the other is subscriber.js that listens for messages on specific channels.
 
-```javascript
+```js
 // publisher.js
 
 const Valkey = require("iovalkey");
@@ -158,7 +158,7 @@ setInterval(() => {
 }, 1000);
 ```
 
-```javascript
+```js
 // subscriber.js
 
 const Valkey = require("iovalkey");
@@ -211,7 +211,7 @@ setInterval(() => {
 
 `PSUBSCRIBE` is also supported in a similar way when you want to subscribe all channels whose name matches a pattern:
 
-```javascript
+```js
 valkey.psubscribe("pat?ern", (err, count) => {});
 
 // Event names are "pmessage"/"pmessageBuffer" instead of "message/messageBuffer".
@@ -223,7 +223,7 @@ valkey.on("pmessageBuffer", (pattern, channel, message) => {});
 
 Valkey v5 introduces a new data type called streams. It doubles as a communication channel for building streaming architectures and as a log-like data structure for persisting data. With iovalkey, the usage can be pretty straightforward. Say we have a producer publishes messages to a stream with `valkey.xadd("mystream", "*", "randomValue", Math.random())` (You may find the [official documentation of Streams](https://valkey.io/topics/streams-intro/) as a starter to understand the parameters used), to consume the messages, we'll have a consumer with the following code:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 const valkey = new Valkey();
 
@@ -251,7 +251,7 @@ listenForMessage();
 
 Valkey can set a timeout to expire your key, after the timeout has expired the key will be automatically deleted. (You can find the [official Expire documentation](https://valkey.io/commands/expire/) to understand better the different parameters you can use), to set your key to expire in 60 seconds, we will have the following code:
 
-```javascript
+```js
 valkey.set("key", "data", "EX", 60);
 // Equivalent to valkey command "SET key data EX 60", because on iovalkey set method,
 // all arguments are passed directly to the valkey server.
@@ -261,7 +261,7 @@ valkey.set("key", "data", "EX", 60);
 
 Binary data support is out of the box. Pass buffers to send binary data:
 
-```javascript
+```js
 valkey.set("foo", Buffer.from([0x62, 0x75, 0x66]));
 ```
 
@@ -269,7 +269,7 @@ valkey.set("foo", Buffer.from([0x62, 0x75, 0x66]));
 Every command that returns a [bulk string](https://redis.io/docs/reference/protocol-spec/#resp-bulk-strings)
 has a variant command with a `Buffer` suffix. The variant command returns a buffer instead of a UTF-8 string:
 
-```javascript
+```js
 const result = await valkey.getBuffer("foo");
 // result is `<Buffer 62 75 66>`
 ```
@@ -278,7 +278,7 @@ It's worth noticing that you don't need the `Buffer` suffix variant in order to 
 in most case you should just use `valkey.set()` instead of `valkey.setBuffer()` unless you want to get the old value
 with the `GET` parameter:
 
-```javascript
+```js
 const result = await valkey.setBuffer("foo", "new value", "GET");
 // result is `<Buffer 62 75 66>` as `GET` indicates returning the old value.
 ```
@@ -292,7 +292,7 @@ the commands in memory and then send them to Valkey all at once. This way the pe
 commands on it just like the `Valkey` instance. The commands are queued in memory
 and flushed to Valkey by calling the `exec` method:
 
-```javascript
+```js
 const pipeline = valkey.pipeline();
 pipeline.set("foo", "bar");
 pipeline.del("cc");
@@ -319,7 +319,7 @@ promise.then((result) => {
 Each chained command can also have a callback, which will be invoked when the command
 gets a reply:
 
-```javascript
+```js
 valkey
   .pipeline()
   .set("foo", "bar")
@@ -333,7 +333,7 @@ valkey
 
 In addition to adding commands to the `pipeline` queue individually, you can also pass an array of commands and arguments to the constructor:
 
-```javascript
+```js
 valkey
   .pipeline([
     ["set", "foo", "bar"],
@@ -346,7 +346,7 @@ valkey
 
 `#length` property shows how many commands in the pipeline:
 
-```javascript
+```js
 const length = valkey.pipeline().set("foo", "bar").get("foo").length;
 // length === 2
 ```
@@ -357,7 +357,7 @@ Most of the time, the transaction commands `multi` & `exec` are used together wi
 Therefore, when `multi` is called, a `Pipeline` instance is created automatically by default,
 so you can use `multi` just like `pipeline`:
 
-```javascript
+```js
 valkey
   .multi()
   .set("foo", "bar")
@@ -370,7 +370,7 @@ valkey
 If there's a syntax error in the transaction's command chain (e.g. wrong number of arguments, wrong command name, etc),
 then none of the commands would be executed, and an error is returned:
 
-```javascript
+```js
 valkey
   .multi()
   .set("foo")
@@ -392,7 +392,7 @@ valkey
 In terms of the interface, `multi` differs from `pipeline` in that when specifying a callback
 to each chained command, the queueing state is passed to the callback instead of the result of the command:
 
-```javascript
+```js
 valkey
   .multi()
   .set("foo", "bar", (err, result) => {
@@ -404,7 +404,7 @@ valkey
 If you want to use transaction without pipeline, pass `{ pipeline: false }` to `multi`,
 and every command will be sent to Valkey immediately without waiting for an `exec` invocation:
 
-```javascript
+```js
 valkey.multi({ pipeline: false });
 valkey.set("foo", "bar");
 valkey.get("foo");
@@ -415,7 +415,7 @@ valkey.exec((err, result) => {
 
 The constructor of `multi` also accepts a batch of commands:
 
-```javascript
+```js
 valkey
   .multi([
     ["set", "foo", "bar"],
@@ -429,7 +429,7 @@ valkey
 Inline transactions are supported by pipeline, which means you can group a subset of commands
 in the pipeline into a transaction:
 
-```javascript
+```js
 valkey
   .pipeline()
   .get("foo")
@@ -448,7 +448,7 @@ However, it's tedious to use in real world scenarios since developers have to ta
 care of script caching and to detect when to use `EVAL` and when to use `EVALSHA`.
 iovalkey exposes a `defineCommand` method to make scripting much easier to use:
 
-```javascript
+```js
 const valkey = new Valkey();
 
 // This will define a command myecho:
@@ -478,7 +478,7 @@ If the number of keys can't be determined when defining a command, you can
 omit the `numberOfKeys` property and pass the number of keys as the first argument
 when you call the command:
 
-```javascript
+```js
 valkey.defineCommand("echoDynamicKeyNumber", {
   lua: "return {KEYS[1],KEYS[2],ARGV[1],ARGV[2]}",
 });
@@ -494,7 +494,7 @@ valkey.echoDynamicKeyNumber(2, "k1", "k2", "a1", "a2", (err, result) => {
 
 Besides `defineCommand()`, you can also define custom commands with the `scripts` constructor option:
 
-```javascript
+```js
 const valkey = new Valkey({
   scripts: {
     myecho: {
@@ -518,7 +518,7 @@ namespaces.
 **Warning** This feature won't apply to commands like [KEYS](https://valkey.io/commands/keys/) and [SCAN](http://valkey.io/commands/scan) that take patterns rather than actual keys([#239](https://github.com/mcollina/iovalkey/issues/239)),
 and this feature also won't apply to the replies of commands even if they are key names ([#325](https://github.com/mcollina/iovalkey/issues/325)).
 
-```javascript
+```js
 const fooValkey = new Valkey({ keyPrefix: "foo:" });
 fooValkey.set("bar", "baz"); // Actually sends SET foo:bar baz
 
@@ -548,7 +548,7 @@ command returns a hash (e.g. `{ key: val1, key2: v2 }`) rather than an array of 
 iovalkey has a flexible system for transforming arguments and replies. There are two types
 of transformers, argument transformer and reply transformer:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 
 // Here's the built-in argument transformer converting
@@ -590,7 +590,7 @@ There are three built-in transformers, two argument transformers for `hmset` & `
 a reply transformer for `hgetall`. Transformers for `hmset` and `hgetall` were mentioned
 above, and the transformer for `mset` is similar to the one for `hmset`:
 
-```javascript
+```js
 valkey.mset({ k1: "v1", k2: "v2" });
 valkey.get("k1", (err, result) => {
   // result === 'v1';
@@ -609,7 +609,7 @@ valkey.get("k3", (err, result) => {
 
 Another useful example of a reply transformer is one that changes `hgetall` to return array of arrays instead of objects which avoids an unwanted conversation of hash keys to strings when dealing with binary hash keys:
 
-```javascript
+```js
 Valkey.Command.setReplyTransformer("hgetall", (result) => {
   const arr = [];
   for (let i = 0; i < result.length; i += 2) {
@@ -626,7 +626,7 @@ valkey.hgetallBuffer("h1", (err, result) => {
 
 `setArgumentTransformer` can also be configured to allow the ability to rewrite command names in the transformer callback function by setting the third parameter to `true`.
 For example, you can create a transformer for the `del` command that rewrites it to `unlink` when there are more than 5 keys to delete:
-```javascript
+```js
 Valkey.Command.setArgumentTransformer("del", (args) => {
   // args is now an array of command and its arguments, e.g. ['del', 'key1', 'key2', ...]
   if (args.length > 6) {
@@ -648,7 +648,7 @@ The callback for the monitor event takes a timestamp from the Valkey server and 
 
 Here is a simple example:
 
-```javascript
+```js
 valkey.monitor((err, monitor) => {
   monitor.on("monitor", (time, args, source, database) => {});
 });
@@ -656,7 +656,7 @@ valkey.monitor((err, monitor) => {
 
 Here is another example illustrating an `async` function and `monitor.disconnect()`:
 
-```javascript
+```js
 async () => {
   const monitor = await valkey.monitor();
   monitor.on("monitor", console.log);
@@ -673,7 +673,7 @@ of blocking the server for a long time. However, it requires recording the curso
 the `SCAN` command is called in order to iterate through all the keys correctly. Since it's a relatively common use case, iovalkey
 provides a streaming interface for the `SCAN` command to make things much easier. A readable stream can be created by calling `scanStream`:
 
-```javascript
+```js
 const valkey = new Valkey();
 // Create a readable stream (object mode)
 const stream = valkey.scanStream();
@@ -692,7 +692,7 @@ stream.on("end", () => {
 
 `scanStream` accepts an option, with which you can specify the `MATCH` pattern, the `TYPE` filter, and the `COUNT` argument:
 
-```javascript
+```js
 const stream = valkey.scanStream({
   // only returns keys following the pattern of `user:*`
   match: "user:*",
@@ -710,7 +710,7 @@ the key names are not utf8 strings.
 There are also `hscanStream`, `zscanStream` and `sscanStream` to iterate through elements in a hash, zset and set. The interface of each is
 similar to `scanStream` except the first argument is the key name:
 
-```javascript
+```js
 const stream = valkey.hscanStream("myhash", {
   match: "age:??",
 });
@@ -721,7 +721,7 @@ You can learn more from the [Valkey documentation](http://valkey.io/commands/sca
 **Useful Tips**
 It's pretty common that doing an async task in the `data` handler. We'd like the scanning process to be paused until the async task to be finished. `Stream#pause()` and `Stream#resume()` do the trick. For example if we want to migrate data in Valkey to MySQL:
 
-```javascript
+```js
 const stream = valkey.scanStream();
 stream.on("data", (resultKeys) => {
   // Pause the stream from scanning more keys until we've migrated the current keys.
@@ -746,7 +746,7 @@ except when the connection is closed manually by `valkey.disconnect()` or `valke
 It's very flexible to control how long to wait to reconnect after disconnection
 using the `retryStrategy` option:
 
-```javascript
+```js
 const valkey = new Valkey({
   // This is the default value of `retryStrategy`
   retryStrategy(times) {
@@ -770,7 +770,7 @@ the client will resend them when reconnected. This behavior can be disabled by s
 
 By default, all pending commands will be flushed with an error every 20 retry attempts. That makes sure commands won't wait forever when the connection is down. You can change this behavior by setting `maxRetriesPerRequest`:
 
-```javascript
+```js
 const valkey = new Valkey({
   maxRetriesPerRequest: 1,
 });
@@ -782,7 +782,7 @@ Set maxRetriesPerRequest to `null` to disable this behavior, and every command w
 
 Besides auto-reconnect when the connection is closed, iovalkey supports reconnecting on certain Valkey errors using the `reconnectOnError` option. Here's an example that will reconnect when receiving `READONLY` error:
 
-```javascript
+```js
 const valkey = new Valkey({
   reconnectOnError(err) {
     const targetError = "READONLY";
@@ -826,7 +826,7 @@ When a command can't be processed by Valkey (being sent before the `ready` event
 executed when it can be processed. You can disable this feature by setting the `enableOfflineQueue`
 option to `false`:
 
-```javascript
+```js
 const valkey = new Valkey({ enableOfflineQueue: false });
 ```
 
@@ -834,7 +834,7 @@ const valkey = new Valkey({ enableOfflineQueue: false });
 
 Valkey doesn't support TLS natively, however if the valkey server you want to connect to is hosted behind a TLS proxy (e.g. [stunnel](https://www.stunnel.org/)) or is offered by a PaaS service that supports TLS connection, you can set the `tls` option:
 
-```javascript
+```js
 const valkey = new Valkey({
   host: "localhost",
   tls: {
@@ -848,13 +848,13 @@ const valkey = new Valkey({
 
 Alternatively, specify the connection through a [`rediss://` URL](https://www.iana.org/assignments/uri-schemes/prov/rediss).
 
-```javascript
+```js
 const valkey = new Valkey("rediss://valkey.my-service.com");
 ```
 
 If you do not want to use a connection string, you can also specify an empty `tls: {}` object:
 
-```javascript
+```js
 const valkey = new Valkey({
   host: "valkey.my-service.com",
   tls: {},
@@ -870,7 +870,7 @@ you connect to a single node also work when you connect to a sentinel group. Mak
 
 To connect using Sentinel, use:
 
-```javascript
+```js
 const valkey = new Valkey({
   sentinels: [
     { host: "localhost", port: 26379 },
@@ -897,7 +897,7 @@ It's possible to connect to a slave instead of a master by specifying the option
 
 If you specify the option `preferredSlaves` along with `role: 'slave'` iovalkey will attempt to use this value when selecting the slave from the pool of available slaves. The value of `preferredSlaves` should either be a function that accepts an array of available slaves and returns a single result, or an array of slave values priorities by the lowest `prio` value first with a default value of `1`.
 
-```javascript
+```js
 // available slaves format
 const availableSlaves = [{ ip: "127.0.0.1", port: "31231", flags: "slave" }];
 
@@ -934,7 +934,7 @@ const valkey = new Valkey({
 
 Besides the `retryStrategy` option, there's also a `sentinelRetryStrategy` in Sentinel mode which will be invoked when all the sentinel nodes are unreachable during connecting. If `sentinelRetryStrategy` returns a valid delay time, iovalkey will try to reconnect from scratch. The default value of `sentinelRetryStrategy` is:
 
-```javascript
+```js
 function (times) {
   const delay = Math.min(times * 10, 1000);
   return delay;
@@ -946,7 +946,7 @@ function (times) {
 Valkey Cluster provides a way to run a Valkey installation where data is automatically sharded across multiple Valkey nodes.
 You can connect to a Valkey Cluster like this:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 
 const cluster = new Valkey.Cluster([
@@ -977,7 +977,7 @@ cluster.get("foo", (err, res) => {
       iovalkey will try to reconnect to the startup nodes from scratch after the specified delay (in ms). Otherwise, an error of "None of startup nodes is available" will be returned.
       The default value of this option is:
 
-      ```javascript
+      ```js
       function (times) {
         const delay = Math.min(100 + times * 2, 2000);
         return delay;
@@ -986,7 +986,7 @@ cluster.get("foo", (err, res) => {
 
       It's possible to modify the `startupNodes` property in order to switch to another set of nodes here:
 
-      ```javascript
+      ```js
       function (times) {
         this.startupNodes = [{ port: 6790, host: '127.0.0.1' }];
         return Math.min(100 + times * 2, 2000);
@@ -1026,7 +1026,7 @@ A typical valkey cluster contains three or more masters and several slaves for e
 
 For example:
 
-```javascript
+```js
 const cluster = new Valkey.Cluster(
   [
     /* nodes */
@@ -1051,7 +1051,7 @@ Sometimes you may want to send a command to multiple nodes (masters or slaves) o
 
 `Cluster#nodes()` accepts a parameter role, which can be "master", "slave" and "all" (default), and returns an array of `Valkey` instance. For example:
 
-```javascript
+```js
 // Send `FLUSHDB` command to all slaves:
 const slaves = cluster.nodes("slave");
 Promise.all(slaves.map((node) => node.flushdb()));
@@ -1073,7 +1073,7 @@ Sometimes the cluster is hosted within a internal network that can only be acces
 
 You can specify nat mapping rules via `natMap` option:
 
-```javascript
+```js
 const cluster = new Valkey.Cluster(
   [
     {
@@ -1092,7 +1092,7 @@ const cluster = new Valkey.Cluster(
 ```
 
 Or you can specify this parameter through function:
-```javascript
+```js
 const cluster = new Redis.Cluster(
   [
     {
@@ -1145,7 +1145,7 @@ When any commands in a pipeline receives a `MOVED` or `ASK` error, iovalkey will
 
 Pub/Sub in cluster mode works exactly as the same as in standalone mode. Internally, when a node of the cluster receives a message, it will broadcast the message to the other nodes. iovalkey makes sure that each message will only be received once by strictly subscribing one node at the same time.
 
-```javascript
+```js
 const nodes = [
   /* nodes */
 ];
@@ -1178,7 +1178,7 @@ sub.subscribe("news", () => {
 
 Setting the `password` option to access password-protected clusters:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 const cluster = new Valkey.Cluster(nodes, {
   redisOptions: {
@@ -1189,7 +1189,7 @@ const cluster = new Valkey.Cluster(nodes, {
 
 If some of nodes in the cluster using a different password, you should specify them in the first parameter:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 const cluster = new Valkey.Cluster(
   [
@@ -1213,7 +1213,7 @@ AWS ElastiCache for Valkey (Clustered Mode) supports TLS encryption. If you use
 this, you may encounter errors with invalid certificates. To resolve this
 issue, construct the `Cluster` with the `dnsLookup` option as follows:
 
-```javascript
+```js
 const cluster = new Valkey.Cluster(
   [
     {
@@ -1256,7 +1256,7 @@ Note that the same slot limitation within a single command still holds, as it is
 
 This sample code uses iovalkey with automatic pipeline enabled.
 
-```javascript
+```js
 const Valkey = require("./built");
 const http = require("http");
 
@@ -1320,7 +1320,7 @@ And here's the same test for a cluster of 3 masters and 3 replicas:
 
 All the errors returned by the Valkey server are instances of `ReplyError`, which can be accessed via `Valkey`:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 const valkey = new Valkey();
 // This command causes a reply error since the SET command requires two arguments.
@@ -1347,7 +1347,7 @@ module itself, not in your code. So it's not easy to find out where the error ha
 iovalkey provides an option `showFriendlyErrorStack` to solve the problem. When you enable
 `showFriendlyErrorStack`, iovalkey will optimize the error stack for you:
 
-```javascript
+```js
 const Valkey = require("iovalkey");
 const valkey = new Valkey({ showFriendlyErrorStack: true });
 valkey.set("foo");
@@ -1373,7 +1373,7 @@ default, this option is disabled and can only be used for debugging purposes. Yo
 
 # Running tests
 
-Start a Valkey/Valkey server on 127.0.0.1:6379, and then:
+Start a Valkey server on 127.0.0.1:6379, and then:
 
 ```shell
 npm test
@@ -1391,9 +1391,7 @@ $ DEBUG=iovalkey:* node app.js
 
 # Join in!
 
-I'm happy to receive bug reports, fixes, documentation enhancements, and any other improvements.
-
-And since I'm not a native English speaker, if you find any grammar mistakes in the documentation, please also let me know. :)
+We are happy to receive bug reports, fixes, documentation enhancements, and any other improvements.
 
 # License
 
