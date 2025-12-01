@@ -10,6 +10,7 @@ export interface RedisOptions {
   host: string;
   username?: string;
   password?: string;
+  availabilityZone?: string;
   [key: string]: any;
 }
 

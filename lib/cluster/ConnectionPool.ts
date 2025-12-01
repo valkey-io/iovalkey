@@ -90,6 +90,20 @@ export default class ConnectionPool extends EventEmitter {
           { lazyConnect: true }
         )
       );
+      
+      redis.once("ready", async () => {
+        try {
+          const hello = await redis.call("HELLO", "3");
+          const i = (hello as string[]).indexOf("az");
+          if (i > -1) {
+            redis.options.availabilityZone = hello[i + 1];
+            debug("HELLO az for %s → %s", key, redis.options.availabilityZone);
+          }
+        } catch (e) {
+          debug("Cannot fetch HELLO az for %s: %s", key, (e as Error).message);
+        }
+      });
+
       const endListener = () => {
         this.removeNode(key);
       };

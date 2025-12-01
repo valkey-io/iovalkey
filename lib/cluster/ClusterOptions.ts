@@ -59,7 +59,22 @@ export interface ClusterOptions extends CommanderOptions {
    *
    * @default "master"
    */
-  scaleReads?: NodeRole | Function;
+  scaleReads?:
+    | NodeRole
+    | Function
+    | "AZAffinity"
+    | "AZAffinityReplicasAndPrimary";
+
+  /**
+   * The availability zone (AZ) identifier where the client is running.
+   * Used by read strategies like "AZAffinity" or "AZAffinityReplicasAndPrimary"
+   * to prioritize routing read commands to replica or primary nodes in the same AZ.
+   *
+   * Example: "us-east-1a"
+   *
+   * @default undefined
+   */
+  clientAz?: string;
 
   /**
    * When a MOVED or ASK error is received, client will redirect the
@@ -205,6 +220,7 @@ export const DEFAULT_CLUSTER_OPTIONS: ClusterOptions = {
   enableOfflineQueue: true,
   enableReadyCheck: true,
   scaleReads: "master",
+  clientAz: undefined,
   maxRedirections: 16,
   retryDelayOnMoved: 0,
   retryDelayOnFailover: 100,
