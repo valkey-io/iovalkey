@@ -1,6 +1,6 @@
 import Redis from "../../lib/Redis";
 import { expect, use } from "chai";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { waitForMonitorReady } from "../helpers/util";
 
 use(require("chai-as-promised"));

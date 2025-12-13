@@ -1,23 +1,23 @@
 import { expectType } from "tsd";
-import { Redis } from "../../built";
+import { Valkey } from "../../built";
 
-const redis = new Redis();
+const redis = new Valkey();
 
-expectType<Redis>(redis.on("connect", () => {}));
-expectType<Redis>(redis.on("ready", () => {}));
-expectType<Redis>(redis.on("close", () => {}));
-expectType<Redis>(redis.on("end", () => {}));
-expectType<Redis>(
+expectType<Valkey>(redis.on("connect", () => {}));
+expectType<Valkey>(redis.on("ready", () => {}));
+expectType<Valkey>(redis.on("close", () => {}));
+expectType<Valkey>(redis.on("end", () => {}));
+expectType<Valkey>(
   redis.on("error", (error) => {
     expectType<Error>(error);
   })
 );
 
-expectType<Redis>(redis.once("connect", () => {}));
-expectType<Redis>(redis.once("ready", () => {}));
-expectType<Redis>(redis.once("close", () => {}));
-expectType<Redis>(redis.once("end", () => {}));
-expectType<Redis>(
+expectType<Valkey>(redis.once("connect", () => {}));
+expectType<Valkey>(redis.once("ready", () => {}));
+expectType<Valkey>(redis.once("close", () => {}));
+expectType<Valkey>(redis.once("end", () => {}));
+expectType<Valkey>(
   redis.once("error", (error) => {
     expectType<Error>(error);
   })

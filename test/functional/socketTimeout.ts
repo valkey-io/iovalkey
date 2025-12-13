@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 
 describe("socketTimeout", () => {
   const timeoutMs = 500;
@@ -7,7 +7,7 @@ describe("socketTimeout", () => {
   it("should ensure correct startup with password (https://github.com/redis/ioredis/issues/1919)", (done) => {
     let timeoutObj: NodeJS.Timeout;
 
-    const redis = new Redis({
+    const redis = new Valkey({
       socketTimeout: timeoutMs,
       lazyConnect: true,
       password: "foobared",
@@ -28,7 +28,7 @@ describe("socketTimeout", () => {
   it("should not throw error when socketTimeout is set and no command is sent", (done) => {
     let timeoutObj: NodeJS.Timeout;
 
-    const redis = new Redis({
+    const redis = new Valkey({
       socketTimeout: timeoutMs,
       lazyConnect: true,
     });
@@ -46,7 +46,7 @@ describe("socketTimeout", () => {
   });
 
   it("should throw if socket timeout is reached", (done) => {
-    const redis = new Redis({
+    const redis = new Valkey({
       socketTimeout: timeoutMs,
       lazyConnect: true,
     });

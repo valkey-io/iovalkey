@@ -1,8 +1,8 @@
-import * as calculateSlot from "cluster-key-slot";
+import calculateSlot from "cluster-key-slot";
 import MockServer from "../../helpers/mock_server";
 import { expect } from "chai";
 import { Cluster } from "../../../lib";
-import * as sinon from "sinon";
+import sinon from "sinon";
 
 describe("cluster:pipeline", () => {
   it("should throw when not all keys in a pipeline command belong to the same slot", (done) => {

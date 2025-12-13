@@ -1,7 +1,7 @@
 import { expectType } from "tsd";
-import { Redis, Pipeline } from "../../built";
+import { Valkey, Pipeline } from "../../built";
 
-const redis = new Redis();
+const redis = new Valkey();
 
 type RETURN_TYPE = Promise<[Error | null, unknown][] | null>;
 

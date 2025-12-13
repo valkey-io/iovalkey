@@ -1,9 +1,9 @@
-import Redis from "../../lib/Redis";
+import Valkey from "../../lib/Valkey";
 import { expect } from "chai";
 
 describe("select", function () {
   it("should support auto select", (done) => {
-    const redis = new Redis({ db: 2 });
+    const redis = new Valkey({ db: 2 });
     redis.set("foo", "2");
     redis.select("2");
     redis.get("foo", function (err, res) {
@@ -14,7 +14,7 @@ describe("select", function () {
   });
 
   it("should resend commands to the correct db", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.once("ready", function () {
       redis.set("foo", "2", function () {
         redis.stream.destroy();
@@ -35,7 +35,7 @@ describe("select", function () {
   });
 
   it("should re-select the current db when reconnect", (done) => {
-    const redis = new Redis();
+    const redis = new Valkey();
 
     redis.once("ready", function () {
       redis.set("foo", "bar");
@@ -53,7 +53,7 @@ describe("select", function () {
 
   it('should emit "select" event when db changes', (done) => {
     const changes = [];
-    const redis = new Redis();
+    const redis = new Valkey();
     redis.on("select", function (db) {
       changes.push(db);
     });
@@ -71,7 +71,7 @@ describe("select", function () {
   });
 
   it("should be sent on the connect event", (done) => {
-    const redis = new Redis({ db: 2 });
+    const redis = new Valkey({ db: 2 });
     const select = redis.select;
     redis.select = function () {
       return select.apply(redis, arguments).then(function () {

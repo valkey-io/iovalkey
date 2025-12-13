@@ -1,74 +1,96 @@
-exports = module.exports = require("./Redis").default;
-
-export { default } from "./Redis";
-export { default as Redis } from "./Redis";
-export { default as Cluster } from "./cluster";
+// eslint-disable-next-line import/extensions, @typescript-eslint/no-require-imports
+exports = module.exports = require('./Valkey.js').Valkey as unknown as typeof import('./Valkey.js').Valkey;
+export { Valkey as default } from './Valkey.js';
+export { Valkey } from './Valkey.js';
 
 /**
  * @ignore
  */
-export { default as Command } from "./Command";
+export { Redis } from './Redis.js';
+
+export { Cluster } from "./cluster/index.js";
+
+/**
+ * @ignore
+ */
+export { Command } from "./Command.js";
 
 /**
  * @ignore
  */
 export {
-  default as RedisCommander,
+  ValkeyCommander, 
   Result,
   ClientContext,
-} from "./utils/RedisCommander";
+} from "./utils/ValkeyCommander.js";
+
+/**
+ * @ignore
+ * @deprecated Use ValkeyCommander instead.
+ */
+export { RedisCommander } from "./utils/RedisCommander.js";
 
 /**
  * @ignore
  */
-export { default as ScanStream } from "./ScanStream";
+export { ScanStream } from "./ScanStream.js";
 
 /**
  * @ignore
  */
-export { default as Pipeline } from "./Pipeline";
+export { Pipeline } from "./Pipeline.js";
 
 /**
  * @ignore
  */
-export { default as AbstractConnector } from "./connectors/AbstractConnector";
+export { AbstractConnector } from "./connectors/AbstractConnector.js";
 
 /**
  * @ignore
  */
 export {
-  default as SentinelConnector,
+  SentinelConnector,
   SentinelIterator,
-} from "./connectors/SentinelConnector";
+} from "./connectors/SentinelConnector/index.js";
 
 /**
  * @ignore
  */
-export { Callback } from "./types";
+export { Callback } from "./types.js";
 
 // Type Exports
 export {
   SentinelAddress,
   SentinelConnectionOptions,
-} from "./connectors/SentinelConnector";
-export { StandaloneConnectionOptions } from "./connectors/StandaloneConnector";
-export { RedisOptions, CommonRedisOptions } from "./redis/RedisOptions";
-export { ClusterNode } from "./cluster";
+} from "./connectors/SentinelConnector/index.js";
+export { StandaloneConnectionOptions } from "./connectors/StandaloneConnector.js";
+export { ValkeyOptions, CommonValkeyOptions } from "./redis/ValkeyOptions.js";
+/**
+ * @ignore
+ * @deprecated Use ValkeyOptions instead.
+ */
+export { RedisOptions } from "./redis/RedisOptions.js";
+export { ClusterNode } from "./cluster/index.js";
 export {
   ClusterOptions,
   DNSLookupFunction,
   DNSResolveSrvFunction,
   NatMap,
-} from "./cluster/ClusterOptions";
-export { NodeRole } from "./cluster/util";
+} from "./cluster/ClusterOptions.js";
+export { NodeRole } from "./cluster/util.js";
 export type {
-  RedisKey,
+  ValkeyKey,
   RedisValue,
   ChainableCommander,
-} from "./utils/RedisCommander";
+} from "./utils/ValkeyCommander.js";
+/**
+ * @ignore
+ */
+export { print } from "./print.js";
 
 // No TS typings
-export const ReplyError = require("redis-errors").ReplyError;
+import * as RedisErrors from "redis-errors";
+export const ReplyError: typeof RedisErrors.ReplyError = RedisErrors.ReplyError as unknown as typeof RedisErrors.ReplyError;
 
 /**
  * @ignore
@@ -86,14 +108,3 @@ Object.defineProperty(exports, "Promise", {
     );
   },
 });
-
-/**
- * @ignore
- */
-export function print(err: Error | null, reply?: any) {
-  if (err) {
-    console.log("Error: " + err);
-  } else {
-    console.log("Reply: " + reply);
-  }
-}
