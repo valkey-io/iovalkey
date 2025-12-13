@@ -111,7 +111,6 @@ export default class MockServer extends EventEmitter {
       });
 
       c.on("end", () => {
-        // @ts-expect-error
         this.clients[clientIndex] = null;
         this.emit("disconnect", c);
       });
