@@ -1,5 +1,5 @@
 import sinon from "sinon";
-import Valkey from "../../lib/Valkey";
+import Valkey from "../../lib/Valkey.js"
 
 afterEach((done) => {
   sinon.restore();

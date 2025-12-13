@@ -8,7 +8,7 @@ export function waitForMonitorReady() {
 export async function getCommandsFromMonitor(
   redis: any,
   count: number,
-  exec: Function
+  exec: () => Promise<any>
 ): Promise<[any]> {
   const arr: string[] = [];
   const monitor = await redis.monitor();

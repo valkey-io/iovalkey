@@ -76,7 +76,8 @@
       "rules": {
         "prefer-const": 0,
         "import/extensions": 0,
-        "@typescript-eslint/no-require-imports": 0
+        "@typescript-eslint/no-require-imports": 0,
+        "@typescript-eslint/no-unused-expressions": 0
       }
     }
   ]
