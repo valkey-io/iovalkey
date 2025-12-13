@@ -1,8 +1,8 @@
 import { createServer, Server, Socket } from "net";
 import { EventEmitter } from "events";
 import { convertBufferToString } from "../../lib/utils/index.js";
-import * as enableDestroy from "server-destroy";
-import * as Parser from "redis-parser";
+import enableDestroy from "server-destroy";
+import Parser from "redis-parser";
 
 let createdMockServers: MockServer[] = [];
 const RAW_DATA_KEY = "___IOREDIS_MOCK_ROW_DATA___";
