@@ -1,8 +1,8 @@
 import { createConnection, IpcNetConnectOpts, TcpNetConnectOpts } from "net";
 import { connect as createTLSConnection, ConnectionOptions } from "tls";
-import { NetStream } from "../types";
-import { CONNECTION_CLOSED_ERROR_MSG } from "../utils";
-import AbstractConnector, { ErrorEmitter } from "./AbstractConnector";
+import { NetStream } from "../types.js";
+import { CONNECTION_CLOSED_ERROR_MSG } from "../utils/index.js";
+import { AbstractConnector, ErrorEmitter } from "./AbstractConnector.js";
 
 type TcpOptions = Pick<TcpNetConnectOpts, "port" | "host" | "family">;
 type IpcOptions = Pick<IpcNetConnectOpts, "path">;
@@ -12,7 +12,7 @@ export type StandaloneConnectionOptions = Partial<TcpOptions & IpcOptions> & {
   tls?: ConnectionOptions;
 };
 
-export default class StandaloneConnector extends AbstractConnector {
+class StandaloneConnector extends AbstractConnector {
   constructor(protected options: StandaloneConnectionOptions) {
     super(options.disconnectTimeout);
   }
@@ -77,3 +77,6 @@ export default class StandaloneConnector extends AbstractConnector {
     });
   }
 }
+
+export { StandaloneConnector };
+export default StandaloneConnector;

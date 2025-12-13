@@ -1,6 +1,6 @@
-import * as net from "net";
+import net from "net";
 import Redis from "../../lib/Redis";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 import MockServer from "../helpers/mock_server";
 import { StandaloneConnector } from "../../lib/connectors";

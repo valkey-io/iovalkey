@@ -1,4 +1,4 @@
-import { RedisOptions } from "../../redis/RedisOptions";
+import { RedisOptions } from "../../redis/RedisOptions.js";
 
 export interface SentinelAddress {
   port: number;
@@ -25,7 +25,10 @@ export interface RedisClient {
   disconnect(): void;
 }
 
-export interface Sentinel {
+interface Sentinel {
   address: Partial<SentinelAddress>;
   client: RedisClient;
 }
+
+export { Sentinel };
+export default Sentinel;

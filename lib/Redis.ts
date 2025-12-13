@@ -1,32 +1,33 @@
 import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import asCallback from "standard-as-callback";
-import Cluster from "./cluster";
-import Command from "./Command";
-import { DataHandledable, FlushQueueOptions, Condition } from "./DataHandler";
-import { StandaloneConnector } from "./connectors";
-import AbstractConnector from "./connectors/AbstractConnector";
-import SentinelConnector from "./connectors/SentinelConnector";
-import * as eventHandler from "./redis/event_handler";
+import { Cluster } from "./cluster/index.js";
+import { Command } from "./Command.js";
+import { DataHandledable, FlushQueueOptions, Condition } from "./DataHandler.js";
+import { StandaloneConnector } from "./connectors/index.js";
+import { AbstractConnector } from "./connectors/AbstractConnector.js";
+import { SentinelConnector } from "./connectors/SentinelConnector/index.js";
+import * as eventHandler from "./redis/event_handler.js";
 import {
   DEFAULT_REDIS_OPTIONS,
   ReconnectOnError,
   RedisOptions,
-} from "./redis/RedisOptions";
-import ScanStream from "./ScanStream";
-import { addTransactionSupport, Transaction } from "./transaction";
+} from "./redis/RedisOptions.js";
+import { ScanStream } from "./ScanStream.js";
+import { addTransactionSupport, Transaction } from "./transaction.js";
 import {
   Callback,
   CommandItem,
   NetStream,
   ScanStreamOptions,
   WriteableStream,
-} from "./types";
-import { CONNECTION_CLOSED_ERROR_MSG, Debug, isInt, parseURL } from "./utils";
-import applyMixin from "./utils/applyMixin";
-import Commander from "./utils/Commander";
-import { defaults, noop } from "./utils/lodash";
-import Deque = require("denque");
+} from "./types.js";
+import { CONNECTION_CLOSED_ERROR_MSG, Debug, isInt, parseURL } from "./utils/index.js";
+import applyMixin from "./utils/applyMixin.js";
+import { Commander } from "./utils/Commander.js";
+import { defaults, noop } from "./utils/lodash.js";
+import { default as Deque } from "denque";
+
 const debug = Debug("redis");
 
 type RedisStatus =
@@ -55,6 +56,7 @@ type RedisStatus =
  * }
  * ```
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class Redis extends Commander implements DataHandledable {
   static Cluster = Cluster;
   static Command = Command;
@@ -859,6 +861,7 @@ class Redis extends Commander implements DataHandledable {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 interface Redis extends EventEmitter {
   on(event: "message", cb: (channel: string, message: string) => void): this;
   once(event: "message", cb: (channel: string, message: string) => void): this;
@@ -904,6 +907,8 @@ interface Redis extends EventEmitter {
 applyMixin(Redis, EventEmitter);
 
 addTransactionSupport(Redis.prototype);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Redis extends Transaction {}
 
+export { Redis, Transaction };
 export default Redis;

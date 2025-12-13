@@ -1,20 +1,20 @@
 import { EventEmitter } from "events";
 import { createConnection, TcpNetConnectOpts } from "net";
-import { NatMap } from "../../cluster/ClusterOptions";
+import { NatMap } from "../../cluster/ClusterOptions.js";
 import {
   CONNECTION_CLOSED_ERROR_MSG,
   packObject,
   sample,
   Debug,
-} from "../../utils";
+} from "../../utils/index.js";
 import { connect as createTLSConnection, ConnectionOptions } from "tls";
-import SentinelIterator from "./SentinelIterator";
-import { RedisClient, SentinelAddress, Sentinel } from "./types";
-import AbstractConnector, { ErrorEmitter } from "../AbstractConnector";
-import { NetStream } from "../../types";
-import Redis from "../../Redis";
-import { RedisOptions } from "../../redis/RedisOptions";
-import { FailoverDetector } from "./FailoverDetector";
+import { SentinelIterator } from "./SentinelIterator.js";
+import { RedisClient, SentinelAddress, Sentinel } from "./types.js";
+import { AbstractConnector, ErrorEmitter } from "../AbstractConnector.js";
+import { NetStream } from "../../types.js";
+import { Redis } from "../../Redis.js"; 
+import { RedisOptions } from "../../redis/RedisOptions.js";
+import { FailoverDetector } from "./FailoverDetector.js";
 
 const debug = Debug("SentinelConnector");
 
@@ -31,7 +31,7 @@ type PreferredSlaves =
 
 export { SentinelAddress, SentinelIterator };
 
-export interface SentinelConnectionOptions {
+interface SentinelConnectionOptions {
   /**
    * Master group name of the Sentinel
    */
@@ -61,7 +61,7 @@ export interface SentinelConnectionOptions {
   failoverDetector?: boolean;
 }
 
-export default class SentinelConnector extends AbstractConnector {
+class SentinelConnector extends AbstractConnector {
   emitter: EventEmitter | null = null;
   protected sentinelIterator: SentinelIterator;
   private retryAttempts: number;
@@ -308,7 +308,6 @@ export default class SentinelConnector extends AbstractConnector {
       password: this.options.sentinelPassword || null,
       family:
         endpoint.family ||
-        // @ts-expect-error
         ("path" in this.options && this.options.path
           ? undefined
           : // @ts-expect-error
@@ -453,3 +452,6 @@ function addressResponseToAddress(input: AddressFromResponse): SentinelAddress {
 }
 
 function noop(): void {}
+
+export { SentinelConnector, SentinelConnectionOptions, FailoverDetector };
+export default SentinelConnector;

@@ -1,18 +1,18 @@
-import { Debug } from "../utils";
-import Deque = require("denque");
+import { Debug } from "../utils/index.js";
+import { default as Deque } from "denque";
 
 const debug = Debug("delayqueue");
 
-export interface DelayQueueOptions {
-  callback?: Function;
+interface DelayQueueOptions {
+  callback?: (cb: () => void) => void;
   timeout: number;
 }
 
 /**
  * Queue that runs items after specified duration
  */
-export default class DelayQueue {
-  private queues: { [key: string]: Deque<Function> } = {};
+class DelayQueue {
+  private queues: { [key: string]: Deque<() => void> } = {}; 
   private timeouts: { [key: string]: NodeJS.Timer } = {};
 
   /**
@@ -22,7 +22,7 @@ export default class DelayQueue {
    * @param item function that will run later
    * @param options
    */
-  push(bucket: string, item: Function, options: DelayQueueOptions): void {
+  push(bucket: string, item: () => void, options: DelayQueueOptions): void {
     const callback = options.callback || process.nextTick;
     if (!this.queues[bucket]) {
       this.queues[bucket] = new Deque();
@@ -57,4 +57,8 @@ export default class DelayQueue {
       queue.shift()();
     }
   }
+
 }
+
+export { DelayQueue, DelayQueueOptions };
+export default DelayQueue;

@@ -3,6 +3,7 @@ node_modules
 /test.*
 /.idea
 built
+.DS_Store
 
 .nyc_output
 coverage
