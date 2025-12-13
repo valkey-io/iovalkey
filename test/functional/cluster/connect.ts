@@ -1,7 +1,7 @@
 import MockServer from "../../helpers/mock_server";
 import { expect } from "chai";
 import { Cluster } from "../../../lib";
-import * as sinon from "sinon";
+import sinon from "sinon";
 
 describe("cluster:connect", () => {
   it("should flush the queue when all startup nodes are unreachable", (done) => {

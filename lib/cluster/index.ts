@@ -2,13 +2,13 @@ import { exists, hasFlag } from "@iovalkey/commands";
 import { EventEmitter } from "events";
 import { AbortError, RedisError } from "redis-errors";
 import asCallback from "standard-as-callback";
-import Command from "../Command";
-import ClusterAllFailedError from "../errors/ClusterAllFailedError";
-import Pipeline from "../Pipeline";
-import Redis from "../Redis";
-import ScanStream from "../ScanStream";
-import { addTransactionSupport, Transaction } from "../transaction";
-import { Callback, ScanStreamOptions, WriteableStream } from "../types";
+import { Command } from "../Command.js";
+import { ClusterAllFailedError } from "../errors/ClusterAllFailedError.js";
+import { Pipeline } from "../Pipeline.js";
+import { Redis } from "../Redis.js";
+import { ScanStream } from "../ScanStream.js";
+import { addTransactionSupport, Transaction } from "../transaction.js";
+import { Callback, ScanStreamOptions, WriteableStream } from "../types.js";
 import {
   CONNECTION_CLOSED_ERROR_MSG,
   Debug,
@@ -18,13 +18,13 @@ import {
   shuffle,
   timeout,
   zipMap,
-} from "../utils";
-import applyMixin from "../utils/applyMixin";
-import Commander from "../utils/Commander";
-import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions";
-import ClusterSubscriber from "./ClusterSubscriber";
-import ConnectionPool from "./ConnectionPool";
-import DelayQueue from "./DelayQueue";
+} from "../utils/index.js";
+import applyMixin from "../utils/applyMixin.js";
+import { Commander } from "../utils/Commander.js";
+import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions.js";
+import { ClusterSubscriber } from "./ClusterSubscriber.js";
+import { ConnectionPool } from "./ConnectionPool.js";
+import { DelayQueue }  from "./DelayQueue.js";
 import {
   getConnectionName,
   getUniqueHostnamesFromOptions,
@@ -35,8 +35,8 @@ import {
   normalizeNodeOptions,
   RedisOptions,
   weightSrvRecords,
-} from "./util";
-import Deque = require("denque");
+} from "./util.js";
+import { default as Deque } from "denque";
 
 const debug = Debug("cluster");
 
@@ -53,7 +53,8 @@ export type ClusterNode =
   | number
   | {
       host?: string | undefined;
-      port?: number | undefined;
+      port?: string | number | undefined;
+      password?: string | undefined;
     };
 
 type ClusterStatus =
@@ -69,6 +70,8 @@ type ClusterStatus =
 /**
  * Client for the official Redis Cluster
  */
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 class Cluster extends Commander {
   options: ClusterOptions;
   slots: NodeKey[][] = [];
@@ -1061,10 +1064,13 @@ class Cluster extends Commander {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Cluster extends EventEmitter {}
 applyMixin(Cluster, EventEmitter);
 
 addTransactionSupport(Cluster.prototype);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging, @typescript-eslint/no-empty-object-type
 interface Cluster extends Transaction {}
 
+export { Cluster };
 export default Cluster;

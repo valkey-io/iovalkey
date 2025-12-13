@@ -2,12 +2,16 @@
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:import/typescript",
     "prettier"
   ],
-  "ignorePatterns": ["bin/generateRedisCommander/template.ts"],
+  "ignorePatterns": ["bin/generateRedisCommander/template.ts", "built/"],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "eslint-plugin-import"],
   "env": { "node": true },
+  "settings": {
+    "import/extensions": [".js"]
+  },
   "rules": {
     "prefer-rest-params": 0,
     "no-var": 0,
@@ -59,15 +63,21 @@
       {
         "args": "none"
       }
-    ]
+    ],
+    "import/extensions": ["error", { "ts": "always" }],
+    "@typescript-eslint/no-require-imports": 1
   },
   "overrides": [
     {
-      "files": ["test/cluster/*", "test/unit/*", "test/functional/*"],
+      "files": ["test/cluster/**/*", "test/unit/**/*", "test/functional/**/*"],
       "env": {
         "mocha": true
       },
-      "rules": { "prefer-const": 0 }
+      "rules": {
+        "prefer-const": 0,
+        "import/extensions": 0,
+        "@typescript-eslint/no-require-imports": 0
+      }
     }
   ]
 }

@@ -1,12 +1,12 @@
 "use strict";
 
-import Deque = require("denque");
+import { default as Deque } from "denque";
 import { AbortError } from "redis-errors";
-import Command from "../Command";
-import { MaxRetriesPerRequestError } from "../errors";
-import { CommandItem, Respondable } from "../types";
-import { Debug, noop, CONNECTION_CLOSED_ERROR_MSG } from "../utils";
-import DataHandler from "../DataHandler";
+import { Command } from "../Command.js"; 
+import { MaxRetriesPerRequestError } from "../errors/index.js";
+import { CommandItem, Respondable } from "../types.js";
+import { Debug, noop, CONNECTION_CLOSED_ERROR_MSG } from "../utils/index.js";
+import { DataHandler } from "../DataHandler.js";
 
 const debug = Debug("connection");
 

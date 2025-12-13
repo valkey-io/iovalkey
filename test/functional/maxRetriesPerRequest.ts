@@ -1,5 +1,5 @@
-import Redis from "../../lib/Redis";
 import { expect } from "chai";
+import { Redis } from "../../lib/Redis";
 import { MaxRetriesPerRequestError } from "../../lib/errors";
 
 describe("maxRetriesPerRequest", () => {

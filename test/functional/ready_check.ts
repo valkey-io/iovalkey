@@ -1,6 +1,6 @@
 import Redis from "../../lib/Redis";
 import { noop } from "../../lib/utils";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 
 const stubInfo = (

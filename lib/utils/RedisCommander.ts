@@ -4,7 +4,7 @@
  * this file.
  */
 
-import { Callback } from "../types";
+import { Callback } from "../types.js";
 
 export type RedisKey = string | Buffer;
 export type RedisValue = string | Buffer | number;
@@ -16023,4 +16023,5 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   ): Result<number, Context>;
 }
 
+export { RedisCommander };
 export default RedisCommander;

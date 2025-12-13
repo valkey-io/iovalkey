@@ -1,7 +1,7 @@
-import * as net from "net";
-import * as tls from "tls";
+import net from "net";
+import tls from "tls";
 import { StandaloneConnector } from "../../../lib/connectors";
-import * as sinon from "sinon";
+import sinon from "sinon";
 import { expect } from "chai";
 
 describe("StandaloneConnector", () => {
