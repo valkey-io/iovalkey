@@ -3,7 +3,7 @@
 A robust, performance-focused and full-featured [Valkey](https://valkey.io) client for [Node.js](https://nodejs.org).
 This is a friendly fork of [ioredis](https://github.com/redis/ioredis) after [this commit](https://github.com/redis/ioredis/commit/ec42c82ceab1957db00c5175dfe37348f1856a93).
 
-Supports Valkey >= 2.6.12.
+Supports Redis >= 2.6.12. Supports Valkey >= 7.0.0.
 
 # Features
 
