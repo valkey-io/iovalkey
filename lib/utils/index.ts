@@ -1,4 +1,4 @@
-import { parse as urllibParse } from "url";
+// No url import needed - using URL constructor instead of deprecated url.parse
 import { defaults, noop } from "./lodash";
 import { Callback } from "../types";
 import Debug from "./debug";
@@ -206,43 +206,61 @@ export function parseURL(url: string): Record<string, unknown> {
   if (isInt(url)) {
     return { port: url };
   }
-  let parsed = urllibParse(url, true, true);
 
-  if (!parsed.slashes && url[0] !== "/") {
-    url = "//" + url;
-    parsed = urllibParse(url, true, true);
+  // Handle unix socket paths
+  if (url[0] === "/") {
+    return { path: url };
   }
 
-  const options = parsed.query || {};
+  let urlStr: string = url;
+
+  // If no slashes, prepend //
+  if (!urlStr.includes("//")) {
+    urlStr = "//" + urlStr;
+  }
+
+  const parsed = new URL(urlStr, "redis://127.0.0.1");
 
   const result: any = {};
-  if (parsed.auth) {
-    const index = parsed.auth.indexOf(":");
-    result.username = index === -1 ? parsed.auth : parsed.auth.slice(0, index);
-    result.password = index === -1 ? "" : parsed.auth.slice(index + 1);
+
+  // Extract username and password from auth
+  if (parsed.username) {
+    result.username = decodeURIComponent(parsed.username);
   }
-  if (parsed.pathname) {
+  if (parsed.password || parsed.username) {
+    result.password = parsed.password ? decodeURIComponent(parsed.password) : "";
+  }
+
+  // Extract path - for redis:// URLs, path is database number
+  if (parsed.pathname && parsed.pathname.length > 1) {
     if (parsed.protocol === "redis:" || parsed.protocol === "rediss:") {
-      if (parsed.pathname.length > 1) {
-        result.db = parsed.pathname.slice(1);
-      }
+      result.db = parsed.pathname.slice(1);
     } else {
       result.path = parsed.pathname;
     }
   }
-  if (parsed.host) {
+
+  // Extract host and port
+  if (parsed.hostname && parsed.protocol !== "unix:") {
     result.host = parsed.hostname;
   }
-  if (parsed.port) {
+  if (parsed.port && parsed.port !== "") {
     result.port = parsed.port;
   }
-  if (typeof options.family === "string") {
-    const intFamily = Number.parseInt(options.family, 10);
-    if (!Number.isNaN(intFamily)) {
-      result.family = intFamily;
+
+  // Extract query parameters
+  for (const [key, value] of parsed.searchParams.entries()) {
+    if (key === "family") {
+      const intFamily = Number.parseInt(value, 10);
+      if (!Number.isNaN(intFamily)) {
+        result[key] = intFamily;
+      } else {
+        result[key] = value;
+      }
+    } else {
+      result[key] = value;
     }
   }
-  defaults(result, options);
 
   return result;
 }
