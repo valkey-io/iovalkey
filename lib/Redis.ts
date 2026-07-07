@@ -562,6 +562,24 @@ class Redis extends Commander implements DataHandledable {
     });
   }
 
+  /**
+   * Cancel any pending socket timeout timer.
+   *
+   * The timer is armed against a specific socket, but its callback destroys
+   * whatever `this.stream` points to when it fires. If the socket it was armed
+   * for closes before its `"data"` handler clears the timer (e.g. the
+   * connection drops with no reply in flight), the timer would otherwise
+   * survive the reconnect and destroy the new, healthy stream. Clearing it on
+   * close prevents that spurious disconnect and lets the next command re-arm a
+   * fresh timer on the current socket.
+   */
+  private clearSocketTimeout() {
+    if (this.socketTimeoutTimer !== undefined) {
+      clearTimeout(this.socketTimeoutTimer);
+      this.socketTimeoutTimer = undefined;
+    }
+  }
+
   scanStream(options?: ScanStreamOptions) {
     return this.createScanStream("scan", { options });
   }

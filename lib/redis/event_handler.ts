@@ -157,6 +157,10 @@ function abortTransactionFragments(commandQueue: Deque<CommandItem>) {
 
 export function closeHandler(self) {
   return function () {
+    // Cancel any socket timeout armed on the closing socket so a stale timer
+    // can't destroy the next (healthy) stream after a reconnect.
+    self.clearSocketTimeout();
+
     const prevStatus = self.status;
     self.setStatus("close");
 
