@@ -1,7 +1,21 @@
-import { Command, Cluster, ReplyError } from "../../lib";
+import ValkeyDefault, {
+  Command,
+  Cluster,
+  Redis,
+  ReplyError,
+  Valkey,
+} from "../../lib";
 import { expect } from "chai";
 
 describe("exports", () => {
+  describe(".Valkey", () => {
+    it("should alias the default and Redis exports", () => {
+      expect(Valkey).to.equal(ValkeyDefault);
+      expect(Valkey).to.equal(Redis);
+      expect(Valkey).to.equal(require("../../lib"));
+    });
+  });
+
   describe(".Command", () => {
     it("should be `Command`", () => {
       expect(Command).to.eql(require("../../lib/Command").default);

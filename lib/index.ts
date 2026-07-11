@@ -2,6 +2,7 @@ exports = module.exports = require("./Redis").default;
 
 export { default } from "./Redis";
 export { default as Redis } from "./Redis";
+export { default as Valkey } from "./Redis";
 export { default as Cluster } from "./cluster";
 
 /**
