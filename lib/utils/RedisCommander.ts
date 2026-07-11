@@ -13942,33 +13942,33 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     callback?: Callback<string[]>
   ): Result<string[], Context>;
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     callback?: Callback<Buffer[]>
   ): Result<Buffer[], Context>;
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     withscores: "WITHSCORES",
     callback?: Callback<string[]>
   ): Result<string[], Context>;
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     withscores: "WITHSCORES",
     callback?: Callback<Buffer[]>
   ): Result<Buffer[], Context>;
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     limitToken: "LIMIT",
     offset: number | string,
     count: number | string,
@@ -13977,7 +13977,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     limitToken: "LIMIT",
     offset: number | string,
     count: number | string,
@@ -13986,78 +13986,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    withscores: "WITHSCORES",
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    withscores: "WITHSCORES",
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
-    withscores: "WITHSCORES",
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
-    withscores: "WITHSCORES",
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
+    stop: string | Buffer | number,
     limitToken: "LIMIT",
     offset: number | string,
     count: number | string,
@@ -14067,8 +13996,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    rev: "REV",
+    stop: string | Buffer | number,
     limitToken: "LIMIT",
     offset: number | string,
     count: number | string,
@@ -14078,96 +14006,21 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    withscores: "WITHSCORES",
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    withscores: "WITHSCORES",
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    withscores: "WITHSCORES",
-    callback?: Callback<string[]>
-  ): Result<string[], Context>;
-  zrangeBuffer(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
-    limitToken: "LIMIT",
-    offset: number | string,
-    count: number | string,
-    withscores: "WITHSCORES",
-    callback?: Callback<Buffer[]>
-  ): Result<Buffer[], Context>;
-  zrange(
-    key: RedisKey,
-    start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     callback?: Callback<string[]>
   ): Result<string[], Context>;
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     callback?: Callback<Buffer[]>
   ): Result<Buffer[], Context>;
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     withscores: "WITHSCORES",
     callback?: Callback<string[]>
@@ -14175,8 +14028,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     withscores: "WITHSCORES",
     callback?: Callback<Buffer[]>
@@ -14184,8 +14036,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14195,8 +14046,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14206,8 +14056,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
-    byscore: "BYSCORE",
+    stop: string | Buffer | number,
     rev: "REV",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14218,7 +14067,158 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
+    rev: "REV",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    withscores: "WITHSCORES",
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    withscores: "WITHSCORES",
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    withscores: "WITHSCORES",
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    withscores: "WITHSCORES",
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    withscores: "WITHSCORES",
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    withscores: "WITHSCORES",
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    withscores: "WITHSCORES",
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    callback?: Callback<Buffer[]>
+  ): Result<Buffer[], Context>;
+  zrange(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
+    byscore: "BYSCORE",
+    rev: "REV",
+    limitToken: "LIMIT",
+    offset: number | string,
+    count: number | string,
+    withscores: "WITHSCORES",
+    callback?: Callback<string[]>
+  ): Result<string[], Context>;
+  zrangeBuffer(
+    key: RedisKey,
+    start: string | Buffer | number,
+    stop: string | Buffer | number,
     byscore: "BYSCORE",
     rev: "REV",
     limitToken: "LIMIT",
@@ -14230,21 +14230,21 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     callback?: Callback<string[]>
   ): Result<string[], Context>;
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     callback?: Callback<Buffer[]>
   ): Result<Buffer[], Context>;
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     withscores: "WITHSCORES",
     callback?: Callback<string[]>
@@ -14252,7 +14252,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     withscores: "WITHSCORES",
     callback?: Callback<Buffer[]>
@@ -14260,7 +14260,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14270,7 +14270,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14280,7 +14280,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14291,7 +14291,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     limitToken: "LIMIT",
     offset: number | string,
@@ -14302,7 +14302,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     callback?: Callback<string[]>
@@ -14310,7 +14310,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     callback?: Callback<Buffer[]>
@@ -14318,7 +14318,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     withscores: "WITHSCORES",
@@ -14327,7 +14327,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     withscores: "WITHSCORES",
@@ -14336,7 +14336,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     limitToken: "LIMIT",
@@ -14347,7 +14347,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     limitToken: "LIMIT",
@@ -14358,7 +14358,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrange(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     limitToken: "LIMIT",
@@ -14370,7 +14370,7 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   zrangeBuffer(
     key: RedisKey,
     start: string | Buffer | number,
-    stop: string | Buffer,
+    stop: string | Buffer | number,
     bylex: "BYLEX",
     rev: "REV",
     limitToken: "LIMIT",
