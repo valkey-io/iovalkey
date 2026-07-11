@@ -112,6 +112,32 @@ export default class ConnectionPool extends EventEmitter {
   }
 
   /**
+   * Replace a stale connection to a node with a fresh one.
+   */
+  recreate(redisOptions: RedisOptions, readOnly = false): NodeRecord {
+    const key = getNodeKey(redisOptions);
+    const existing = this.nodeRecords.all[key];
+
+    if (existing) {
+      debug("Recreating connection to %s", key);
+      existing.redis.removeListener("end", existing.endListener);
+      existing.redis.removeListener("error", existing.errorListener);
+      delete this.nodeRecords.all[key];
+      delete this.nodeRecords.master[key];
+      delete this.nodeRecords.slave[key];
+      existing.redis.disconnect();
+    }
+
+    const replacement = this.findOrCreate(redisOptions, readOnly);
+    if (existing) {
+      // Notify listeners only after the replacement is registered, so they
+      // never observe an empty pool during an atomic replacement.
+      this.emit("-node", existing.redis, key);
+    }
+    return replacement;
+  }
+
+  /**
    * Reset the pool with a set of nodes.
    * The old node will be removed.
    */
