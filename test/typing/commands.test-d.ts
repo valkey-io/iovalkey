@@ -59,6 +59,14 @@ expectType<Promise<(string | null)[]>>(redis.mget(["key", "bar"]));
 expectType<Promise<Record<string, string>>>(redis.hgetall("key"));
 expectType<Promise<Record<string, Buffer>>>(redis.hgetallBuffer("key"));
 
+// Hash field expiration
+expectType<Promise<number[]>>(redis.hexpire("key", 60, "FIELDS", 1, "field"));
+expectType<Promise<number[]>>(
+  redis.hpexpire("key", 1000, "NX", "FIELDS", 1, "field")
+);
+expectType<Promise<number[]>>(redis.httl("key", "FIELDS", 1, "field"));
+expectType<Promise<number[]>>(redis.hpersist("key", "FIELDS", 1, "field"));
+
 // LPOP
 expectType<Promise<string | null>>(redis.lpop("key"));
 expectType<Promise<Buffer | null>>(redis.lpopBuffer("key"));
