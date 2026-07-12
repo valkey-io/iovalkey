@@ -4590,6 +4590,566 @@ interface RedisCommander<Context extends ClientContext = { type: "default" }> {
   ): Result<Buffer[], Context>;
 
   /**
+   * Sets the expiration time in seconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpire(
+    ...args: [
+      key: RedisKey,
+      seconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Sets the expiration time in milliseconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpire(
+    ...args: [
+      key: RedisKey,
+      milliseconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Sets the expiration time as a Unix timestamp in seconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeSeconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Sets the expiration time as a Unix timestamp in milliseconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      nx: "NX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      xx: "XX",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      gt: "GT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpireat(
+    ...args: [
+      key: RedisKey,
+      unixTimeMilliseconds: number | string,
+      lt: "LT",
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Returns the remaining TTL in seconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  httl(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  httl(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Returns the remaining TTL in milliseconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hpttl(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpttl(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Removes the expiration time for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hpersist(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpersist(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Returns the expiration time as a Unix timestamp in seconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hexpiretime(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hexpiretime(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
+   * Returns the expiration time as a Unix timestamp in milliseconds for specified fields in a hash key.
+   * - _group_: hash
+   * - _complexity_: O(N) where N is the number of specified fields.
+   * - _since_: 8.0.0
+   */
+  hpexpiretime(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[],
+      callback: Callback<number[]>
+    ]
+  ): Result<number[], Context>;
+  hpexpiretime(
+    ...args: [
+      key: RedisKey,
+      fieldsToken: "FIELDS",
+      numfields: number | string,
+      ...fields: (string | Buffer)[]
+    ]
+  ): Result<number[], Context>;
+
+  /**
    * Increments the integer value of a key by one. Uses 0 as initial value if the key doesn't exist.
    * - _group_: string
    * - _complexity_: O(1)
