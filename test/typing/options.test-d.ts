@@ -1,7 +1,15 @@
 import { expectAssignable, expectType } from "tsd";
-import { Redis, Cluster, NatMap, DNSLookupFunction } from "../../built";
+import ValkeyDefault, {
+  Redis,
+  Valkey,
+  Cluster,
+  NatMap,
+  DNSLookupFunction,
+} from "../../built";
 
 expectType<Redis>(new Redis());
+expectType<Redis>(new Valkey());
+expectType<Redis>(new ValkeyDefault());
 
 // TCP
 expectType<Redis>(new Redis());

@@ -8,7 +8,7 @@
     "built/"
   ],
   "scripts": {
-    "test:tsd": "npm run build && tsd",
+    "test:tsd": "npm run build && node test/exports/commonjs.js && node test/exports/esm.mjs && tsd",
     "test:js": "TS_NODE_TRANSPILE_ONLY=true NODE_ENV=test mocha \"test/helpers/*.ts\" \"test/unit/**/*.ts\" \"test/functional/**/*.ts\"",
     "test:cov": "nyc npm run test:js",
     "test:js:cluster": "TS_NODE_TRANSPILE_ONLY=true NODE_ENV=test mocha \"test/cluster/**/*.ts\"",
