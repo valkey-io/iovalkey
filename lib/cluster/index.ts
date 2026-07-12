@@ -538,6 +538,20 @@ class Cluster extends Commander {
             tryConnection(false, `${mapped.host}:${mapped.port}`);
           },
           tryagain: partialTry,
+          loading: function () {
+            if (to === "master") {
+              reject.call(command, err);
+              return;
+            }
+            // With `all`, prefer the primary rather than retrying a replica
+            // that is resynchronizing. With `slave`, retry replica selection.
+            if (_this.options.scaleReads === "all") {
+              to = "master";
+              tryConnection();
+            } else {
+              partialTry();
+            }
+          },
           clusterDown: partialTry,
           connectionClosed: partialTry,
           maxRedirections: function (redirectionError) {
@@ -696,6 +710,10 @@ class Cluster extends Commander {
       handlers.ask(errv[1], errv[2]);
     } else if (errv[0] === "TRYAGAIN") {
       this.delayQueue.push("tryagain", handlers.tryagain, {
+        timeout: this.options.retryDelayOnTryAgain,
+      });
+    } else if (errv[0] === "LOADING") {
+      this.delayQueue.push("loading", handlers.loading, {
         timeout: this.options.retryDelayOnTryAgain,
       });
     } else if (

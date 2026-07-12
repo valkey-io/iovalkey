@@ -174,6 +174,13 @@ class Pipeline extends Commander<{ type: "pipeline" }> {
             _this.exec();
           },
           tryagain: exec,
+          loading: () => {
+            if (cluster.options.scaleReads === "master") {
+              matched = false;
+            } else {
+              exec();
+            }
+          },
           clusterDown: exec,
           connectionClosed: exec,
           maxRedirections: () => {
