@@ -27,6 +27,7 @@ import ConnectionPool from "./ConnectionPool";
 import DelayQueue from "./DelayQueue";
 import {
   getConnectionName,
+  getNodeKey,
   getUniqueHostnamesFromOptions,
   groupSrvRecords,
   NodeKey,
@@ -488,6 +489,9 @@ class Cluster extends Commander {
     let targetSlot = node ? node.slot : command.getSlot();
     const ttl = {};
     const _this = this;
+    // Track the connection used for the previous attempt so circular MOVED
+    // responses can distinguish a stale connection from a normal redirect.
+    let lastRedis: Redis | null = null;
     if (!node && !REJECT_OVERWRITTEN_COMMANDS.has(command)) {
       REJECT_OVERWRITTEN_COMMANDS.add(command);
 
@@ -505,7 +509,24 @@ class Cluster extends Commander {
             }
             _this._groupsBySlot[slot] =
               _this._groupsIds[_this.slots[slot].join(";")];
-            _this.connectionPool.findOrCreate(_this.natMapper(key));
+            const mapped = _this.natMapper(key);
+            const mappedKey = getNodeKey(mapped);
+            if (
+              lastRedis &&
+              getNodeKey(lastRedis.options as RedisOptions) === mappedKey &&
+              _this.connectionPool.getInstanceByKey(mappedKey) === lastRedis
+            ) {
+              // A redirect back to the connection that returned it can loop
+              // forever when a proxy endpoint changes its backing server.
+              // Reconnect once; concurrent commands will reuse the replacement.
+              debug(
+                "MOVED redirect points back at %s; recreating its connection",
+                mappedKey
+              );
+              _this.connectionPool.recreate(mapped);
+            } else {
+              _this.connectionPool.findOrCreate(mapped);
+            }
             tryConnection();
             debug("refreshing slot caches... (triggered by MOVED error)");
             _this.refreshSlotsCache();
@@ -573,6 +594,14 @@ class Cluster extends Commander {
                   key = nodeKeys[0];
                 }
                 redis = _this.connectionPool.getInstanceByKey(key);
+                if (!redis) {
+                  // The slot map still owns this node, so recreate its lost
+                  // transport instead of falling back to an unrelated node.
+                  redis = _this.connectionPool.findOrCreate(
+                    _this.natMapper(key),
+                    nodeKeys.indexOf(key) > 0
+                  ).redis;
+                }
               }
             }
             if (asking) {
@@ -593,6 +622,7 @@ class Cluster extends Commander {
         }
       }
       if (redis) {
+        lastRedis = redis;
         redis.sendCommand(command, stream);
       } else if (_this.options.enableOfflineQueue) {
         _this.offlineQueue.push({
