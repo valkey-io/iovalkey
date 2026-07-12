@@ -258,6 +258,17 @@ describe("Redis", () => {
           done,
         });
       });
+
+      it("should not change family when familyFallback is not specified", (done) => {
+        // familyFallback is opt-in, so a client that never sets it must keep
+        // the family it was configured with across reconnects.
+        testFamilyFallback({
+          redisOptions: {},
+          expectedFamilySequence: [defaultFamily, defaultFamily, defaultFamily],
+          retryLimit: 3,
+          done,
+        });
+      });
     });
 
     describe("family fallback with alternate: false", () => {

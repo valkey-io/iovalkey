@@ -370,7 +370,9 @@ export function validateFamilyFallbackOptions(self: Redis) {
     options?._initialFamily ?? (self.options.family as 4 | 6);
 
   const fallback: FamilyFallback = {
-    enabled: true,
+    // `familyFallback` is opt-in (documented `@default undefined`). Without it,
+    // a plain client would have its `family` switched on every reconnect.
+    enabled: options !== undefined,
     alternate: false,
     _initialFamily: initialFamily,
     _triedFamilyFour: false,
