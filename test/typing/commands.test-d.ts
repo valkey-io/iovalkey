@@ -84,6 +84,11 @@ expectType<Promise<number[]>>(redis.smismember("key", "e1", "e2"));
 expectType<Promise<number>>(redis.zadd("key", 1, "member"));
 expectType<Promise<number>>(redis.zadd("key", "CH", 1, "member"));
 
+// ZRANGE
+expectType<Promise<string[]>>(redis.zrange("key", 0, 2));
+expectType<Promise<string[]>>(redis.zrange("key", 0, -1, "WITHSCORES"));
+expectType<Promise<Buffer[]>>(redis.zrangeBuffer("key", 0, 2));
+
 // ZRANDMEMBER
 expectType<Promise<string | null>>(redis.zrandmember("key"));
 expectType<Promise<string[]>>(redis.zrandmember("key", 20));

@@ -11,6 +11,7 @@ module.exports = {
       "threshold",
       "start",
       "end",
+      "stop",
       "max",
       "min",
     ].some((pattern) => name.toLowerCase().includes(pattern))
