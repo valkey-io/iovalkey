@@ -11,3 +11,10 @@ coverage
 benchmarks/fixtures/*.txt
 
 *.rdb
+
+# Agent instructions
+AGENTS.md
+
+# AI agent configuration
+.pi
+.claude
