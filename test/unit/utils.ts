@@ -202,6 +202,23 @@ describe("utils", () => {
         host: "127.0.0.1",
         family: "IPv6",
       });
+      expect(utils.parseURL("redis://[::1]:6380/2")).to.eql({
+        host: "::1",
+        port: "6380",
+        db: "2",
+      });
+      expect(
+        utils.parseURL("redis://user%40name:p%40ss%3Aword@localhost")
+      ).to.eql({
+        host: "localhost",
+        username: "user@name",
+        password: "p@ss:word",
+      });
+      expect(utils.parseURL("localhost?password=1%2B1&db=3")).to.eql({
+        host: "localhost",
+        password: "1+1",
+        db: "3",
+      });
     });
   });
 
