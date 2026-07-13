@@ -800,16 +800,18 @@ On ElastiCache instances with Auto-failover enabled, `reconnectOnError` does not
 
 ## Family Fallback
 
-iovalkey supports family fallback, which allows the client to attempt family 4 or 6 if initial connection fails. This is enabled by default. By default alternate is false, which means it will attempt to use the other family (if `options.family = undefined or 4, it will attempt to use 6, and vice versa). If alternate is true, it will alternate between family 4 and 6, possibly leading to a lot of error logs.
+iovalkey enables family fallback by default. When a connection fails, the client tries the other IP family once and then returns to the configured family for later attempts. Since `family` defaults to `4`, the default retry sequence is IPv4, IPv6, then IPv4 for subsequent attempts.
 
 ```js
 const redis = new Redis({
   familyFallback: {
-    enabled: true,
-    alternate: false,
+    enabled: true, // default
+    alternate: false, // default: try the other family once
   },
 });
 ```
+
+Set `familyFallback.enabled` to `false` to disable fallback. Set `alternate` to `true` to switch between IPv4 and IPv6 on every reconnect attempt.
 
 ## Connection Events
 

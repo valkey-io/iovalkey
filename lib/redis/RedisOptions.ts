@@ -209,6 +209,7 @@ export interface CommonRedisOptions extends CommanderOptions {
 
   /**
    * Allows the client to attempt family 4 or 6 if initial connection fails.
+   * When omitted, fallback is enabled with `alternate` set to `false`.
    * @example
    * ```js
    * const redis = new Redis({
@@ -218,7 +219,7 @@ export interface CommonRedisOptions extends CommanderOptions {
    *   },
    * });
    * ```
-   * @default undefined
+   * @default { enabled: true, alternate: false }
    */
   familyFallback?: FamilyFallback;
 }
