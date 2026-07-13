@@ -23,6 +23,7 @@ import applyMixin from "../utils/applyMixin";
 import Commander from "../utils/Commander";
 import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions";
 import ClusterSubscriber from "./ClusterSubscriber";
+import ClusterSubscriberGroup from "./ClusterSubscriberGroup";
 import ConnectionPool from "./ConnectionPool";
 import DelayQueue from "./DelayQueue";
 import {
@@ -42,6 +43,7 @@ import Deque = require("denque");
 const debug = Debug("cluster");
 
 const REJECT_OVERWRITTEN_COMMANDS = new WeakSet<Command>();
+const SHARDED_STATE_COMMANDS = new WeakSet<Command>();
 
 type OfflineQueueItem = {
   command: Command;
@@ -97,6 +99,9 @@ class Cluster extends Commander {
   private delayQueue: DelayQueue = new DelayQueue();
   private offlineQueue = new Deque<OfflineQueueItem>();
   private subscriber: ClusterSubscriber;
+  private shardedSubscribers: ClusterSubscriberGroup;
+  private subscriberGroupEmitter: EventEmitter;
+  private shardedSubscriberRetryTimers: Set<NodeJS.Timeout> = new Set();
   private slotsTimer: NodeJS.Timer;
   private reconnectTimeout: NodeJS.Timer;
   private isRefreshing = false;
@@ -121,6 +126,7 @@ class Cluster extends Commander {
 
     this.startupNodes = startupNodes;
     this.options = defaults({}, options, DEFAULT_CLUSTER_OPTIONS, this.options);
+    this.createShardedSubscriberGroup();
 
     if (
       this.options.redisOptions &&
@@ -294,8 +300,10 @@ class Cluster extends Commander {
       debug("Canceled reconnecting attempts");
     }
     this.clearNodesRefreshInterval();
+    this.clearShardedSubscriberRetryTimers();
 
     this.subscriber.stop();
+    this.shardedSubscribers.stop();
     if (status === "wait") {
       this.setStatus("close");
       this.handleCloseEvent();
@@ -318,8 +326,10 @@ class Cluster extends Commander {
       this.reconnectTimeout = null;
     }
     this.clearNodesRefreshInterval();
+    this.clearShardedSubscriberRetryTimers();
 
     this.subscriber.stop();
+    this.shardedSubscribers.stop();
 
     if (status === "wait") {
       const ret = asCallback(Promise.resolve<"OK">("OK"), callback);
@@ -502,15 +512,15 @@ class Cluster extends Commander {
           moved: function (slot, key) {
             debug("command %s is moved to %s", command.name, key);
             targetSlot = Number(slot);
+            const mapped = _this.natMapper(key);
+            const mappedKey = getNodeKey(mapped);
             if (_this.slots[slot]) {
-              _this.slots[slot][0] = key;
+              _this.slots[slot][0] = mappedKey;
             } else {
-              _this.slots[slot] = [key];
+              _this.slots[slot] = [mappedKey];
             }
             _this._groupsBySlot[slot] =
               _this._groupsIds[_this.slots[slot].join(";")];
-            const mapped = _this.natMapper(key);
-            const mappedKey = getNodeKey(mapped);
             if (
               lastRedis &&
               getNodeKey(lastRedis.options as RedisOptions) === mappedKey &&
@@ -527,6 +537,11 @@ class Cluster extends Commander {
             } else {
               _this.connectionPool.findOrCreate(mapped);
             }
+            _this.shardedSubscribers.updateSlotOwner(
+              Number(slot),
+              mappedKey,
+              mapped
+            );
             tryConnection();
             debug("refreshing slot caches... (triggered by MOVED error)");
             _this.refreshSlotsCache();
@@ -578,7 +593,62 @@ class Cluster extends Commander {
           Command.checkFlag("ENTER_SUBSCRIBER_MODE", command.name) ||
           Command.checkFlag("EXIT_SUBSCRIBER_MODE", command.name)
         ) {
-          redis = _this.subscriber.getInstance();
+          if (
+            command.name === "ssubscribe" ||
+            command.name === "sunsubscribe"
+          ) {
+            if (typeof targetSlot !== "number") {
+              if (
+                command.name === "sunsubscribe" &&
+                command.args.length === 0
+              ) {
+                _this.shardedSubscribers.unsubscribeAll().then(
+                  (count) => command.resolve(count),
+                  (error) => command.reject(error)
+                );
+              } else {
+                command.reject(
+                  new AbortError("A sharded subscription channel is required")
+                );
+              }
+              return;
+            }
+
+            const channels = command.getKeys();
+            if (!_this.shardedSubscribers.validateChannels(channels)) {
+              command.reject(
+                new AbortError(
+                  "CROSSSLOT Keys in request don't hash to the same slot"
+                )
+              );
+              return;
+            }
+
+            const shardedSubscriber =
+              _this.shardedSubscribers.getResponsibleSubscriber(targetSlot);
+            if (!shardedSubscriber) {
+              command.reject(
+                new AbortError(`No sharded subscriber for slot: ${targetSlot}`)
+              );
+              return;
+            }
+
+            if (!SHARDED_STATE_COMMANDS.has(command)) {
+              SHARDED_STATE_COMMANDS.add(command);
+              const resolve = command.resolve;
+              command.resolve = (count) => {
+                const globalCount =
+                  command.name === "ssubscribe"
+                    ? _this.shardedSubscribers.addChannels(channels)
+                    : _this.shardedSubscribers.removeChannels(channels);
+                resolve(globalCount < 0 ? count : globalCount);
+              };
+            }
+            redis = shardedSubscriber.getInstance();
+          } else {
+            redis = _this.subscriber.getInstance();
+          }
+
           if (!redis) {
             command.reject(new AbortError("No subscriber for the cluster"));
             return;
@@ -742,6 +812,13 @@ class Cluster extends Commander {
     this.offlineQueue = new Deque();
   }
 
+  private clearShardedSubscriberRetryTimers() {
+    for (const timer of this.shardedSubscriberRetryTimers) {
+      clearTimeout(timer);
+    }
+    this.shardedSubscriberRetryTimers.clear();
+  }
+
   private clearNodesRefreshInterval() {
     if (this.slotsTimer) {
       clearTimeout(this.slotsTimer);
@@ -836,9 +913,7 @@ class Cluster extends Commander {
 
   private natMapper(nodeKey: NodeKey | RedisOptions): RedisOptions {
     const key =
-      typeof nodeKey === "string"
-        ? nodeKey
-        : `${nodeKey.host}:${nodeKey.port}`;
+      typeof nodeKey === "string" ? nodeKey : `${nodeKey.host}:${nodeKey.port}`;
 
     let mapped = null;
     if (this.options.natMap && typeof this.options.natMap === "function") {
@@ -954,6 +1029,11 @@ class Cluster extends Commander {
         }
 
         this.connectionPool.reset(nodes);
+        this.shardedSubscribers
+          .reset(this.slots, this.connectionPool.getNodes("all"))
+          .catch((err) => {
+            Redis.prototype.silentEmit.call(this, "error", err);
+          });
         callback();
       }, this.options.slotsRefreshTimeout)
     );
@@ -1093,6 +1173,73 @@ class Cluster extends Commander {
       }
       return Object.assign({}, node, { host: config });
     });
+  }
+
+  private createShardedSubscriberGroup() {
+    this.subscriberGroupEmitter = new EventEmitter();
+    this.shardedSubscribers = new ClusterSubscriberGroup(
+      this.subscriberGroupEmitter,
+      this.options
+    );
+
+    const refreshSlotsCacheCallback = (err?: Error) => {
+      if (err instanceof ClusterAllFailedError) {
+        this.disconnect(true);
+      }
+    };
+
+    this.subscriberGroupEmitter.on("-node", (redis, nodeKey) => {
+      this.emit("-node", redis, nodeKey);
+      this.refreshSlotsCache(refreshSlotsCacheCallback);
+    });
+    this.subscriberGroupEmitter.on(
+      "subscriberConnectFailed",
+      ({ delay, error }) => {
+        if (
+          this.status === "disconnecting" ||
+          this.status === "close" ||
+          this.status === "end"
+        ) {
+          return;
+        }
+
+        Redis.prototype.silentEmit.call(this, "error", error);
+        const epoch = this.connectionEpoch;
+        const timer = setTimeout(() => {
+          this.shardedSubscriberRetryTimers.delete(timer);
+          if (
+            epoch !== this.connectionEpoch ||
+            this.status === "disconnecting" ||
+            this.status === "close" ||
+            this.status === "end"
+          ) {
+            return;
+          }
+          this.refreshSlotsCache(refreshSlotsCacheCallback);
+        }, delay);
+        this.shardedSubscriberRetryTimers.add(timer);
+      }
+    );
+    this.subscriberGroupEmitter.on("moved", () => {
+      this.refreshSlotsCache(refreshSlotsCacheCallback);
+    });
+    this.subscriberGroupEmitter.on("-subscriber", () => {
+      this.emit("-subscriber");
+    });
+    this.subscriberGroupEmitter.on("+subscriber", () => {
+      this.emit("+subscriber");
+    });
+    this.subscriberGroupEmitter.on("nodeError", (error, nodeKey) => {
+      this.emit("node error", error, nodeKey);
+    });
+    this.subscriberGroupEmitter.on("subscribersReady", () => {
+      this.emit("subscribersReady");
+    });
+    for (const event of ["smessage", "smessageBuffer"]) {
+      this.subscriberGroupEmitter.on(event, (...args) => {
+        this.emit(event, ...args);
+      });
+    }
   }
 
   private createScanStream(

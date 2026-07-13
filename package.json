@@ -12,6 +12,8 @@
     "test:js": "TS_NODE_TRANSPILE_ONLY=true NODE_ENV=test mocha \"test/helpers/*.ts\" \"test/unit/**/*.ts\" \"test/functional/**/*.ts\"",
     "test:cov": "nyc npm run test:js",
     "test:js:cluster": "TS_NODE_TRANSPILE_ONLY=true NODE_ENV=test mocha \"test/cluster/**/*.ts\"",
+    "test:js:valkey-cluster": "TS_NODE_TRANSPILE_ONLY=true NODE_ENV=test mocha \"test/cluster/sharded-pubsub.ts\"",
+    "test:integration:valkey-cluster": "bash test/cluster/docker-valkey/main.sh",
     "test": "npm run test:js && npm run test:tsd",
     "lint": "eslint --ext .js,.ts ./lib",
     "docs": "npx typedoc --logLevel Error --excludeExternals --excludeProtected --excludePrivate --readme none lib/index.ts",

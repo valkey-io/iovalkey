@@ -44,6 +44,22 @@ jobs:
       - name: Build and test cluster
         run: bash test/cluster/docker/main.sh
 
+  test-valkey-cluster:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - run: npm ci
+      - name: Test sharded Pub/Sub against Valkey Cluster
+        run: npm run test:integration:valkey-cluster
+
   test-valkey:
     runs-on: ubuntu-latest
     strategy:
