@@ -743,7 +743,7 @@ class Redis extends Commander implements DataHandledable {
         defaults(options, arg);
       } else if (typeof arg === "string") {
         defaults(options, parseURL(arg));
-        if (arg.startsWith("rediss://")) {
+        if (/^(?:rediss|valkeys):\/\//i.test(arg)) {
           isTls = true;
         }
       } else if (typeof arg === "number") {

@@ -198,8 +198,15 @@ export function optimizeErrorStack(
   return error;
 }
 
+const DATABASE_URL_PROTOCOLS = new Set([
+  "redis:",
+  "rediss:",
+  "valkey:",
+  "valkeys:",
+]);
+
 /**
- * Parse the redis protocol url
+ * Parse a Redis or Valkey protocol URL.
  */
 export function parseURL(url: string): Record<string, unknown> {
   if (isInt(url)) {
@@ -219,7 +226,7 @@ export function parseURL(url: string): Record<string, unknown> {
   }
 
   if (parsed.pathname.length > 1) {
-    if (parsed.protocol === "redis:" || parsed.protocol === "rediss:") {
+    if (DATABASE_URL_PROTOCOLS.has(parsed.protocol)) {
       result.db = parsed.pathname.slice(1);
     } else {
       result.path = parsed.pathname;

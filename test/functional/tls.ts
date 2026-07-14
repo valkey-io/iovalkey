@@ -36,6 +36,37 @@ describe("tls option", () => {
         redis.on("end", () => done());
       });
     });
+
+    it("supports valkeys:// URLs", async () => {
+      // @ts-expect-error
+      const stub = sinon.stub(tls, "connect").callsFake((op) => {
+        // @ts-expect-error
+        expect(op.host).to.eql("localhost");
+        // @ts-expect-error
+        expect(op.port).to.eql(6379);
+        const stream = net.createConnection(op);
+        stream.on("connect", (data) => {
+          stream.emit("secureConnect", data);
+        });
+        return stream;
+      });
+
+      const redis = new Redis("valkeys://localhost:6379/4");
+      try {
+        await new Promise<void>((resolve, reject) => {
+          redis.once("ready", resolve);
+          redis.once("error", reject);
+        });
+        expect(redis.options.db).to.eql(4);
+      } finally {
+        const ended = new Promise<void>((resolve) =>
+          redis.once("end", resolve)
+        );
+        redis.disconnect();
+        await ended;
+        stub.restore();
+      }
+    });
   });
 
   describe("Sentinel", () => {

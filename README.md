@@ -123,14 +123,14 @@ new Valkey({
 });
 ```
 
-You can also specify connection options as a [`redis://` URL](http://www.iana.org/assignments/uri-schemes/prov/redis) or [`rediss://` URL](https://www.iana.org/assignments/uri-schemes/prov/rediss) when using [TLS encryption](#tls-options):
+You can also specify connection options with a `valkey://` URL, or use `valkeys://` when connecting with [TLS encryption](#tls-options). The compatible `redis://` and `rediss://` schemes remain supported.
 
 ```javascript
 // Connect to 127.0.0.1:6380, db 4, using password "authpassword":
-new Valkey("redis://:authpassword@127.0.0.1:6380/4");
+new Valkey("valkey://:authpassword@127.0.0.1:6380/4");
 
 // Username can also be passed via URI.
-new Valkey("redis://username:authpassword@127.0.0.1:6380/4");
+new Valkey("valkey://username:authpassword@127.0.0.1:6380/4");
 ```
 
 See [API Documentation](https://redis.github.io/iovalkey/index.html#RedisOptions) for all available options.
@@ -861,10 +861,10 @@ const valkey = new Valkey({
 });
 ```
 
-Alternatively, specify the connection through a [`rediss://` URL](https://www.iana.org/assignments/uri-schemes/prov/rediss).
+Alternatively, use a `valkeys://` URL. The compatible `rediss://` scheme is also supported.
 
 ```js
-const valkey = new Valkey("rediss://valkey.my-service.com");
+const valkey = new Valkey("valkeys://valkey.my-service.com");
 ```
 
 If you do not want to use a connection string, you can also specify an empty `tls: {}` object:

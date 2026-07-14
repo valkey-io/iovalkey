@@ -98,6 +98,27 @@ describe("Redis", () => {
         });
         expect(option.tls).to.deep.equal({ hostname: "example.test" });
 
+        option = getOption("valkey://:authpassword@127.0.0.1:6380/4");
+        expect(option).to.include({
+          host: "127.0.0.1",
+          port: 6380,
+          password: "authpassword",
+          db: 4,
+        });
+
+        option = getOption("valkeys://example.test:6380/4");
+        expect(option).to.include({
+          host: "example.test",
+          port: 6380,
+          db: 4,
+          tls: true,
+        });
+
+        option = getOption("valkeys://example.test", {
+          tls: { hostname: "example.test" },
+        });
+        expect(option.tls).to.deep.equal({ hostname: "example.test" });
+
         option = getOption("redis://localhost?family=6");
         expect(option).to.have.property("family", 6);
       } catch (err) {
