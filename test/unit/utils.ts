@@ -194,6 +194,24 @@ describe("utils", () => {
         password: "pass",
         key: "value",
       });
+      expect(
+        utils.parseURL("valkey://user:pass@127.0.0.1:6380/4?key=value")
+      ).to.eql({
+        host: "127.0.0.1",
+        port: "6380",
+        db: "4",
+        username: "user",
+        password: "pass",
+        key: "value",
+      });
+      expect(utils.parseURL("valkeys://[::1]:6380/2")).to.eql({
+        host: "::1",
+        port: "6380",
+        db: "2",
+      });
+      expect(utils.parseURL("valkey://127.0.0.1/")).to.eql({
+        host: "127.0.0.1",
+      });
       expect(utils.parseURL("redis://127.0.0.1/?family=6")).to.eql({
         host: "127.0.0.1",
         family: 6,
