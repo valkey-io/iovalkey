@@ -108,4 +108,65 @@ describe("cluster:LOADING", () => {
       done();
     });
   });
+
+  it("retries AZAffinity reads without treating the strategy as a pool role", (done) => {
+    let replicaReads = 0;
+    new MockServer(30001, (argv) => {
+      const command = argv[0];
+      if (command === "cluster" && argv[1] === "SLOTS") {
+        return slotTable;
+      }
+      if (command === "hello") {
+        return [
+          "server",
+          "valkey",
+          "version",
+          "8.1.0",
+          "proto",
+          2,
+          "role",
+          "master",
+          "availability_zone",
+          "zone-b",
+        ];
+      }
+      return "master";
+    });
+    new MockServer(30002, (argv) => {
+      const command = argv[0];
+      if (command === "hello") {
+        return [
+          "server",
+          "valkey",
+          "version",
+          "8.1.0",
+          "proto",
+          2,
+          "role",
+          "slave",
+          "availability_zone",
+          "zone-a",
+        ];
+      }
+      if (command === "get") {
+        if (replicaReads++ === 0) {
+          return new Error("LOADING Redis is loading the dataset in memory");
+        }
+        return "replica";
+      }
+    });
+
+    const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+      scaleReads: "AZAffinity",
+      clientAz: "zone-a",
+      retryDelayOnTryAgain: 1,
+    });
+    cluster.get("foo", (err, result) => {
+      expect(err).to.eql(null);
+      expect(result).to.eql("replica");
+      expect(replicaReads).to.eql(2);
+      cluster.disconnect();
+      done();
+    });
+  });
 });

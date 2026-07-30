@@ -11,7 +11,23 @@ type NodeRecord = {
   redis: Redis;
   endListener: () => void;
   errorListener: (error: unknown) => void;
+  availabilityZone?: string | null;
+  availabilityZonePromise?: Promise<void>;
 };
+
+function parseAvailabilityZone(reply: unknown): string | null {
+  if (!Array.isArray(reply)) {
+    return null;
+  }
+
+  for (let i = 0; i + 1 < reply.length; i += 2) {
+    if (reply[i] === "availability_zone") {
+      return typeof reply[i + 1] === "string" ? reply[i + 1] : null;
+    }
+  }
+
+  return null;
+}
 
 export default class ConnectionPool extends EventEmitter {
   // master + slave = all
@@ -40,6 +56,45 @@ export default class ConnectionPool extends EventEmitter {
     const keys = Object.keys(this.nodeRecords[role]);
     const sampleKey = sample(keys);
     return this.nodeRecords[role][sampleKey]?.redis;
+  }
+
+  getAvailabilityZone(redis: Redis): string | null | undefined {
+    const key = getNodeKey(redis.options as RedisOptions);
+    return this.nodeRecords.all[key]?.availabilityZone;
+  }
+
+  areAvailabilityZonesReady(nodeKeys: NodeKey[]): boolean {
+    return nodeKeys.every((key) => {
+      const record = this.nodeRecords.all[key];
+      return Boolean(record) && record.availabilityZone !== undefined;
+    });
+  }
+
+  ensureAvailabilityZones(nodeKeys: NodeKey[]): Promise<void> {
+    const uniqueKeys = Array.from(new Set(nodeKeys));
+    return Promise.all(
+      uniqueKeys.map((key) => {
+        const record = this.nodeRecords.all[key];
+        if (!record) {
+          return Promise.reject(
+            new Error(`Node ${key} is not in the connection pool`)
+          );
+        }
+        return this.ensureAvailabilityZone(key, record);
+      })
+    ).then(() => undefined);
+  }
+
+  prepareAvailabilityZones(nodes: RedisOptions[]): Promise<void> {
+    const nodeKeys = nodes.map((node) => {
+      const key = getNodeKey(node);
+      if (!this.nodeRecords.all[key]) {
+        this.findOrCreate(node, node.readOnly);
+      }
+      return key;
+    });
+
+    return this.ensureAvailabilityZones(nodeKeys);
   }
 
   /**
@@ -186,5 +241,38 @@ export default class ConnectionPool extends EventEmitter {
         this.emit("drain");
       }
     }
+  }
+
+  private ensureAvailabilityZone(
+    key: NodeKey,
+    record: NodeRecord
+  ): Promise<void> {
+    if (record.availabilityZone !== undefined) {
+      return Promise.resolve();
+    }
+    if (record.availabilityZonePromise) {
+      return record.availabilityZonePromise;
+    }
+
+    record.availabilityZonePromise = record.redis
+      .call("hello", "2")
+      .then((reply) => {
+        record.availabilityZone = parseAvailabilityZone(reply);
+        debug(
+          "HELLO availability_zone for %s -> %s",
+          key,
+          record.availabilityZone ?? "unknown"
+        );
+      })
+      .catch((error: Error) => {
+        record.availabilityZone = null;
+        debug(
+          "Cannot fetch HELLO availability_zone for %s: %s",
+          key,
+          error.message
+        );
+      });
+
+    return record.availabilityZonePromise;
   }
 }

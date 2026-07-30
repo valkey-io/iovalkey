@@ -42,6 +42,43 @@ describe("cluster", () => {
     }).to.throw(/Invalid option scaleReads/);
   });
 
+  it("requires clientAz when scaleReads is AZAffinity", () => {
+    expect(() => new Cluster([{}], { scaleReads: "AZAffinity" })).to.throw(
+      /Option "clientAz" is required/
+    );
+  });
+
+  it("requires clientAz when scaleReads is AZAffinityReplicasAndPrimary", () => {
+    expect(
+      () =>
+        new Cluster([{}], {
+          scaleReads: "AZAffinityReplicasAndPrimary",
+        })
+    ).to.throw(/Option "clientAz" is required/);
+  });
+
+  it("accepts clientAz when scaleReads is AZAffinity", () => {
+    const cluster = new Cluster([{}], {
+      scaleReads: "AZAffinity",
+      clientAz: "zone-a",
+    });
+    expect(cluster.options).to.include({
+      scaleReads: "AZAffinity",
+      clientAz: "zone-a",
+    });
+  });
+
+  it("accepts clientAz when scaleReads is AZAffinityReplicasAndPrimary", () => {
+    const cluster = new Cluster([{}], {
+      scaleReads: "AZAffinityReplicasAndPrimary",
+      clientAz: "zone-a",
+    });
+    expect(cluster.options).to.include({
+      scaleReads: "AZAffinityReplicasAndPrimary",
+      clientAz: "zone-a",
+    });
+  });
+
   it("disables slotsRefreshTimeout by default", () => {
     const cluster = new Cluster([{}]);
     expect(cluster.options.slotsRefreshInterval).to.eql(undefined);

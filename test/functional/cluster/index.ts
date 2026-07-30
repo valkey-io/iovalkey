@@ -298,6 +298,476 @@ describe("cluster", () => {
     });
   });
 
+  describe("AZ affinity scaleReads", () => {
+    describe("routing", () => {
+      const nodePorts = [30001, 30003, 30004];
+      let slotTable;
+      let zones;
+      let helloCalls: any[][];
+
+      beforeEach(() => {
+        slotTable = [
+          [0, 16383, ...nodePorts.map((port) => ["127.0.0.1", port])],
+        ];
+        zones = {
+          30001: "zone-b",
+          30003: "zone-a",
+          30004: "zone-b",
+        };
+        helloCalls = [];
+
+        nodePorts.forEach((port, index) => {
+          new MockServer(port, (argv) => {
+            const command = argv[0];
+            if (command === "cluster" && argv[1] === "SLOTS") {
+              return slotTable;
+            }
+            if (command === "hello") {
+              helloCalls.push(argv);
+              return [
+                "server",
+                "valkey",
+                "version",
+                "8.1.0",
+                "proto",
+                2,
+                "id",
+                port,
+                "mode",
+                "cluster",
+                "role",
+                index === 0 ? "master" : "slave",
+                "modules",
+                [],
+                "availability_zone",
+                zones[port],
+              ];
+            }
+            return port;
+          });
+        });
+      });
+
+      context("AZAffinity", () => {
+        it("uses HELLO 2 and routes reads to a local replica", (done) => {
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinity",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30003);
+              expect(helloCalls).to.have.lengthOf(3);
+              helloCalls.forEach((argv) => expect(argv[1]).to.eql("2"));
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+
+        it("falls back to a remote replica", (done) => {
+          slotTable = [[0, 16383, ["127.0.0.1", 30001], ["127.0.0.1", 30003]]];
+          zones[30001] = "zone-a";
+          zones[30003] = "zone-b";
+
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinity",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30003);
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+
+        it("falls back to the primary without replicas", (done) => {
+          slotTable = [[0, 16383, ["127.0.0.1", 30001]]];
+
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinity",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30001);
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+      });
+
+      context("AZAffinityReplicasAndPrimary", () => {
+        it("prefers a local replica", (done) => {
+          slotTable = [[0, 16383, ["127.0.0.1", 30001], ["127.0.0.1", 30003]]];
+          zones[30001] = "zone-a";
+
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinityReplicasAndPrimary",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30003);
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+
+        it("prefers a local primary", (done) => {
+          slotTable = [[0, 16383, ["127.0.0.1", 30001], ["127.0.0.1", 30003]]];
+          zones[30001] = "zone-a";
+          zones[30003] = "zone-b";
+
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinityReplicasAndPrimary",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30001);
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+
+        it("falls back to a remote replica", (done) => {
+          slotTable = [[0, 16383, ["127.0.0.1", 30001], ["127.0.0.1", 30003]]];
+          zones[30001] = "zone-b";
+          zones[30003] = "zone-b";
+
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinityReplicasAndPrimary",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30003);
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+
+        it("falls back to a remote primary without replicas", (done) => {
+          slotTable = [[0, 16383, ["127.0.0.1", 30001]]];
+          zones[30001] = "zone-b";
+
+          const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+            scaleReads: "AZAffinityReplicasAndPrimary",
+            clientAz: "zone-a",
+          });
+          cluster.on("ready", () => {
+            cluster.get("foo", (err, result) => {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30001);
+              cluster.disconnect();
+              done();
+            });
+          });
+        });
+      });
+
+      it("samples only matching local replicas", (done) => {
+        zones[30004] = "zone-a";
+
+        const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+          scaleReads: "AZAffinity",
+          clientAz: "zone-a",
+        });
+        cluster.on("ready", () => {
+          const stub = sinon
+            .stub(utils, "sample")
+            .callsFake((nodes: Redis[]) => {
+              expect(nodes.map((node) => node.options.port)).to.eql([
+                30003, 30004,
+              ]);
+              return nodes[1];
+            });
+          cluster.get("foo", (err, result) => {
+            try {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30004);
+              expect(stub.callCount).to.eql(1);
+              stub.restore();
+              cluster.disconnect();
+              done();
+            } catch (error) {
+              stub.restore();
+              cluster.disconnect();
+              done(error);
+            }
+          });
+        });
+      });
+
+      it("keeps writes on the primary", (done) => {
+        const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+          scaleReads: "AZAffinity",
+          clientAz: "zone-a",
+        });
+        cluster.on("ready", () => {
+          cluster.set("foo", "bar", (err, result) => {
+            try {
+              expect(err).to.eql(null);
+              expect(result).to.eql(30001);
+              cluster.disconnect();
+              done();
+            } catch (error) {
+              cluster.disconnect();
+              done(error);
+            }
+          });
+        });
+      });
+    });
+
+    it("treats a missing availability_zone as a non-local fallback", (done) => {
+      new MockServer(30001, (argv) => {
+        const command = argv[0];
+        if (command === "cluster" && argv[1] === "SLOTS") {
+          return [[0, 16383, ["127.0.0.1", 30001], ["127.0.0.1", 30004]]];
+        }
+        if (command === "hello") {
+          return [
+            "server",
+            "valkey",
+            "version",
+            "8.1.0",
+            "proto",
+            2,
+            "role",
+            "master",
+            "availability_zone",
+            "zone-a",
+          ];
+        }
+        return 30001;
+      });
+      new MockServer(30004, (argv) => {
+        const command = argv[0];
+        if (command === "hello") {
+          // Simulate a server whose HELLO reply omits the field entirely
+          // (e.g. a server that predates availability-zone support).
+          return [
+            "server",
+            "valkey",
+            "version",
+            "7.2.0",
+            "proto",
+            2,
+            "role",
+            "slave",
+          ];
+        }
+        return 30004;
+      });
+
+      const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+        scaleReads: "AZAffinityReplicasAndPrimary",
+        clientAz: "zone-a",
+      });
+      cluster.on("ready", () => {
+        cluster.get("foo", (err, result) => {
+          try {
+            expect(err).to.eql(null);
+            expect(result).to.eql(30001);
+            cluster.disconnect();
+            done();
+          } catch (error) {
+            cluster.disconnect();
+            done(error);
+          }
+        });
+      });
+    });
+
+    it("waits for all candidate metadata before becoming ready", (done) => {
+      const nodes = [
+        { port: 30001, zone: "zone-b" },
+        { port: 30003, zone: "zone-a" },
+        { port: 30004, zone: "zone-b" },
+      ];
+      const slotTable = [
+        [0, 16383, ...nodes.map((node) => ["127.0.0.1", node.port])],
+      ];
+      const pendingReplies: Array<{
+        server: MockServer;
+        socket: any;
+        reply: unknown;
+      }> = [];
+      let ready = false;
+
+      nodes.forEach((node, index) => {
+        let server: MockServer;
+        server = new MockServer(node.port, (argv, socket, flags) => {
+          const command = argv[0];
+          if (command === "cluster" && argv[1] === "SLOTS") {
+            return slotTable;
+          }
+          if (command === "hello") {
+            flags.hang = true;
+            pendingReplies.push({
+              server,
+              socket,
+              reply: [
+                "server",
+                "valkey",
+                "version",
+                "8.1.0",
+                "proto",
+                2,
+                "role",
+                index === 0 ? "master" : "slave",
+                "availability_zone",
+                node.zone,
+              ],
+            });
+            if (pendingReplies.length === nodes.length) {
+              setImmediate(() => {
+                try {
+                  expect(ready).to.eql(false);
+                  pendingReplies.forEach((pending) =>
+                    pending.server.write(pending.socket, pending.reply)
+                  );
+                } catch (error) {
+                  done(error);
+                }
+              });
+            }
+            return;
+          }
+          return node.port;
+        });
+      });
+
+      const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+        scaleReads: "AZAffinity",
+        clientAz: "zone-a",
+      });
+      cluster.once("ready", () => {
+        ready = true;
+        cluster.disconnect();
+        done();
+      });
+    });
+
+    it("keeps the previous topology active while new node metadata is pending", (done) => {
+      let slotTable = [[0, 16383, ["127.0.0.1", 30001], ["127.0.0.1", 30003]]];
+      const nodes = [
+        { port: 30001, zone: "zone-a" },
+        { port: 30003, zone: "zone-b" },
+      ];
+
+      nodes.forEach((node, index) => {
+        new MockServer(node.port, (argv) => {
+          const command = argv[0];
+          if (command === "cluster" && argv[1] === "SLOTS") {
+            return slotTable;
+          }
+          if (command === "hello") {
+            return [
+              "server",
+              "valkey",
+              "version",
+              "8.1.0",
+              "proto",
+              2,
+              "role",
+              index === 0 ? "master" : "slave",
+              "availability_zone",
+              node.zone,
+            ];
+          }
+          return node.port;
+        });
+      });
+
+      let newNode: MockServer;
+      let metadataRequested = false;
+      newNode = new MockServer(30004, (argv, socket, flags) => {
+        const command = argv[0];
+        if (command === "cluster" && argv[1] === "SLOTS") {
+          return slotTable;
+        }
+        if (command === "hello") {
+          metadataRequested = true;
+          flags.hang = true;
+          setImmediate(() => {
+            try {
+              cluster.get("foo", (err, result) => {
+                try {
+                  expect(err).to.eql(null);
+                  expect(result).to.eql(30003);
+                  newNode.write(socket, [
+                    "server",
+                    "valkey",
+                    "version",
+                    "8.1.0",
+                    "proto",
+                    2,
+                    "role",
+                    "slave",
+                    "availability_zone",
+                    "zone-a",
+                  ]);
+                } catch (error) {
+                  done(error);
+                }
+              });
+            } catch (error) {
+              done(error);
+            }
+          });
+          return;
+        }
+        return 30004;
+      });
+
+      const cluster = new Cluster([{ host: "127.0.0.1", port: 30001 }], {
+        scaleReads: "AZAffinity",
+        clientAz: "zone-a",
+      });
+      cluster.once("ready", () => {
+        slotTable = [
+          [
+            0,
+            16383,
+            ["127.0.0.1", 30001],
+            ["127.0.0.1", 30003],
+            ["127.0.0.1", 30004],
+          ],
+        ];
+        cluster.once("refresh", () => {
+          cluster.get("foo", (err, result) => {
+            try {
+              expect(metadataRequested).to.eql(true);
+              expect(err).to.eql(null);
+              expect(result).to.eql(30004);
+              cluster.disconnect();
+              done();
+            } catch (error) {
+              cluster.disconnect();
+              done(error);
+            }
+          });
+        });
+        cluster.refreshSlotsCache();
+      });
+    });
+  });
+
   describe("#nodes()", () => {
     it("should return the current nodes", (done) => {
       const slotTable = [

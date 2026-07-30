@@ -3,6 +3,8 @@ import { RedisOptions } from "../redis/RedisOptions";
 import { CommanderOptions } from "../utils/Commander";
 import { NodeRole } from "./util";
 
+export type AzAffinityStrategy = "AZAffinity" | "AZAffinityReplicasAndPrimary";
+
 export type DNSResolveSrvFunction = (
   hostname: string,
   callback: (
@@ -59,7 +61,15 @@ export interface ClusterOptions extends CommanderOptions {
    *
    * @default "master"
    */
-  scaleReads?: NodeRole | Function;
+  scaleReads?: NodeRole | AzAffinityStrategy | Function;
+
+  /**
+   * Availability zone where the client is running. Required when `scaleReads`
+   * is set to an AZ affinity strategy.
+   *
+   * @example "us-east-1a"
+   */
+  clientAz?: string;
 
   /**
    * When a MOVED or ASK error is received, client will redirect the

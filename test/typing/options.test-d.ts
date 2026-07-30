@@ -47,6 +47,18 @@ expectType<Cluster>(
     enableAutoPipelining: true,
   })
 );
+expectType<Cluster>(
+  new Redis.Cluster([30001, 30002], {
+    scaleReads: "AZAffinity",
+    clientAz: "us-east-1a",
+  })
+);
+expectType<Cluster>(
+  new Redis.Cluster([30001, 30002], {
+    scaleReads: "AZAffinityReplicasAndPrimary",
+    clientAz: "us-east-1a",
+  })
+);
 
 expectAssignable<NatMap>({
   "10.0.1.230:30001": { host: "203.0.113.73", port: 30001 },

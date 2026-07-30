@@ -21,7 +21,11 @@ import {
 } from "../utils";
 import applyMixin from "../utils/applyMixin";
 import Commander from "../utils/Commander";
-import { ClusterOptions, DEFAULT_CLUSTER_OPTIONS } from "./ClusterOptions";
+import {
+  AzAffinityStrategy,
+  ClusterOptions,
+  DEFAULT_CLUSTER_OPTIONS,
+} from "./ClusterOptions";
 import ClusterSubscriber from "./ClusterSubscriber";
 import ConnectionPool from "./ConnectionPool";
 import DelayQueue from "./DelayQueue";
@@ -42,6 +46,14 @@ import Deque = require("denque");
 const debug = Debug("cluster");
 
 const REJECT_OVERWRITTEN_COMMANDS = new WeakSet<Command>();
+
+function isAzAffinityStrategy(
+  strategy: ClusterOptions["scaleReads"]
+): strategy is AzAffinityStrategy {
+  return (
+    strategy === "AZAffinity" || strategy === "AZAffinityReplicasAndPrimary"
+  );
+}
 
 type OfflineQueueItem = {
   command: Command;
@@ -133,12 +145,27 @@ class Cluster extends Commander {
     // validate options
     if (
       typeof this.options.scaleReads !== "function" &&
-      ["all", "master", "slave"].indexOf(this.options.scaleReads) === -1
+      [
+        "all",
+        "master",
+        "slave",
+        "AZAffinity",
+        "AZAffinityReplicasAndPrimary",
+      ].indexOf(this.options.scaleReads as string) === -1
     ) {
       throw new Error(
         'Invalid option scaleReads "' +
           this.options.scaleReads +
-          '". Expected "all", "master", "slave" or a custom function'
+          '". Expected "all", "master", "slave", "AZAffinity", "AZAffinityReplicasAndPrimary" or a custom function'
+      );
+    }
+
+    if (
+      isAzAffinityStrategy(this.options.scaleReads) &&
+      !this.options.clientAz
+    ) {
+      throw new Error(
+        `Option "clientAz" is required when scaleReads is "${this.options.scaleReads}"`
       );
     }
 
@@ -584,10 +611,36 @@ class Cluster extends Commander {
             return;
           }
         } else {
-          if (!random) {
+          if (!random || isAzAffinityStrategy(to)) {
             if (typeof targetSlot === "number" && _this.slots[targetSlot]) {
               const nodeKeys = _this.slots[targetSlot];
-              if (typeof to === "function") {
+              if (isAzAffinityStrategy(to) && !asking) {
+                const nodes = nodeKeys.map(
+                  (key, index) =>
+                    _this.connectionPool.getInstanceByKey(key) ||
+                    _this.connectionPool.findOrCreate(
+                      _this.natMapper(key),
+                      index > 0
+                    ).redis
+                );
+                const availabilityZoneNodeKeys = nodes.map((node) =>
+                  getNodeKey(node.options as RedisOptions)
+                );
+                if (
+                  !_this.connectionPool.areAvailabilityZonesReady(
+                    availabilityZoneNodeKeys
+                  )
+                ) {
+                  _this.connectionPool
+                    .ensureAvailabilityZones(availabilityZoneNodeKeys)
+                    .then(
+                      () => tryConnection(random, asking),
+                      (error) => command.reject(error)
+                    );
+                  return;
+                }
+                redis = _this.selectNodeByAz(nodes, nodes[0]);
+              } else if (typeof to === "function") {
                 const nodes = nodeKeys.map(function (key) {
                   return _this.connectionPool.getInstanceByKey(key);
                 });
@@ -624,11 +677,28 @@ class Cluster extends Commander {
             }
           }
           if (!redis) {
-            redis =
-              (typeof to === "function"
-                ? null
-                : _this.connectionPool.getSampleInstance(to)) ||
-              _this.connectionPool.getSampleInstance("all");
+            if (isAzAffinityStrategy(to)) {
+              const nodes = _this.connectionPool.getNodes();
+              const nodeKeys = nodes.map((node) =>
+                getNodeKey(node.options as RedisOptions)
+              );
+              if (!_this.connectionPool.areAvailabilityZonesReady(nodeKeys)) {
+                _this.connectionPool
+                  .ensureAvailabilityZones(nodeKeys)
+                  .then(
+                    () => tryConnection(random, asking),
+                    (error) => command.reject(error)
+                  );
+                return;
+              }
+              redis = _this.selectNodeByAz(nodes);
+            } else {
+              redis =
+                (typeof to === "function"
+                  ? null
+                  : _this.connectionPool.getSampleInstance(to)) ||
+                _this.connectionPool.getSampleInstance("all");
+            }
           }
         }
         if (node && !node.redis) {
@@ -900,6 +970,11 @@ class Cluster extends Commander {
           return;
         }
         const nodes: RedisOptions[] = [];
+        const slotRanges: Array<{
+          start: number;
+          end: number;
+          keys: NodeKey[];
+        }> = [];
 
         debug("cluster slots result count: %d", result.length);
 
@@ -930,32 +1005,93 @@ class Cluster extends Commander {
             keys
           );
 
-          for (let slot = slotRangeStart; slot <= slotRangeEnd; slot++) {
-            this.slots[slot] = keys;
-          }
+          slotRanges.push({ start: slotRangeStart, end: slotRangeEnd, keys });
         }
 
-        // Assign to each node keys a numeric value to make autopipeline comparison faster.
-        this._groupsIds = Object.create(null);
-        let j = 0;
-        for (let i = 0; i < 16384; i++) {
-          const target = (this.slots[i] || []).join(";");
-
-          if (!target.length) {
-            this._groupsBySlot[i] = undefined;
-            continue;
+        const finalizeTopology = () => {
+          if (
+            this.status === "disconnecting" ||
+            this.status === "close" ||
+            this.status === "end"
+          ) {
+            callback();
+            return;
           }
 
-          if (!this._groupsIds[target]) {
-            this._groupsIds[target] = ++j;
+          for (const range of slotRanges) {
+            for (let slot = range.start; slot <= range.end; slot++) {
+              this.slots[slot] = range.keys;
+            }
           }
 
-          this._groupsBySlot[i] = this._groupsIds[target];
+          // Assign to each node keys a numeric value to make autopipeline comparison faster.
+          this._groupsIds = Object.create(null);
+          let j = 0;
+          for (let i = 0; i < 16384; i++) {
+            const target = (this.slots[i] || []).join(";");
+
+            if (!target.length) {
+              this._groupsBySlot[i] = undefined;
+              continue;
+            }
+
+            if (!this._groupsIds[target]) {
+              this._groupsIds[target] = ++j;
+            }
+
+            this._groupsBySlot[i] = this._groupsIds[target];
+          }
+
+          this.connectionPool.reset(nodes);
+          callback();
+        };
+
+        if (isAzAffinityStrategy(this.options.scaleReads)) {
+          this.connectionPool
+            .prepareAvailabilityZones(nodes)
+            .then(finalizeTopology, callback);
+        } else {
+          finalizeTopology();
         }
-
-        this.connectionPool.reset(nodes);
-        callback();
       }, this.options.slotsRefreshTimeout)
+    );
+  }
+
+  private selectNodeByAz(
+    nodes: Array<Redis | undefined>,
+    primary?: Redis
+  ): Redis | undefined {
+    const availableNodes = nodes.filter(Boolean) as Redis[];
+    const primaries = primary
+      ? [primary]
+      : availableNodes.filter((node) => !node.options.readOnly);
+    const replicas = primary
+      ? availableNodes.filter((node) => node !== primary)
+      : availableNodes.filter((node) => node.options.readOnly);
+    const isLocal = (node: Redis) =>
+      this.connectionPool.getAvailabilityZone(node) === this.options.clientAz;
+    const localReplicas = replicas.filter(isLocal);
+    const remoteReplicas = replicas.filter((node) => !isLocal(node));
+    const localPrimaries = primaries.filter(isLocal);
+    const remotePrimaries = primaries.filter((node) => !isLocal(node));
+    const pickFirstAvailable = (...groups: Redis[][]) => {
+      for (const group of groups) {
+        if (group.length) {
+          return sample(group);
+        }
+      }
+      return undefined;
+    };
+
+    if (this.options.scaleReads === "AZAffinity") {
+      return pickFirstAvailable(localReplicas, remoteReplicas, primaries);
+    }
+
+    return pickFirstAvailable(
+      localReplicas,
+      localPrimaries,
+      remoteReplicas,
+      remotePrimaries
     );
   }
 
