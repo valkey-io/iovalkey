@@ -78,10 +78,13 @@ class Pipeline extends Commander<{ type: "pipeline" }> {
     if (this._queue[position].name === "exec" && Array.isArray(value[1])) {
       const execLength = value[1].length;
       for (let i = 0; i < execLength; i++) {
+        const cmd = this._queue[position - (execLength - i)];
         if (value[1][i] instanceof Error) {
+          // Deliver the error to the command so write-time bookkeeping
+          // can be rolled back (e.g. a socket marked as having a script).
+          cmd?.reject(value[1][i]);
           continue;
         }
-        const cmd = this._queue[position - (execLength - i)];
         try {
           value[1][i] = cmd.transformReply(value[1][i]);
         } catch (err) {
