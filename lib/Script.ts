@@ -47,9 +47,15 @@ export default class Script {
 
       transformReply(result: Buffer | Buffer[]) {
         if (this._scriptInlined) {
-          if (String(result) === "QUEUED") {
-            // The command was queued by MULTI, not run: if the
-            // transaction is discarded the script is never cached.
+          if (this.inTransaction || String(result) === "QUEUED") {
+            // Queued by MULTI, not run: if the transaction is discarded the
+            // script is never cached. The flag is the reliable half and covers
+            // every command Pipeline sends. The reply check is what covers
+            // multi({ pipeline: false }), whose commands go straight to the
+            // client and carry no flag; the parser runs with returnBuffers, so
+            // that leg cannot tell +QUEUED from a script whose own result is
+            // the string "QUEUED", and over-clears for it. The cost is one
+            // redundant EVAL on the next call, never a wrong result.
             socketHasScriptLoaded.delete(this._scriptSocket);
           } else {
             socketHasScriptLoaded.add(this._scriptSocket);
