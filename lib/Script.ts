@@ -17,6 +17,9 @@ export default class Script {
     const sha = this.sha;
     const socketHasScriptLoaded = new WeakSet();
     this.Command = class CustomScriptCommand extends Command {
+      private _scriptSocket?: object;
+      private _scriptInlined = false;
+
       toWritable(socket: object): string | Buffer {
         const origReject = this.reject;
         this.reject = (err) => {
@@ -26,15 +29,39 @@ export default class Script {
           origReject.call(this, err);
         };
 
+        this._scriptSocket = socket;
+        this._scriptInlined = false;
         if (!socketHasScriptLoaded.has(socket)) {
-          socketHasScriptLoaded.add(socket);
+          // The mark is provisional: only the reply to this write proves
+          // whether the EVAL body actually ran on the server.
+          this._scriptInlined = true;
           this.name = "eval";
           this.args[0] = lua;
+          socketHasScriptLoaded.add(socket);
         } else if (this.name === "eval") {
           this.name = "evalsha";
           this.args[0] = sha;
         }
         return super.toWritable(socket);
+      }
+
+      transformReply(result: Buffer | Buffer[]) {
+        if (this._scriptInlined) {
+          if (this.inTransaction || String(result) === "QUEUED") {
+            // Queued by MULTI, not run: if the transaction is discarded the
+            // script is never cached. The flag is the reliable half and covers
+            // every command Pipeline sends. The reply check is what covers
+            // multi({ pipeline: false }), whose commands go straight to the
+            // client and carry no flag; the parser runs with returnBuffers, so
+            // that leg cannot tell +QUEUED from a script whose own result is
+            // the string "QUEUED", and over-clears for it. The cost is one
+            // redundant EVAL on the next call, never a wrong result.
+            socketHasScriptLoaded.delete(this._scriptSocket);
+          } else {
+            socketHasScriptLoaded.add(this._scriptSocket);
+          }
+        }
+        return super.transformReply(result);
       }
     };
   }
