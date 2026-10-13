@@ -72,3 +72,14 @@ jobs:
       - run: npm run build
       - run: npm run test:tsd
       - run: npm run test:cov || npm run test:cov || npm run test:cov
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+          cache: npm
+      - run: npm ci
+      - run: npm run format-check

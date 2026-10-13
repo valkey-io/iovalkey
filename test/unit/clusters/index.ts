@@ -57,7 +57,6 @@ describe("cluster", () => {
     });
   });
 
-
   describe("natMapper", () => {
     it("returns the original nodeKey if no NAT mapping is provided", () => {
       const cluster = new Cluster([]);
@@ -96,7 +95,6 @@ describe("cluster", () => {
       expect(result).to.eql({ host: "203.0.113.1", port: 6379 });
     });
   });
-
 });
 
 describe("nodeKeyToRedisOptions()", () => {
