@@ -57,11 +57,7 @@ export default class MockServer extends EventEmitter {
   private readonly port: number;
   private readonly slotTable?: any;
 
-  constructor(
-    port: number,
-    handler?: MockServerHandler,
-    slotTable?: any
-  ) {
+  constructor(port: number, handler?: MockServerHandler, slotTable?: any) {
     super();
     this.port = port;
     this.handler = handler;
