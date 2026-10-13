@@ -10,28 +10,36 @@ on:
       - 'docs/**'
       - '*.md'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test-redis:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
-        node: [18.x, 20.x, 22.x]
+        node: [18.x, 20.x, 22.x, 24.x]
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
 
       - name: Start Redis
         uses: supercharge/redis-github-action@1.4.0
         with:
           redis-version: latest
 
-      - run: npm install
+      - run: npm ci
       - run: npm run lint
       - run: npm run build
       - run: npm run test:tsd
@@ -40,7 +48,7 @@ jobs:
   test-cluster:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: Build and test cluster
         run: bash test/cluster/docker/main.sh
 
@@ -49,7 +57,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        node: [18.x, 20.x, 22.x]
+        node: [18.x, 20.x, 22.x, 24.x]
 
     services:
       valkey:
@@ -60,14 +68,15 @@ jobs:
 
     steps:
       - name: Git checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7
 
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
+          cache: npm
 
-      - run: npm install
+      - run: npm ci
       - run: npm run lint
       - run: npm run build
       - run: npm run test:tsd
