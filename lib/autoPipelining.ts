@@ -1,5 +1,5 @@
 import { isArguments, noop } from "./utils/lodash";
-import * as calculateSlot from "cluster-key-slot";
+import * as calculateSlot from "./utils/calculateSlot";
 import asCallback from "standard-as-callback";
 import { ArgumentType } from "./Command";
 
@@ -111,6 +111,10 @@ export function getFirstValueInFlattenedArray(
   return undefined;
 }
 
+function toBytes(value: string | Buffer | number | null | undefined): Buffer {
+  return Buffer.isBuffer(value) ? value : Buffer.from(String(value));
+}
+
 export function executeWithAutoPipelining(
   client,
   functionName: string,
@@ -145,12 +149,19 @@ export function executeWithAutoPipelining(
   // If we have slot information, we can improve routing by grouping slots served by the same subset of nodes
   // Note that the first value in args may be a (possibly empty) array.
   // ioredis will only flatten one level of the array, in the Command constructor.
-  const prefix = client.options.keyPrefix || "";
-  const slotKey = client.isCluster
-    ? client.slots[
-        calculateSlot(`${prefix}${getFirstValueInFlattenedArray(args)}`)
-      ].join(",")
-    : "main";
+  let slotKey = "main";
+  if (client.isCluster) {
+    const prefix = client.options.keyPrefix || "";
+    const key = getFirstValueInFlattenedArray(args);
+    // Hash Buffer keys and prefixes by their bytes, as Command#getSlot does;
+    // decoding them as UTF-8 can change the slot (ported from
+    // redis/ioredis#2208 and redis/ioredis#2243).
+    const slot =
+      Buffer.isBuffer(key) || Buffer.isBuffer(prefix)
+        ? calculateSlot(Buffer.concat([toBytes(prefix), toBytes(key)]))
+        : calculateSlot(`${prefix}${key}`);
+    slotKey = client.slots[slot].join(",");
+  }
 
   if (!client._autoPipelines.has(slotKey)) {
     const pipeline = client.pipeline();
