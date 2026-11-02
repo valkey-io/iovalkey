@@ -19,6 +19,7 @@ export default class Script {
     this.Command = class CustomScriptCommand extends Command {
       private _scriptSocket?: object;
       private _scriptInlined = false;
+      private _scriptAwaitingExec = false;
 
       toWritable(socket: object): string | Buffer {
         const origReject = this.reject;
@@ -31,6 +32,7 @@ export default class Script {
 
         this._scriptSocket = socket;
         this._scriptInlined = false;
+        this._scriptAwaitingExec = false;
         if (!socketHasScriptLoaded.has(socket)) {
           // The mark is provisional: only the reply to this write proves
           // whether the EVAL body actually ran on the server.
@@ -47,7 +49,14 @@ export default class Script {
 
       transformReply(result: Buffer | Buffer[]) {
         if (this._scriptInlined) {
-          if (this.inTransaction || String(result) === "QUEUED") {
+          if (this._scriptAwaitingExec) {
+            // Second reply: the EXEC array element for this command. Only a
+            // transaction that really ran reaches this call — a discard
+            // yields no EXEC array and error elements go to reject()
+            // instead — so the script is cached and the mark is real again.
+            socketHasScriptLoaded.add(this._scriptSocket);
+            this._scriptAwaitingExec = false;
+          } else if (this.inTransaction || String(result) === "QUEUED") {
             // Queued by MULTI, not run: if the transaction is discarded the
             // script is never cached. The flag is the reliable half and covers
             // every command Pipeline sends. The reply check is what covers
@@ -57,6 +66,7 @@ export default class Script {
             // the string "QUEUED", and over-clears for it. The cost is one
             // redundant EVAL on the next call, never a wrong result.
             socketHasScriptLoaded.delete(this._scriptSocket);
+            this._scriptAwaitingExec = true;
           } else {
             socketHasScriptLoaded.add(this._scriptSocket);
           }
