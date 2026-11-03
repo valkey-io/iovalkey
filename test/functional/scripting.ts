@@ -383,6 +383,31 @@ describe("scripting", () => {
     redis.disconnect();
   });
 
+  it("should send EVAL again after a queue-time error rejects an inlined EVAL", async () => {
+    const redis = new Redis();
+
+    redis.defineCommand("test", {
+      lua: `return 1 -- ${Date.now()}queuereject`,
+    });
+
+    // Without a numkeys argument, EVAL fails its arity check at queue time,
+    // so the script is never cached and the socket mark must be cleared.
+    // @ts-expect-error
+    await redis
+      .multi()
+      .test()
+      .exec()
+      .catch(() => {});
+
+    const commands = await getCommandsFromMonitor(redis, 1, async () => {
+      // @ts-expect-error
+      expect(await redis.test(1, "k")).to.eql(1);
+    });
+    expect(commands[0][0].toLowerCase()).to.eql("eval");
+
+    redis.disconnect();
+  });
+
   it("should support key prefixing", (done) => {
     const redis = new Redis({ keyPrefix: "foo:" });
 

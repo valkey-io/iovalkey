@@ -24,7 +24,8 @@ export default class Script {
       toWritable(socket: object): string | Buffer {
         const origReject = this.reject;
         this.reject = (err) => {
-          if (err.message.indexOf("NOSCRIPT") !== -1) {
+          // An inlined EVAL that was rejected may not have cached the script.
+          if (this._scriptInlined || err.message.indexOf("NOSCRIPT") !== -1) {
             socketHasScriptLoaded.delete(socket);
           }
           origReject.call(this, err);
