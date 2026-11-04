@@ -17,24 +17,62 @@ export default class Script {
     const sha = this.sha;
     const socketHasScriptLoaded = new WeakSet();
     this.Command = class CustomScriptCommand extends Command {
+      private _scriptSocket?: object;
+      private _scriptInlined = false;
+      private _scriptAwaitingExec = false;
+
       toWritable(socket: object): string | Buffer {
         const origReject = this.reject;
         this.reject = (err) => {
-          if (err.message.indexOf("NOSCRIPT") !== -1) {
+          // An inlined EVAL that was rejected may not have cached the script.
+          if (this._scriptInlined || err.message.indexOf("NOSCRIPT") !== -1) {
             socketHasScriptLoaded.delete(socket);
           }
           origReject.call(this, err);
         };
 
+        this._scriptSocket = socket;
+        this._scriptInlined = false;
+        this._scriptAwaitingExec = false;
         if (!socketHasScriptLoaded.has(socket)) {
-          socketHasScriptLoaded.add(socket);
+          // The mark is provisional: only the reply to this write proves
+          // whether the EVAL body actually ran on the server.
+          this._scriptInlined = true;
           this.name = "eval";
           this.args[0] = lua;
+          socketHasScriptLoaded.add(socket);
         } else if (this.name === "eval") {
           this.name = "evalsha";
           this.args[0] = sha;
         }
         return super.toWritable(socket);
+      }
+
+      transformReply(result: Buffer | Buffer[]) {
+        if (this._scriptInlined) {
+          if (this._scriptAwaitingExec) {
+            // Second reply: the EXEC array element for this command. Only a
+            // transaction that really ran reaches this call — a discard
+            // yields no EXEC array and error elements go to reject()
+            // instead — so the script is cached and the mark is real again.
+            socketHasScriptLoaded.add(this._scriptSocket);
+            this._scriptAwaitingExec = false;
+          } else if (this.inTransaction || String(result) === "QUEUED") {
+            // Queued by MULTI, not run: if the transaction is discarded the
+            // script is never cached. The flag is the reliable half and covers
+            // every command Pipeline sends. The reply check is what covers
+            // multi({ pipeline: false }), whose commands go straight to the
+            // client and carry no flag; the parser runs with returnBuffers, so
+            // that leg cannot tell +QUEUED from a script whose own result is
+            // the string "QUEUED", and over-clears for it. The cost is one
+            // redundant EVAL on the next call, never a wrong result.
+            socketHasScriptLoaded.delete(this._scriptSocket);
+            this._scriptAwaitingExec = true;
+          } else {
+            socketHasScriptLoaded.add(this._scriptSocket);
+          }
+        }
+        return super.transformReply(result);
       }
     };
   }

@@ -291,6 +291,123 @@ describe("scripting", () => {
     );
   });
 
+  it("should rerun the script after a transaction discarded by WATCH", async () => {
+    const redis = new Redis();
+    const other = new Redis();
+
+    redis.defineCommand("test", {
+      numberOfKeys: 1,
+      lua: `return 1 -- ${Date.now()}`,
+    });
+
+    await redis.watch("watched");
+    await other.set("watched", "changed");
+    // @ts-expect-error
+    expect(await redis.multi().test("k").exec()).to.eql(null);
+
+    // The discarded transaction never ran the script, so the next
+    // transaction must inline EVAL again instead of failing NOSCRIPT.
+    // @ts-expect-error
+    expect(await redis.multi().test("k").exec()).to.eql([[null, 1]]);
+
+    other.disconnect();
+    redis.disconnect();
+  });
+
+  it("should rerun the script after a DISCARDed transaction", async () => {
+    const redis = new Redis();
+
+    redis.defineCommand("test", {
+      numberOfKeys: 1,
+      lua: `return 1 -- ${Date.now()}discard`,
+    });
+
+    await redis.multi({ pipeline: false });
+    // @ts-expect-error
+    expect(await redis.test("k")).to.eql("QUEUED");
+    await redis.discard();
+
+    // @ts-expect-error
+    expect(await redis.multi().test("k").exec()).to.eql([[null, 1]]);
+
+    redis.disconnect();
+  });
+
+  it("should fall back to EVAL after a NOSCRIPT inside EXEC", async () => {
+    const redis = new Redis();
+
+    redis.defineCommand("test", {
+      numberOfKeys: 1,
+      lua: `return 1 -- ${Date.now()}noscript`,
+    });
+
+    // @ts-expect-error
+    await redis.test("k");
+    await redis.script("flush");
+
+    // @ts-expect-error
+    const [[err]] = await redis.multi().test("k").exec();
+    expect(err.message).to.match(/^NOSCRIPT No matching script/);
+
+    // The connection must have unlearned the script, so the next call
+    // sends EVAL rather than EVALSHA.
+    const commands = await getCommandsFromMonitor(redis, 1, async () => {
+      // @ts-expect-error
+      await redis.test("k");
+    });
+    expect(commands[0][0].toLowerCase()).to.eql("eval");
+
+    redis.disconnect();
+  });
+
+  it("should keep the socket marked after a successful MULTI/EXEC", async () => {
+    const redis = new Redis();
+
+    redis.defineCommand("test", {
+      numberOfKeys: 1,
+      lua: `return 1 -- ${Date.now()}execmark`,
+    });
+
+    // The script's first run happens inside the transaction: EVAL is
+    // queued and its body really runs inside EXEC, so the socket mark
+    // must survive and the next call may go out as EVALSHA.
+    // @ts-expect-error
+    expect(await redis.multi().test("k").exec()).to.eql([[null, 1]]);
+
+    const commands = await getCommandsFromMonitor(redis, 1, async () => {
+      // @ts-expect-error
+      expect(await redis.test("k")).to.eql(1);
+    });
+    expect(commands[0][0].toLowerCase()).to.eql("evalsha");
+
+    redis.disconnect();
+  });
+
+  it("should send EVAL again after a queue-time error rejects an inlined EVAL", async () => {
+    const redis = new Redis();
+
+    redis.defineCommand("test", {
+      lua: `return 1 -- ${Date.now()}queuereject`,
+    });
+
+    // Without a numkeys argument, EVAL fails its arity check at queue time,
+    // so the script is never cached and the socket mark must be cleared.
+    // @ts-expect-error
+    await redis
+      .multi()
+      .test()
+      .exec()
+      .catch(() => {});
+
+    const commands = await getCommandsFromMonitor(redis, 1, async () => {
+      // @ts-expect-error
+      expect(await redis.test(1, "k")).to.eql(1);
+    });
+    expect(commands[0][0].toLowerCase()).to.eql("eval");
+
+    redis.disconnect();
+  });
+
   it("should support key prefixing", (done) => {
     const redis = new Redis({ keyPrefix: "foo:" });
 
